@@ -58,6 +58,33 @@ npm run build && npm run preview
 
 ---
 
+## Project Architecture
+
+Built with **React 19 + TypeScript + Vite + Tailwind CSS v4 + Zustand + Lucide Icons**, with a strict 3-layer separation keeping all audio, AI inference, and WASM engines 100% framework-agnostic:
+
+```text
+src/
+├── engine/                 # Framework-agnostic pure TypeScript engines
+│   ├── lilypond.ts         # Browser LilyPond WASM compiler + crash auto-recovery
+│   ├── arpeggio.ts         # Scheme engraver hook + Mutopia sanitizer + arpeggio restoration
+│   ├── pianoflow.ts        # WebGPU/WASM Flow Matching + all 7 modes + DP MIDI aligner
+│   ├── pianoAudio.ts       # 5-layer Salamander + SpessaSynth SF2 + Sympathetic Worklet + Hall IR
+│   ├── presets.ts          # Built-in score presets
+│   └── instances.ts        # Shared engine singletons (60fps canvas reads without React re-renders)
+├── store/
+│   └── useStudioStore.ts   # Zustand global studio state & actions
+└── components/             # Modular Studio UI
+    ├── TopBar.tsx
+    ├── ScoreSidebar.tsx
+    ├── PipelineHeader.tsx
+    ├── TransportBar.tsx
+    ├── PianoRollCanvas.tsx
+    ├── WorkbenchPanel.tsx
+    └── SheetMusicPanel.tsx
+```
+
+---
+
 ## Credits & Open-Source Assets
 
 - Expressive performance model: [SyMuPe / PianoFlow-base](https://huggingface.co/SyMuPe/PianoFlow-base)

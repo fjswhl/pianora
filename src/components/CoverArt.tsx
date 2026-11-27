@@ -8,7 +8,12 @@ export type CoverEdition =
   | 'fantasia'
   | 'tema'
   | 'allegro'
-  | 'andante';
+  | 'andante'
+  | 'baroque'
+  | 'beethoven'
+  | 'romantic'
+  | 'liszt'
+  | 'satie';
 
 // Resolution-independent prints for all library editions and the featured keyboard.
 export function CoverArt({ edition }: { edition: CoverEdition }) {
@@ -85,6 +90,11 @@ export function CoverArt({ edition }: { edition: CoverEdition }) {
         tema: ['#dad0aa', '#6e5b2e', 142],
         allegro: ['#bfd2c4', '#335d4c', 228],
         andante: ['#d8c2b7', '#744c40', 168],
+        baroque: ['#cfc5a8', '#5c4b27', 96],
+        beethoven: ['#c2b6b2', '#523432', 252],
+        romantic: ['#d4bcc3', '#6b3e4f', 190],
+        liszt: ['#b5c0d4', '#364a70', 302],
+        satie: ['#c4ccc7', '#425954', 124],
       };
       const [paper, ink, moonX] = colors[edition];
       ctx.fillStyle = paper;

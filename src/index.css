@@ -255,6 +255,39 @@ body {
 .shelf {
   margin-top: 35px;
 }
+.composer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+.composer-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fffef8;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.composer-tab span {
+  font-size: 11px;
+  opacity: 0.72;
+}
+.composer-tab:hover {
+  border-color: #69856e;
+  color: var(--ink);
+}
+.composer-tab.active {
+  background: #1f4536;
+  border-color: #1f4536;
+  color: #fcf8e5;
+}
 .shelf header,
 .card-copy > div,
 .card-copy footer {

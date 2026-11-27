@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -38,6 +39,27 @@ export const editions: Record<string, EditionMeta> = {
     bars: 48,
     art: 'dew',
   },
+  bach_goldberg_aria: {
+    name: '哥德堡变奏曲 · 咏叹调',
+    title: 'Goldberg Aria · BWV 988',
+    credit: 'J. S. Bach',
+    bars: 32,
+    art: 'baroque',
+  },
+  bach_invention_01: {
+    name: 'C 大调二部创意曲 No.1',
+    title: 'Invention No. 1 · BWV 772',
+    credit: 'J. S. Bach',
+    bars: 22,
+    art: 'baroque',
+  },
+  bach_wtc1_prelude1: {
+    name: '平均律第一册 C 大调前奏曲',
+    title: 'WTC I · Prelude in C',
+    credit: 'J. S. Bach',
+    bars: 35,
+    art: 'baroque',
+  },
   mozart_fantasia_k397: {
     name: 'D 小调幻想曲 K.397',
     title: 'Fantasia in D minor',
@@ -66,10 +88,139 @@ export const editions: Record<string, EditionMeta> = {
     bars: 74,
     art: 'andante',
   },
+  beethoven_fur_elise: {
+    name: '致爱丽丝 WoO 59',
+    title: 'Für Elise',
+    credit: 'L. van Beethoven',
+    bars: 105,
+    art: 'beethoven',
+  },
+  beethoven_pathetique_1: {
+    name: '悲怆奏鸣曲 Op.13 I',
+    title: 'Pathétique · I. Grave',
+    credit: 'L. van Beethoven',
+    bars: 312,
+    art: 'beethoven',
+  },
+  beethoven_pathetique_2: {
+    name: '悲怆奏鸣曲 Op.13 II',
+    title: 'Pathétique · II. Adagio',
+    credit: 'L. van Beethoven',
+    bars: 73,
+    art: 'andante',
+  },
+  beethoven_pathetique_3: {
+    name: '悲怆奏鸣曲 Op.13 III',
+    title: 'Pathétique · III. Rondo',
+    credit: 'L. van Beethoven',
+    bars: 210,
+    art: 'beethoven',
+  },
+  beethoven_tempest_1: {
+    name: '暴风雨奏鸣曲 Op.31 No.2 I',
+    title: 'Tempest Sonata · I',
+    credit: 'L. van Beethoven',
+    bars: 232,
+    art: 'fantasia',
+  },
+  schumann_op15_no1: {
+    name: '童年情景 · 异国与异国人民',
+    title: 'Kinderszenen · Op.15 No.1',
+    credit: 'Robert Schumann',
+    bars: 22,
+    art: 'romantic',
+  },
+  schumann_traumerei: {
+    name: '童年情景 · 梦幻曲',
+    title: 'Träumerei · Op.15 No.7',
+    credit: 'Robert Schumann',
+    bars: 24,
+    art: 'romantic',
+  },
+  liszt_consolation_1: {
+    name: '安慰曲 No.1',
+    title: 'Consolation No. 1',
+    credit: 'Franz Liszt',
+    bars: 25,
+    art: 'liszt',
+  },
+  liszt_consolation_3: {
+    name: '安慰曲 No.3 降 D 大调',
+    title: 'Consolation No. 3',
+    credit: 'Franz Liszt',
+    bars: 61,
+    art: 'liszt',
+  },
+  liszt_consolation_4: {
+    name: '安慰曲 No.4',
+    title: 'Consolation No. 4',
+    credit: 'Franz Liszt',
+    bars: 34,
+    art: 'liszt',
+  },
+  debussy_arabesque_1: {
+    name: '第一号阿拉伯风格曲',
+    title: 'Première Arabesque',
+    credit: 'Claude Debussy',
+    bars: 106,
+    art: 'moon',
+  },
+  debussy_arabesque_2: {
+    name: '第二号阿拉伯风格曲',
+    title: 'Deuxième Arabesque',
+    credit: 'Claude Debussy',
+    bars: 110,
+    art: 'allegro',
+  },
+  satie_gnossienne_1: {
+    name: '玄秘曲 No.1',
+    title: 'Gnossienne No. 1',
+    credit: 'Erik Satie',
+    bars: 82,
+    art: 'satie',
+  },
+  satie_gymnopedie_1: {
+    name: '裸体歌舞 No.1',
+    title: 'Gymnopédie No. 1',
+    credit: 'Erik Satie',
+    bars: 47,
+    art: 'satie',
+  },
+  satie_gymnopedie_2: {
+    name: '裸体歌舞 No.2',
+    title: 'Gymnopédie No. 2',
+    credit: 'Erik Satie',
+    bars: 65,
+    art: 'satie',
+  },
+  satie_gymnopedie_3: {
+    name: '裸体歌舞 No.3',
+    title: 'Gymnopédie No. 3',
+    credit: 'Erik Satie',
+    bars: 59,
+    art: 'satie',
+  },
 };
 
+const COMPOSER_FILTERS = [
+  { id: 'all', label: '全部' },
+  { id: 'Bach', label: '巴赫' },
+  { id: 'Mozart', label: '莫扎特' },
+  { id: 'Beethoven', label: '贝多芬' },
+  { id: 'Schumann', label: '舒曼' },
+  { id: 'Liszt', label: '李斯特' },
+  { id: 'Debussy', label: '德彪西' },
+  { id: 'Satie', label: '萨蒂' },
+  { id: 'Pianora', label: 'Pianora' },
+];
+
 export function Library({ openScore }: { openScore: (id: string) => void }) {
-  const presets = scorePresets;
+  const [composer, setComposer] = useState('all');
+  const presets =
+    composer === 'all'
+      ? scorePresets
+      : scorePresets.filter((p) => p.composer === composer);
+
   return (
     <>
       <section className="feature">
@@ -94,8 +245,28 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
             <BookOpen size={15} /> {presets.length} 部作品
           </span>
         </header>
+        <div className="composer-tabs" role="tablist" aria-label="按作曲家筛选">
+          {COMPOSER_FILTERS.map((f) => {
+            const count =
+              f.id === 'all'
+                ? scorePresets.length
+                : scorePresets.filter((p) => p.composer === f.id).length;
+            return (
+              <button
+                key={f.id}
+                role="tab"
+                aria-selected={composer === f.id}
+                className={composer === f.id ? 'composer-tab active' : 'composer-tab'}
+                onClick={() => setComposer(f.id)}
+              >
+                {f.label} <span>{count}</span>
+              </button>
+            );
+          })}
+        </div>
         <div className="score-grid">
-          {presets.map((p, index) => {
+          {presets.map((p) => {
+            const globalIdx = scorePresets.indexOf(p);
             const e = editions[p.id] ?? {
               name: p.name,
               title: p.name,
@@ -111,7 +282,9 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
               >
                 <div className="jacket">
                   <CoverArt edition={e.art} />
-                  <span className="catalogue-no">PN / {String(index + 1).padStart(3, '0')}</span>
+                  <span className="catalogue-no">
+                    PN / {String(globalIdx + 1).padStart(3, '0')}
+                  </span>
                 </div>
                 <div className="card-copy">
                   <div>

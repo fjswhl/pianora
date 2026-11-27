@@ -1,0 +1,18 @@
+# Dependencies & build outputs
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Logs & OS files
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.local
+
+# Large local runtime/model/soundfont binaries (auto-restored via npm run setup:*)
+public/ort/
+public/spessa/
+public/soundfonts/*.sf2
+public/soundfonts/*.sf3
+public/models/*.onnx

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pianora 琴境 — AI Grand Piano Performance Studio</title>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --panel: #131929;
+      --panel-2: #192136;
+      --border: #26314d;
+      --text: #e6ecff;
+      --muted: #8b98bc;
+      --gold: #f0c975;
+      --gold-dim: rgba(240, 201, 117, 0.16);
+      --cyan: #67d4ff;
+      --green: #4ade80;
+      --purple: #a78bfa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at 20% 0%, #17203a 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      padding: 14px 22px; border-bottom: 1px solid var(--border);
+      background: rgba(11, 15, 26, 0.88); backdrop-filter: blur(10px);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--gold), #a67c32);
+      display: grid; place-items: center; font-size: 20px; color: #0b0f1a; font-weight: 800;
+    }
+    .brand h1 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+    .zero-tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 999px;
+      background: rgba(74, 222, 128, 0.16); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.4);
+    }
+    .brand p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status-pill {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; padding: 6px 11px; border-radius: 999px;
+      background: var(--panel-2); border: 1px solid var(--border); color: var(--muted);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+    .dot.ok { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .dot.busy { background: var(--gold); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .layout {
+      display: grid; grid-template-columns: 440px 1fr; gap: 16px;
+      padding: 16px 20px 26px; max-width: 1680px; margin: 0 auto;
+    }
+    @media (max-width: 1080px) { .layout { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .card-title {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 14px; font-weight: 600; margin: 0 0 12px;
+    }
+    select, input[type="number"], textarea {
+      background: #0d1220; border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none;
+    }
+    select:focus, input:focus, textarea:focus { border-color: var(--gold); }
+    #lyEditor {
+      width: 100%; height: 380px; resize: vertical; margin-top: 8px;
+      font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+      font-size: 12px; line-height: 1.5; color: #d7e2ff;
+    }
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+    .ctrl label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .ctrl label span { color: var(--gold); font-weight: 600; }
+    .ctrl input[type="range"] { width: 100%; accent-color: var(--gold); }
+    .ctrl.full { grid-column: span 2; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+      padding: 9px 14px; border-radius: 9px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn:hover:not(:disabled) { border-color: var(--gold); transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, #f0c975, #d49c3d);
+      color: #0b0f1a; border-color: transparent; width: 100%; padding: 11px 16px; font-size: 14px;
+    }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .progress-wrap {
+      display: none; margin-top: 10px; background: #0d1220;
+      border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    }
+    .progress-msg { font-size: 12px; color: var(--cyan); margin-bottom: 6px; }
+    .progress-track { height: 6px; border-radius: 999px; background: #1e2943; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--gold)); transition: width 0.18s; }
+
+    .pipeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+    @media (max-width: 900px) { .pipeline { grid-template-columns: repeat(2, 1fr); } }
+    .stage {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px; font-size: 12px;
+    }
+    .stage.active { border-color: var(--gold); background: rgba(240, 201, 117, 0.08); }
+    .stage.done { border-color: rgba(74, 222, 128, 0.45); }
+    .stage .st-num { font-size: 11px; color: var(--muted); }
+    .stage .st-name { font-weight: 600; margin: 3px 0; }
+    .stage .st-stat { font-size: 11px; color: var(--cyan); min-height: 15px; }
+
+    .ab-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .ab-btn {
+      text-align: left; padding: 10px 12px; border-radius: 10px;
+      background: #0e1424; border: 1px solid var(--border); color: var(--text); cursor: pointer;
+    }
+    .ab-btn:hover { border-color: #465886; }
+    .ab-btn.selected { border-color: var(--gold); background: var(--gold-dim); }
+    .ab-btn .ab-title { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .ab-btn .ab-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .badge { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: rgba(103, 212, 255, 0.14); color: var(--cyan); }
+    .badge.hq { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+    .badge.score { background: rgba(139, 152, 188, 0.15); color: var(--muted); }
+
+    .player-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 10px 12px; border-radius: 10px;
+      background: #0d1220; border: 1px solid var(--border); margin-bottom: 12px;
+    }
+    .seek-wrap { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 8px; }
+    .seek-wrap input[type="range"] { flex: 1; accent-color: var(--gold); }
+    .time-txt { font-family: monospace; font-size: 12px; color: var(--muted); min-width: 86px; text-align: right; }
+
+    .viz-box {
+      border-radius: 10px; overflow: hidden; border: 1px solid var(--border);
+      background: #080c15; margin-bottom: 12px;
+    }
+    #pianoCanvas { display: block; width: 100%; height: 220px; }
+
+    .chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .chip {
+      font-size: 12px; padding: 5px 10px; border-radius: 999px;
+      background: rgba(167, 139, 250, 0.12); border: 1px solid rgba(167, 139, 250, 0.35);
+      color: #d8c8ff; cursor: pointer;
+    }
+    .chip:hover { background: rgba(167, 139, 250, 0.25); }
+
+    .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
+    .tab-btn {
+      background: transparent; border: none; color: var(--muted);
+      font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    }
+    .tab-btn.active { background: var(--panel-2); color: var(--gold); }
+    .svg-gallery { display: flex; flex-direction: column; gap: 12px; max-height: 520px; overflow-y: auto; }
+    .svg-page { background: #fff; border-radius: 8px; padding: 10px; overflow-x: auto; }
+    .svg-page img { width: 100%; height: auto; display: block; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); }
+    .err-box {
+      display: none; margin-top: 10px; padding: 10px 12px; border-radius: 8px;
+      background: rgba(248, 113, 113, 0.12); border: 1px solid rgba(248, 113, 113, 0.4);
+      color: #fecaca; font-size: 12px; white-space: pre-wrap;
+    }
+
+    /* Takes Pool & 7-Mode Studio Workbench */
+    .takes-bar {
+      display: none; gap: 8px; overflow-x: auto; padding: 8px 2px 10px; margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .takes-bar.visible { display: flex; }
+    .take-card {
+      flex: 0 0 auto; min-width: 158px; max-width: 210px; text-align: left;
+      padding: 8px 10px; border-radius: 10px; cursor: pointer;
+      background: #0d1323; border: 1px solid var(--border); color: var(--text);
+      transition: all 0.15s;
+    }
+    .take-card:hover { border-color: #4d6294; }
+    .take-card.active { border-color: var(--gold); background: var(--gold-dim); }
+    .take-card .tk-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .take-card .tk-meta { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+    .mode-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .mode-pill {
+      background: #0e1424; border: 1px solid var(--border); color: var(--muted);
+      padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-pill:hover { border-color: #4b5f8f; color: var(--text); }
+    .mode-pill.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+    .mode-pane { display: none; background: #0d1220; border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px; }
+    .mode-pane.active { display: block; }
+    .mode-desc { font-size: 12px; color: var(--muted); margin: 0 0 11px; line-height: 1.5; }
+    .mode-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+    .mode-row label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+    .mode-row input[type="number"] { width: 70px; padding: 5px 8px; font-size: 12px; }
+    .dim-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+    .dim-chk {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px;
+      background: var(--panel-2); border: 1px solid var(--border); font-size: 12px; cursor: pointer;
+    }
+    .cue-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .cue-item {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 7px 10px;
+      border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); font-size: 12px;
+    }
+    .cue-item input[type="number"] { width: 58px; padding: 4px 6px; }
+    .live-box {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0;
+      padding: 12px; border-radius: 10px; background: rgba(103, 212, 255, 0.06); border: 1px solid rgba(103, 212, 255, 0.25);
+    }
+    .live-slider label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+    .live-slider input[type="range"] { width: 100%; accent-color: var(--cyan); }
+    .live-status { font-size: 12px; color: var(--cyan); margin-top: 8px; min-height: 18px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">♪</div>
+      <div>
+        <h1>Pianora <span style="font-weight:400; color:var(--gold); font-size:14px;">琴境</span> <span class="zero-tag">100% 纯前端 · 零后端</span></h1>
+        <p>LilyPond WASM → Scheme 符号提取 → Flow Matching AI (WebGPU) → 7 大交互指挥玩法 → 多力度大三角 + 琴弦共鸣 + 音乐厅卷积</p>
+      </div>
+    </div>
+    <div class="pills">
+      <div class="status-pill"><span id="wasmDot" class="dot busy"></span><span id="wasmStatus">LilyPond WASM 待命</span></div>
+      <div class="status-pill"><span id="ortDot" class="dot busy"></span><span id="ortStatus">PianoFlow ONNX 待加载</span></div>
+      <div class="status-pill"><span id="pianoDot" class="dot busy"></span><span id="pianoStatus">加载 5 层 Yamaha C5...</span></div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="card-title">
+        <span>① LilyPond (.ly) 源码输入</span>
+        <label class="btn btn-sm" style="cursor:pointer;">
+          导入本地 .ly
+          <input id="fileInput" type="file" accept=".ly,.txt" style="display:none" />
+        </label>
+      </div>
+
+      <select id="presetSelect" style="width:100%;"></select>
+      <textarea id="lyEditor" spellcheck="false"></textarea>
+
+      <div class="controls-grid">
+        <div class="ctrl">
+          <label>Flow Matching 步数 <span id="stepsVal">10</span></label>
+          <input id="stepsSlider" type="range" min="4" max="20" step="1" value="10" />
+        </div>
+        <div class="ctrl">
+          <label>发挥大胆度 Factor <span id="factorVal">0.75</span></label>
+          <input id="factorSlider" type="range" min="0.50" max="1.00" step="0.05" value="0.75" />
+        </div>
+        <div class="ctrl">
+          <label>随机种子 Seed</label>
+          <input id="seedInput" type="number" value="42" style="width:100%" />
+        </div>
+        <div class="ctrl">
+          <label>初始抽卡数 Takes</label>
+          <select id="batchCountSelect" style="width:100%; padding:6px 8px;">
+            <option value="1" selected>1 版（单次快速）</option>
+            <option value="2">2 版盲盒对比</option>
+            <option value="4">4 版盲盒抽卡</option>
+            <option value="6">6 版深度抽卡</option>
+            <option value="8">8 版海选抽卡</option>
+          </select>
+        </div>
+        <div class="ctrl full">
+          <label>④ 琶音滚奏时长基准（拖拽即时生效） <span id="arpVal">240 ms</span></label>
+          <input id="arpSlider" type="range" min="100" max="400" step="10" value="240" />
+        </div>
+      </div>
+
+      <button id="renderBtn" class="btn btn-primary">🚀 纯浏览器执行 5 阶段 AI 演奏流水线</button>
+
+      <div id="progressWrap" class="progress-wrap">
+        <div id="progressMsg" class="progress-msg">准备中...</div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      </div>
+      <div id="errBox" class="err-box"></div>
+    </section>
+
+    <section style="display:flex; flex-direction:column; gap:14px;">
+      <div class="card">
+        <div class="pipeline">
+          <div id="st1" class="stage"><div class="st-num">STAGE 1 (WASM)</div><div class="st-name">.ly 编译</div><div class="st-stat" id="st1Stat">待运行</div></div>
+          <div id="st2" class="stage"><div class="st-num">STAGE 2 (Scheme)</div><div class="st-name">装饰音提取</div><div class="st-stat" id="st2Stat">待运行</div></div>
+          <div id="st3" class="stage"><div class="st-num">STAGE 3 (ONNX)</div><div class="st-name">PianoFlow AI</div><div class="st-stat" id="st3Stat">待运行</div></div>
+          <div id="st4" class="stage"><div class="st-num">STAGE 4 (TS)</div><div class="st-name">符号精准还原</div><div class="st-stat" id="st4Stat">待运行</div></div>
+          <div id="st5" class="stage"><div class="st-num">STAGE 5 (WebAudio)</div><div class="st-name">真实三角钢琴</div><div class="st-stat" id="st5Stat">Salamander C5</div></div>
+        </div>
+
+        <div id="takesBar" class="takes-bar"></div>
+
+        <div class="ab-bar">
+          <button class="ab-btn" data-track="score">
+            <div class="ab-title"><span>1. 原谱机械版</span><span class="badge score" id="qScore">Score</span></div>
+            <div class="ab-sub">lilypond-wasm 直出裸 MIDI</div>
+          </button>
+          <button class="ab-btn" data-track="pianoflow_raw">
+            <div class="ab-title"><span>2. PianoFlow AI 原版</span><span class="badge" id="qRaw">ONNX</span></div>
+            <div class="ab-sub">浏览器内流匹配 AI 演奏（未还原琶音）</div>
+          </button>
+          <button class="ab-btn selected" data-track="final_restored">
+            <div class="ab-title"><span>3. ✨ 符号还原终极版</span><span class="badge hq" id="qFinal">Restored</span></div>
+            <div class="ab-sub">AI 表现力 + Scheme 精准滚奏琶音</div>
+          </button>
+        </div>
+
+        <div class="player-bar">
+          <button id="playBtn" class="btn btn-sm" disabled>▶ 播放</button>
+          <button id="stopBtn" class="btn btn-sm" disabled>⏹ 停止</button>
+          <div class="seek-wrap">
+            <input id="seekSlider" type="range" min="0" max="100" step="0.1" value="0" disabled />
+            <span id="timeTxt" class="time-txt">00:00 / 00:00</span>
+          </div>
+          <select id="timbreSelect" title="切换高质量三角钢琴音色" style="max-width:260px; padding:6px 8px; font-size:12px;"></select>
+          <label class="btn btn-sm" style="cursor:pointer;" title="拖入/选择任意本地 .sf2 / .sf3 精品钢琴音色库">
+            📂 本地 SF2
+            <input id="sf2Input" type="file" accept=".sf2,.sf3,.dls" style="display:none" />
+          </label>
+          <select id="hallSelect" title="真实音乐厅卷积混响空间 (ConvolverNode IR)" style="max-width:190px; padding:6px 8px; font-size:12px;"></select>
+          <label style="font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px;" title="真实音乐厅卷积混响干湿比">
+            厅堂 <input id="reverbSlider" type="range" min="0" max="0.65" step="0.05" value="0.28" style="width:62px; accent-color:var(--gold);" />
+          </label>
+          <label style="font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px;" title="AudioWorklet 琴弦交感共鸣 & 音板踏板共鸣强度">
+            弦共鸣 <input id="resSlider" type="range" min="0" max="1.0" step="0.05" value="0.55" style="width:62px; accent-color:var(--cyan);" />
+          </label>
+          <button id="dlMidiBtn" class="btn btn-sm" disabled>⬇ MIDI</button>
+          <button id="exportWavBtn" class="btn btn-sm" disabled>🎵 导出 WAV</button>
+        </div>
+        <div id="timbreDesc" style="font-size:11px; color:var(--muted); margin:-6px 0 10px 4px;"></div>
+
+        <div class="viz-box">
+          <canvas id="pianoCanvas" width="1060" height="220"></canvas>
+        </div>
+
+        <div id="chipsSection" style="display:none;">
+          <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
+            🎯 点击任意检测到的 <code>\arpeggio</code> 位置，直接跳到前 1.5 秒并随时切换 1/2/3 轨盲听对比：
+          </div>
+          <div id="chipsWrap" class="chips-wrap"></div>
+        </div>
+      </div>
+
+      <div class="card" id="studioModesCard">
+        <div class="card-title">
+          <span>🎛️ PianoFlow 7 大进阶演奏玩法（纯浏览器 WebGPU 实时操控）</span>
+          <span id="barCountBadge" class="badge">先点击左侧执行流水线解锁</span>
+        </div>
+
+        <div class="mode-pills">
+          <button class="mode-pill active" data-mode="m1">① 🎲 批量盲盒抽卡</button>
+          <button class="mode-pill" data-mode="m2">② ✂️ 锁前半段续弹</button>
+          <button class="mode-pill" data-mode="m3">🩹 ③ 局部挖空重弹</button>
+          <button class="mode-pill" data-mode="m4">🎛️ ④ 拆维度精修</button>
+          <button class="mode-pill" data-mode="m5">🎼 ⑤ 分段指挥家</button>
+          <button class="mode-pill" data-mode="m6">🎚️ ⑥ 实时滑块指挥</button>
+          <button class="mode-pill" data-mode="m7">👑 ⑦ 大师风格接力</button>
+        </div>
+
+        <!-- Mode 1: Batch Gacha -->
+        <div id="pane-m1" class="mode-pane active">
+          <p class="mode-desc">一次并行抽出多版不同虚拟钢琴家演绎（自动递增 Seed），全部放进上方「版本池」供一键切换盲听对比。</p>
+          <div class="mode-row">
+            <label>抽卡版数
+              <select id="m1Count">
+                <option value="2">2 版</option>
+                <option value="4" selected>4 版</option>
+                <option value="6">6 版</option>
+                <option value="8">8 版</option>
+              </select>
+            </label>
+            <label>起始 Seed <input id="m1Seed" type="number" value="100" /></label>
+            <button id="m1RunBtn" class="btn btn-sm" disabled>🎲 开始批量抽卡</button>
+          </div>
+        </div>
+
+        <!-- Mode 2: Prefix Lock Continuation -->
+        <div id="pane-m2" class="mode-pane">
+          <p class="mode-desc">基于上方当前选中的版本：把前 <b>X</b> 小节的弹法原封不动锁死为条件上下文，只把后面重新抽出 1~4 种不同走向无缝接上。</p>
+          <div class="mode-row">
+            <label>锁死前 <input id="m2LockBars" type="number" min="1" value="2" /> 小节</label>
+            <label>续弹版数
+              <select id="m2Count">
+                <option value="1">1 版</option>
+                <option value="2" selected>2 版</option>
+                <option value="4">4 版</option>
+              </select>
+            </label>
+            <label>新 Seed <input id="m2Seed" type="number" value="202" /></label>
+            <button id="m2RunBtn" class="btn btn-sm" disabled>✂️ 锁死前段并续弹</button>
+          </div>
+        </div>
+
+        <!-- Mode 3: Bidirectional Inpainting -->
+        <div id="pane-m3" class="mode-pane">
+          <p class="mode-desc">像 PS 局部重绘：锁死开头与结尾，只把中间第 <b>A ~ B</b> 小节打上遮罩。PianoFlow 同时盯着前后两头，丝滑重弹并无缝缝合。</p>
+          <div class="mode-row">
+            <label>挖空重弹：第 <input id="m3StartBar" type="number" min="1" value="2" /> 小节</label>
+            <label>至第 <input id="m3EndBar" type="number" min="1" value="3" /> 小节</label>
+            <label>新 Seed <input id="m3Seed" type="number" value="303" /></label>
+            <button id="m3RunBtn" class="btn btn-sm" disabled>🩹 局部双向缝合重弹</button>
+          </div>
+        </div>
+
+        <!-- Mode 4: Per-Dimension Selective Resampling -->
+        <div id="pane-m4" class="mode-pane">
+          <p class="mode-desc">锁死满意的维度，只重算勾选的演奏维度（例如保持原节奏呼吸，只重打磨强弱力度，或只重配踏板延音）。</p>
+          <div class="mode-row">
+            <button class="btn btn-sm m4-preset" data-dims="1,0,0,0">锁快慢，只重弹轻重</button>
+            <button class="btn btn-sm m4-preset" data-dims="0,1,0,0">锁轻重，只重调呼吸</button>
+            <button class="btn btn-sm m4-preset" data-dims="0,0,0,1">只重踩踏板延音</button>
+            <button class="btn btn-sm m4-preset" data-dims="0,0,1,1">重修触键连断 + 踏板</button>
+          </div>
+          <div class="dim-grid">
+            <label class="dim-chk"><input id="dimVel" type="checkbox" checked /> 轻重力度 (Velocity)</label>
+            <label class="dim-chk"><input id="dimTime" type="checkbox" /> 快慢呼吸 (TimeShift)</label>
+            <label class="dim-chk"><input id="dimDur" type="checkbox" /> 手指连断奏 (Duration)</label>
+            <label class="dim-chk"><input id="dimSus" type="checkbox" /> 踏板延音 (Sustain)</label>
+          </div>
+          <div class="mode-row">
+            <label>作用小节：第 <input id="m4StartBar" type="number" min="1" value="1" /> ~ <input id="m4EndBar" type="number" min="1" value="4" /> 小节</label>
+            <label>新 Seed <input id="m4Seed" type="number" value="404" /></label>
+            <button id="m4RunBtn" class="btn btn-sm" disabled>🎛️ 仅重算勾选维度</button>
+          </div>
+        </div>
+
+        <!-- Mode 5: Conductor Timeline -->
+        <div id="pane-m5" class="mode-pane">
+          <p class="mode-desc">像指挥家一样分段设定宏观速度倍率与强弱方向，在 Flow Matching ODE 每一步施加引导，让 AI 自动补齐细腻呼吸与声部平衡。</p>
+          <div id="cueList" class="cue-list"></div>
+          <div class="mode-row">
+            <button id="addCueBtn" class="btn btn-sm">+ 添加指挥段落</button>
+            <button id="presetMoonCueBtn" class="btn btn-sm">🌙 填入推荐表情曲线</button>
+            <label>Seed <input id="m5Seed" type="number" value="505" /></label>
+            <button id="m5RunBtn" class="btn btn-sm" disabled>🎼 按指挥曲线生成</button>
+          </div>
+        </div>
+
+        <!-- Mode 6: Real-Time Live Sliding-Window Conductor -->
+        <div id="pane-m6" class="mode-pane">
+          <p class="mode-desc">边听边拖滑块！采用 0.25s 实时滑动时间窗：拖动速度或强弱滑块瞬间丢弃未播缓存，约 0.2~0.3 秒内 AI 钢琴家立刻跟着你的手势改变演奏表情。</p>
+          <div class="live-box">
+            <div class="live-slider">
+              <label><span>🚀 实时速度倍率</span><span id="liveTempoVal" style="color:var(--cyan);font-weight:700;">1.00x (原速)</span></label>
+              <input id="liveTempoSlider" type="range" min="0.65" max="1.45" step="0.05" value="1.00" />
+            </div>
+            <div class="live-slider">
+              <label><span>🔥 实时强弱情绪</span><span id="liveVelVal" style="color:var(--gold);font-weight:700;">0 (自然)</span></label>
+              <input id="liveVelSlider" type="range" min="-40" max="40" step="2" value="0" />
+            </div>
+          </div>
+          <div class="mode-row">
+            <button id="m6StartBtn" class="btn btn-sm" style="border-color:var(--cyan);color:var(--cyan);" disabled>🎙️ 启动实时指挥演奏</button>
+            <button id="m6StopBtn" class="btn btn-sm" disabled>⏹ 停止并保存为版本</button>
+            <span id="liveStatus" class="live-status">就绪：点击「启动实时指挥演奏」后随时拖动上方两个滑块</span>
+          </div>
+        </div>
+
+        <!-- Mode 7: Master Style Relay (Performance MIDI Alignment) -->
+        <div id="pane-m7" class="mode-pane">
+          <p class="mode-desc">上传任意真人钢琴家演奏的 <code>.mid</code>（或一键试用内置浪漫/戏剧大师引子），浏览器内运行动态规划逐音符对齐前 <b>K</b> 小节并锁死触键与呼吸，让 PianoFlow 顺着大师风格弹完全曲！</p>
+          <div class="mode-row">
+            <label class="btn btn-sm" style="cursor:pointer;">
+              🎹 导入真人演奏 .mid
+              <input id="m7MidiInput" type="file" accept=".mid,.midi" style="display:none" />
+            </label>
+            <button id="m7DemoPoeticBtn" class="btn btn-sm" disabled>🌙 内置：浪漫诗意大师引子</button>
+            <button id="m7DemoDramaticBtn" class="btn btn-sm" disabled>🔥 内置：戏剧炫技大师引子</button>
+          </div>
+          <div class="mode-row">
+            <label>锁死大师引子：前 <input id="m7PrefixBars" type="number" min="1" value="2" /> 小节</label>
+            <label>接力 Seed <input id="m7Seed" type="number" value="707" /></label>
+            <button id="m7RunBtn" class="btn btn-sm" disabled>👑 对齐并开始大师接力</button>
+          </div>
+          <div id="m7Status" style="font-size:12px; color:var(--cyan); min-height:16px;">尚未选择参考演奏 MIDI（可直接点击上方内置大师引子试玩）</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="sheet">🎼 五线谱预览（lilypond-wasm SVG）</button>
+          <button class="tab-btn" data-tab="ann">🔍 Scheme 符号提取 & 琶音还原明细</button>
+        </div>
+        <div id="tabSheet">
+          <div id="svgGallery" class="svg-gallery">
+            <div style="color:var(--muted); font-size:13px; padding:24px; text-align:center;">
+              全流程完全在你的浏览器本地运行（无任何后端服务器）。点击左侧「纯浏览器执行 5 阶段 AI 演奏流水线」开始！
+            </div>
+          </div>
+        </div>
+        <div id="tabAnn" style="display:none;">
+          <table>
+            <thead>
+              <tr><th>小节</th><th>时刻</th><th>和弦音数</th><th>AI 原版跨度</th><th>还原后滚奏</th><th>动作</th></tr>
+            </thead>
+            <tbody id="annTableBody">
+              <tr><td colspan="6" style="color:var(--muted); text-align:center;">尚未运行</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

@@ -1,91 +1,172 @@
-/**
- * Browser LilyPond WebAssembly compiler wrapper with Scheme arpeggio extraction,
- * Mutopia/2.18 compatibility sanitization, and automatic WASM worker crash recovery.
- */
 import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
+import compiledScores from 'virtual:pianora-compiled-scores';
 import { injectSchemeHook, type RawArpeggioAnnotation } from './arpeggio';
+import { readScoreFiles } from './scoreFiles';
 
-export interface LilyPondCompileOutput {
+interface ScoreData {
   scoreMidi: Midi;
-  svgPages: string[];
+  loadPages: () => Promise<string[]>;
   rawAnnotations: RawArpeggioAnnotation[];
-  compileSec: number;
 }
 
+type Progress = (msg: string, pct?: number) => void;
+type Compiler = ReturnType<typeof createReusableCompiler>;
+
 export class BrowserLilyPondEngine {
-  private compiler?: ReturnType<typeof createReusableCompiler>;
-  public preloaded = false;
+  private ready?: Promise<Compiler>;
+  private progress?: Progress;
+  private last?: { source: string; data: ScoreData };
 
-  async compile(
-    lyCode: string,
-    onProgress?: (msg: string, pct?: number) => void,
-  ): Promise<LilyPondCompileOutput> {
-    const t0 = performance.now();
+  // Share initialization between editing and generation, including the first download.
+  private prepare(): Promise<Compiler> {
+    return (this.ready ??= this.initialize().catch((error) => {
+      this.ready = undefined;
+      throw error;
+    }));
+  }
+
+  private async initialize() {
+    const compiler = (
+      await import('@sightread/lilypond-wasm')
+    ).createReusableCompiler();
     try {
-      this.compiler ??= (await import('@sightread/lilypond-wasm')).createReusableCompiler();
-      if (!this.preloaded) {
-        onProgress?.('首次加载 LilyPond WebAssembly 引擎 (~31 MB)...', 5);
-        await this.compiler.preload({
-          onProgress: ({ loadedBytes, totalBytes }: { loadedBytes: number; totalBytes: number }) => {
-            if (totalBytes > 0) {
-              const mb = (loadedBytes / 1e6).toFixed(1);
-              const tot = (totalBytes / 1e6).toFixed(1);
-              onProgress?.(
-                `下载 LilyPond WASM 引擎: ${mb} / ${tot} MB...`,
-                5 + (loadedBytes / totalBytes) * 15,
-              );
-            }
-          },
-        });
-        this.preloaded = true;
-      }
-
-      onProgress?.('正在浏览器 WASM 中编译 LilyPond (.ly → SVG + MIDI)...', 22);
-      const patchedLy = injectSchemeHook(lyCode);
-      const wasmRes = await this.compiler.compile(patchedLy, { format: 'svg' });
-
-      const files = wasmRes.files || {};
-      const midiKey = Object.keys(files).find((k) => k.endsWith('.midi') || k.endsWith('.mid'));
-      if (!midiKey) {
-        throw new Error('LilyPond WASM 未输出 MIDI，请确认源码中包含 \\midi {} 块。');
-      }
-
-      const scoreMidi = new Midi(files[midiKey] as Uint8Array);
-
-      const svgKeys = Object.keys(files)
-        .filter((k) => k.endsWith('.svg'))
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-      const svgPages = svgKeys.map((k) => {
-        const data = files[k];
-        return data instanceof Uint8Array ? new TextDecoder().decode(data) : String(data);
+      const start = performance.now();
+      await compiler.preload({
+        onProgress: ({ loadedBytes, totalBytes }) => {
+          if (totalBytes)
+            this.progress?.(
+              `加载 LilyPond：${Math.round((100 * loadedBytes) / totalBytes)}%`,
+              5 + (15 * loadedBytes) / totalBytes,
+            );
+        },
       });
+      performance.measure('pianora:lilypond-preload', { start });
+      return compiler;
+    } catch (error) {
+      compiler.dispose();
+      throw error;
+    }
+  }
 
-      let rawAnnotations: RawArpeggioAnnotation[] = [];
-      if (files['annotations.json']) {
-        const txt =
-          files['annotations.json'] instanceof Uint8Array
-            ? new TextDecoder().decode(files['annotations.json'])
-            : String(files['annotations.json']);
-        rawAnnotations = JSON.parse(txt);
+  private async presetUrl(source: string) {
+    if (!globalThis.crypto?.subtle || !Object.keys(compiledScores).length)
+      return;
+    const hash = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(source),
+    );
+    const key = Array.from(new Uint8Array(hash), (b) =>
+      b.toString(16).padStart(2, '0'),
+    ).join('');
+    return compiledScores[key];
+  }
+
+  async warmForSource(source: string) {
+    if (this.last?.source !== source && !(await this.presetUrl(source)))
+      await this.prepare();
+  }
+
+  private async run(source: string, format: 'midi' | 'svg') {
+    const compiler = await this.prepare();
+    try {
+      const start = performance.now();
+      const { files } = await compiler.compile(injectSchemeHook(source), {
+        format,
+      });
+      performance.measure('pianora:lilypond-' + format, { start });
+      return readScoreFiles(files);
+    } catch (error) {
+      if (/unreachable|RuntimeError|abort/i.test(String(error))) {
+        compiler.dispose();
+        this.ready = undefined;
       }
+      throw error;
+    }
+  }
 
-      return {
-        scoreMidi,
-        svgPages,
-        rawAnnotations,
-        compileSec: Number(((performance.now() - t0) / 1000).toFixed(2)),
-      };
-    } catch (err) {
-      const msg = (err as Error).message || String(err);
-      if (/unreachable|RuntimeError|abort/i.test(msg)) {
+  private sheetLoader(source: string, url?: string) {
+    const load = async (): Promise<string[]> => {
+      if (url) {
         try {
-          await (this.compiler as unknown as { dispose?: () => Promise<void> }).dispose?.();
-        } catch {}
-        this.compiler = undefined;
-        this.preloaded = false;
+          const response = await fetch(url);
+          if (response.ok) {
+            const pages = await response.json();
+            if (
+              Array.isArray(pages) &&
+              pages.every((p) => typeof p === 'string')
+            )
+              return pages;
+          }
+        } catch {
+          /* Fall back to the score snapshot that produced this performance. */
+        }
       }
-      throw err;
+      return (await this.run(source, 'svg')).svgPages;
+    };
+    let pending: Promise<string[]> | undefined;
+    return () =>
+      (pending ??= load().catch((error) => {
+        pending = undefined;
+        throw error;
+      }));
+  }
+
+  private async loadPreset(source: string): Promise<ScoreData | undefined> {
+    const urls = await this.presetUrl(source);
+    if (!urls) return;
+    try {
+      const response = await fetch(urls[0]);
+      if (!response.ok) return;
+      const { midi, rawAnnotations } = await response.json();
+      if (typeof midi !== 'string' || !Array.isArray(rawAnnotations)) return;
+      return {
+        scoreMidi: new Midi(
+          Uint8Array.from(atob(midi), (c) => c.charCodeAt(0)),
+        ),
+        loadPages: this.sheetLoader(source, urls[1]),
+        rawAnnotations,
+      };
+    } catch {
+      return;
+    }
+  }
+
+  async compile(source: string, onProgress?: Progress) {
+    const start = performance.now();
+    const result = (data: ScoreData, method: string) => {
+      const duration = performance.now() - start;
+      performance.measure('pianora:score-ready', { start, detail: { method } });
+      return {
+        ...data,
+        compileSec: Number((duration / 1000).toFixed(2)),
+        method,
+      };
+    };
+    if (this.last?.source === source)
+      return result(this.last.data, '复用上次结果');
+
+    const preset = await this.loadPreset(source);
+    if (preset) {
+      this.last = { source, data: preset };
+      return result(preset, '读取预编译谱');
+    }
+
+    onProgress?.('正在准备浏览器 LilyPond 编译器…', 5);
+    this.progress = onProgress;
+    try {
+      await this.prepare();
+      onProgress?.('正在提取演奏 MIDI 和琶音标记…', 22);
+      const { midi, rawAnnotations } = await this.run(source, 'midi');
+      const data = {
+        scoreMidi: new Midi(midi),
+        loadPages: this.sheetLoader(source),
+        rawAnnotations,
+      };
+      this.last = { source, data };
+      return result(data, '浏览器编译');
+    } finally {
+      this.progress = undefined;
     }
   }
 }

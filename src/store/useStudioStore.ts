@@ -130,7 +130,7 @@ interface StudioState {
   scoreNotes: SimpleNote[];
   scoreDuration: number;
   rawAnnotations: RawArpeggioAnnotation[];
-  svgPages: string[];
+  loadSheetPages: (() => Promise<string[]>) | null;
   totalBars: number;
   takes: TakeRecord[];
   activeTakeId: string;
@@ -267,7 +267,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     scoreNotes: [],
     scoreDuration: 0,
     rawAnnotations: [],
-    svgPages: [],
+    loadSheetPages: null,
     totalBars: 0,
     takes: [],
     activeTakeId: '',
@@ -472,34 +472,19 @@ export const useStudioStore = create<StudioState>((set, get) => {
           progressMsg: msg,
           progressPct: 4 + compileProgress * 0.7 + modelProgress * 0.28,
         });
-
-        let compiled: {
-          scoreMidi: Midi;
-          svgPages: string[];
-          rawAnnotations: RawArpeggioAnnotation[];
-          compileSec: number;
+        let compiled: Awaited<ReturnType<typeof lilypondEngine.compile>> | {
+          scoreMidi: Midi; rawAnnotations: RawArpeggioAnnotation[]; compileSec: number;
+          loadPages: null; method: string;
         };
-
         if (imported) {
-          set((s) => ({
-            stages: {
-              ...s.stages,
-              st1: { status: 'done', stat: `${imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI'} · ${imported.noteCount} 音` },
-              st2: { status: 'done', stat: `提取 ${imported.rawAnnotations.length} 条事件` },
-            },
-          }));
-          await pianoFlowEngine.load((msg, pct) => {
-            if (pct === modelProgress) return;
-            modelProgress = pct ?? modelProgress;
-            report(msg);
-          }, controller.signal);
+          const method = imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI';
+          compiled = { method, scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages: null };
+          set(s => ({ stages: { ...s.stages,
+            st1: { status: 'done', stat: `${method} · ${imported.noteCount} 音` },
+            st2: { status: 'done', stat: `提取 ${imported.rawAnnotations.length} 条事件` },
+          } }));
+          await pianoFlowEngine.load(report, controller.signal);
           set({ ortReady: true, ortStatus: `PianoFlow (${pianoFlowEngine.provider}) 就绪` });
-          compiled = {
-            scoreMidi: imported.midi,
-            svgPages: [],
-            rawAnnotations: imported.rawAnnotations,
-            compileSec: 0,
-          };
         } else {
           const compileStarted = performance.now();
           const compile = lilypondEngine.compile(lyCode, (msg, pct) => {
@@ -509,10 +494,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
             performance.measure('pianora:score-compile', { start: compileStarted });
             set(s => ({
               wasmReady: true,
-              wasmStatus: 'LilyPond WASM 就绪',
+              wasmStatus: res.method,
               stages: {
                 ...s.stages,
-                st1: { status: 'done', stat: `${res.compileSec}s · ${res.svgPages.length} 页 SVG` },
+                st1: { status: 'done', stat: `${res.method} ${res.compileSec}s` },
                 st2: { status: 'done', stat: `提取 ${res.rawAnnotations.length} 条事件` },
               },
             }));
@@ -569,7 +554,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           scoreNotes: firstOut.scoreNotes,
           scoreDuration: firstOut.scoreDuration,
           rawAnnotations: compiled.rawAnnotations,
-          svgPages: compiled.svgPages,
+          loadSheetPages: compiled.loadPages,
           totalBars,
           cues: defaultCuesForBars(totalBars),
         });
@@ -588,7 +573,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
             st3: { status: 'done', stat: `${dt3}s · ${batchCount} 版` },
             st4: { status: 'done', stat: `${dt4} ms · ${takes[0].arpeggios.length} 处琶音` },
           },
-          progressMsg: `全部 5 阶段纯浏览器完成！(${compiled.compileSec}s 编译 + ${dt3}s AI × ${batchCount}版 + ${dt4}ms 还原)`,
+          progressMsg: `演奏已生成(${compiled.method} ${compiled.compileSec}s + ${dt3}s AI × ${batchCount}版 + ${dt4}ms 还原)`,
           progressPct: 100,
         }));
 

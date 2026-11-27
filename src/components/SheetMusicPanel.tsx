@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FileMusic, Table2, ZoomIn, ZoomOut } from 'lucide-react';
 import { useStudioStore, fmtTime } from '../store/useStudioStore';
 
@@ -6,7 +6,24 @@ export function SheetMusicPanel() {
   const [tab, setTab] = useState<'sheet' | 'ann'>('sheet');
   const [zoom, setZoom] = useState(100);
 
-  const svgPages = useStudioStore((s) => s.svgPages);
+  const load = useStudioStore(s => s.loadSheetPages);
+  const [svgPages, setPages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sheetError, setSheetError] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!load) { setPages([]); setLoading(false); setSheetError(''); return; }
+    if (tab !== 'sheet') return;
+    let active = true;
+    setLoading(true);
+    setSheetError('');
+    load().then(pages => {
+      if (active) setPages(pages);
+    }).catch(error => {
+      if (active) setSheetError(String(error));
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [tab, load, attempt]);
   const takes = useStudioStore((s) => s.takes);
   const activeTakeId = useStudioStore((s) => s.activeTakeId);
   const activeTake = takes.find((t) => t.id === activeTakeId) ?? takes[0] ?? null;
@@ -59,7 +76,9 @@ export function SheetMusicPanel() {
 
       {tab === 'sheet' ? (
         <div id="svgGallery" className="flex max-h-[560px] flex-col gap-3 overflow-y-auto pr-1">
-          {svgPages.length === 0 ? (
+          {loading ? <p role="status">正在准备五线谱…</p> : sheetError ? (
+            <div role="alert">{sheetError} <button onClick={() => setAttempt(n => n + 1)}>重试排版</button></div>
+          ) : svgPages.length === 0 ? (
             <div className="py-12 text-center text-xs text-[#576354]">
               当前演奏来自直接导入的 MIDI / MusicXML 乐谱（跳过 LilyPond 排版），可在「试听与导出」中查看 88 键动态钢琴卷帘。
             </div>

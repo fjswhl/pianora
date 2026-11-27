@@ -4,6 +4,7 @@ import { PipelineHeader, GenerationRecord } from './PipelineHeader';
 import { TransportBar } from './TransportBar';
 import { PianoRollCanvas } from './PianoRollCanvas';
 import { WorkbenchPanel } from './WorkbenchPanel';
+import { FollowScorePanel } from './FollowScorePanel';
 import { SheetMusicPanel } from './SheetMusicPanel';
 import { fmtTime, useStudioStore } from '../store/useStudioStore';
 
@@ -58,6 +59,7 @@ export function StudioPanel() {
               <PianoRollCanvas />
             </div>
             <TransportBar pianoStatus={pianoStatus} />
+            <FollowScorePanel />
             <GenerationRecord />
           </section>
         )}

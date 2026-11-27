@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { lilypondEngine } from '../engine/instances';
 import { useScoreStore } from '../store/useScoreStore';
 import { scorePresets as presets } from '../engine/presets';
 import { FileUp, Play, Sparkles, AlertCircle, Music2, RotateCcw } from 'lucide-react';
@@ -30,6 +31,14 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
   const runFullPipeline = useStudioStore((s) => s.runFullPipeline);
 
   const [dragging, setDragging] = useState(false);
+  useEffect(() => {
+    if (importedScore || selectedPresetId !== 'custom' || !lyCode.trim() || error) return;
+    // Preload once while the user edits. Engraving still requires an explicit Generate.
+    const timer = window.setTimeout(() => {
+      void lilypondEngine.warmForSource(lyCode.trim()).catch(() => {});
+    }, 450);
+    return () => window.clearTimeout(timer);
+  }, [selectedPresetId, lyCode, error, importedScore]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];

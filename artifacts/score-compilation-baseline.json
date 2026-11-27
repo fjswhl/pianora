@@ -1,0 +1,17 @@
+{
+  "commit": "af27c86",
+  "environment": "local Chrome against Wrangler, fresh browser context per score",
+  "scores": {
+    "short_etude": {
+      "scoreReadyMs": 3109.6,
+      "workerPreloadMs": 813.7,
+      "workerCompileMs": 2196.5,
+      "sameSourceMs": 1731.1
+    },
+    "clair_de_lune": {
+      "scoreReadyMs": 27939.5,
+      "workerPreloadMs": 589.4,
+      "workerCompileMs": 27332.7
+    }
+  }
+}

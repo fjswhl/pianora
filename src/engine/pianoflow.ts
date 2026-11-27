@@ -229,7 +229,7 @@ export function decodePerfState(perfState: PerfState): {
 
     const pitch = scoreData.pitches[i];
     perfDryNotes.push({ p: pitch, s: Number(curSec.toFixed(4)), d: Number(dryDur.toFixed(4)), v: vel });
-    perfSustainNotes.push({ p: pitch, s: Number(curSec.toFixed(4)), d: Number(susDur.toFixed(4)), v: vel });
+    perfSustainNotes.push({ scoreTime: scoreData.scoreSimpleNotes[i].s, p: pitch, s: Number(curSec.toFixed(4)), d: Number(susDur.toFixed(4)), v: vel });
   }
   const perfDuration = perfSustainNotes.reduce((mx, n) => Math.max(mx, n.s + n.d), 0);
   return { perfDryNotes, perfSustainNotes, perfDuration: Number(perfDuration.toFixed(2)) };
@@ -1154,6 +1154,7 @@ export class LiveConductorSession {
         const susDur = Math.max(dryDur, this.allValues[rOff + 7]);
 
         const sn: SimpleNote = {
+          scoreTime: this.scoreData.scoreSimpleNotes[i].s,
           p: this.scoreData.pitches[i],
           s: Number(curSec.toFixed(4)),
           d: Number(susDur.toFixed(4)),

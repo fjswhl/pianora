@@ -1,0 +1,40 @@
+{
+  "short_etude": {
+    "preset": {
+      "method": "读取预编译谱",
+      "scoreReadyMs": 312.3
+    },
+    "changedSeed": {
+      "method": "复用上次结果",
+      "scoreReadyMs": 0
+    },
+    "edited": {
+      "method": "浏览器编译",
+      "scoreReadyMs": 1349.4
+    },
+    "verified": {
+      "identicalMidiSha256": "a8c706435eadf8bbb5154c8aaa739c3f5627d50794459ac0feabc702c4bebd02",
+      "annotations": 6,
+      "identicalSvgPages": 1,
+      "unavailableAssetFallback": true
+    },
+    "editedRepeat": {
+      "method": "复用上次结果",
+      "scoreReadyMs": 0
+    }
+  },
+  "clair_de_lune": {
+    "preset": {
+      "method": "读取预编译谱",
+      "scoreReadyMs": 80.9
+    },
+    "edited": {
+      "method": "浏览器编译",
+      "scoreReadyMs": 2709.7
+    },
+    "verified": {
+      "identicalMidiSha256": "dd9b9f2ccc6d706da448c8f63506db167d39e148c36ec0890f619ba1feaf4b13",
+      "annotations": 12
+    }
+  }
+}

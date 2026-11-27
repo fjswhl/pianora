@@ -1,6 +1,7 @@
-import { Midi } from '@tonejs/midi';
+import type { Midi } from '@tonejs/midi';
 
 export interface SimpleNote {
+  scoreTime?: number; // Original onset before expressive timing or arpeggio restoration
   p: number; // MIDI pitch 0..127
   s: number; // start time (seconds)
   d: number; // duration (seconds)
@@ -48,7 +49,46 @@ export const SCHEME_ARP_HOOK = String.raw`
        (display "]\n" port)
        (close-output-port port)))))
 
+% Keep the original engraving and expose its line breaks and musical positions to the player.
+#(define (pn-moment column)
+   (number->string (exact->inexact (ly:moment-main (ly:grob-property column 'when)))))
+
+#(define (pn-staff-attributes grob)
+   (let* ((system (ly:grob-system grob))
+          (y (ly:grob-relative-coordinate grob system Y))
+          (extent (ly:grob-extent system system Y)))
+     (list (cons 'data-system (pn-moment (ly:spanner-bound system LEFT)))
+           (cons 'data-end (pn-moment (ly:spanner-bound system RIGHT)))
+           (cons 'data-top (number->string (- y (cdr extent))))
+           (cons 'data-bottom (number->string (- y (car extent)))))))
+
+#(define (pn-bar-engraver ctx)
+  (let ((repeats '()))
+   (define (record kind numbers)
+     (set! repeats (cons (format #f "~a:~a:~a"
+                        (exact->inexact (ly:moment-main (ly:context-current-moment ctx)))
+                        kind (string-join (map number->string numbers) ",")) repeats)))
+   (make-engraver
+    (listeners
+     ((volta-repeat-start-event engraver event)
+      (record "start" (list (ly:event-property event 'repeat-count 2))))
+     ((volta-repeat-end-event engraver event) (record "end" '()))
+     ((alternative-event engraver event) (record "ending" (ly:event-property event 'volta-numbers '()))))
+    (acknowledgers
+     ((staff-symbol-interface engraver grob source)
+      (ly:grob-set-property! grob 'output-attributes
+       (lambda (piece)
+         (cons (cons 'data-repeats (string-join (reverse repeats) ";")) (pn-staff-attributes piece)))))
+     ((bar-line-interface engraver grob source)
+      (let ((moment (number->string (exact->inexact (ly:moment-main (ly:context-current-moment ctx)))))
+            (number (number->string (ly:context-property ctx 'currentBarNumber 1))))
+        (ly:grob-set-property! grob 'output-attributes
+          (lambda (piece)
+            (list (cons 'data-line (pn-moment (ly:spanner-bound (ly:grob-system piece) LEFT)))
+                  (cons 'data-moment moment) (cons 'data-number number))))))))))
+
 \layout {
+  \context { \Staff \consists #pn-bar-engraver }
   \context {
     \Voice
     \consists #Demo_arpeggio_collector_engraver

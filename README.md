@@ -8,7 +8,7 @@
 ## Core Architecture (5-Stage Pure-Browser Pipeline)
 
 1. **Stage 1 · In-Browser Sheet Music Compilation (`@sightread/lilypond-wasm`)**
-   Compiles LilyPond (`.ly`) scores directly inside a browser WebAssembly Worker into crisp SVG sheet music + exact score MIDI, with built-in Mutopia/2.18 compatibility sanitization.
+   Production builds prepare the bundled scores with the pinned LilyPond WASM compiler. Edited and imported scores run in a browser Worker. MIDI and symbolic ornaments are prepared for playback first. The listening view loads the engraving independently and shares it with the full sheet view. Both paths use the same Mutopia/2.18 sanitization and Scheme hook.
 2. **Stage 2 · Symbolic Ornament Extraction (Scheme Engraver)**
    Injects a custom LilyPond Scheme Engraver (`Demo_arpeggio_collector_engraver`) to extract exact symbolic moments (such as `\arpeggio`) that standard MIDI drops.
 3. **Stage 3 · Expressive Flow Matching AI Pianist (`SyMuPe/PianoFlow-base` ONNX on WebGPU/WASM)**
@@ -133,7 +133,7 @@ src/
 
 ### Loading and caching
 
-The library ships the score catalogue. Opening a piece fetches its source, and generating a performance starts LilyPond compilation and model loading concurrently. The tokenizer is emitted as a Vite content-hashed module paired with the model in `src/engine/assetRelease.ts`.
+The library ships the score catalogue. Opening a piece fetches its source. Generating starts score preparation and model loading concurrently. A SHA-256 match on the full trimmed source selects the bundled MIDI and annotation asset; its SVG pages download separately when requested. Unmatched sources and unavailable assets use the local compiler. The most recently prepared source is reused across seed and parameter changes. Development mode uses the browser compilation path. The tokenizer is emitted as a Vite content-hashed module paired with the model in `src/engine/assetRelease.ts`.
 
 `public/_headers` gives hashed `/assets/*` a one-year browser TTL. HTML keeps the Workers Static Assets revalidation default. Model and soundfont requests use a revision from the release manifest. The same-origin Worker checks the R2 ETag, caches successful full GETs in the local Cloudflare edge cache, and supports range reads from those cached objects. Unversioned URLs remain available for older clients.
 
@@ -142,3 +142,7 @@ For an asset update, upload the file to a **new R2 key**, record its actual R2 E
 To serve these public binaries via a dedicated CDN hostname instead, connect an R2 custom domain, enable a Cache Rule for the model and soundfont paths (keep the revision in the cache key), set object cache metadata, and configure CORS for the studio origin. Set `VITE_R2_PUBLIC_ORIGIN` to that HTTPS origin **at build time** (or set the identically named GitHub repository variable for CI). This bypasses the same-origin Worker for these files. Without this setting, no Cloudflare account changes are required.
 
 Run `scripts/verify-studio.py` against a production build as described in the script. `PIANORA_URL` selects the server and `PIANORA_ARTIFACTS` selects the evidence directory. Set `PIANORA_VERIFY_EDGE=1` against Wrangler or the deployed Worker to also check static headers, cached byte ranges, conditional requests and legacy URLs. For local Wrangler tests, populate its local R2 bucket with the release model, default soundfont and ORT WASM files using `wrangler r2 object put ... --local`. The browser run records the initial assets, overlap of model transfer and compilation, and soundfont request count in `loading-performance.json`.
+
+Run `scripts/verify-score-compilation.py` against a production build to compare short and full-length scores, verify the emitted MIDI and annotations against browser compilation, and check on-demand engraving and source reuse. The report is written to `score-compilation.json` in the evidence directory.
+
+The listening view follows the selected performance through up to three engraved systems. LilyPond supplies the system bounds, bar lines and volta events. The player maps measure boundaries to the actual note onsets for the selected take. Run `scripts/verify-follow-score.py` against the local production build to exercise playback, seeking, repeats and the mobile layout and capture screenshots.

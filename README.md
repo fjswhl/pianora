@@ -50,7 +50,10 @@ npm run setup:soundfonts
 #    (requires Python + symupe + onnxruntime, see scripts/export_pianoflow_onnx.py)
 python scripts/export_pianoflow_onnx.py
 
-# 4. Run dev server or production build
+# 4. Optional: compress installed release binaries for the browser download cache
+npm run setup:packs
+
+# 5. Run dev server or production build
 npm run dev
 # or
 npm run build && npm run preview
@@ -63,7 +66,8 @@ Production runs as a single Cloudflare Worker on **https://opuslin.uk** (`wrangl
 | Payload | Served from |
 | --- | --- |
 | UI bundle, IRs, small runtime files (≤ 25 MiB each) | Workers Static Assets (`dist/`) |
-| ONNX model, ORT WASM, SF2 SoundFonts | R2 bucket `pianora-assets`, streamed by `worker/index.ts` with full `Range` support |
+| Compressed model, ORT WASM and SF2 chunks | Workers Static Assets under content-addressed `/packs/` URLs |
+| Original ONNX model, ORT WASM, SF2 SoundFonts | R2 bucket `pianora-assets`, streamed by `worker/index.ts` with full `Range` support |
 
 ```bash
 # Deploy UI + Worker + custom domain (R2 objects are unchanged by redeploys)
@@ -85,7 +89,7 @@ single-PUT limit is 300 MiB — anything larger must be split before upload.
 
 `.github/workflows/deploy.yml` builds and deploys on every push to `main` (also manually via
 `workflow_dispatch`). It restores the gitignored runtime files with `npm run setup:runtime`,
-typechecks, builds, then runs `wrangler deploy`. R2 objects are untouched by CI.
+typechecks, restores or creates the binary download packs, builds the UI, then runs `wrangler deploy`. R2 objects are untouched by CI.
 
 Required repository secrets (**Settings → Secrets and variables → Actions**):
 
@@ -133,9 +137,11 @@ src/
 
 ### Loading and caching
 
-The library ships the score catalogue. Opening a piece fetches its source. Generating starts score preparation and model loading concurrently. The browser extracts MIDI and annotations from the selected LilyPond source and engraves the SVG for the listening or sheet view on demand. The most recently prepared source is reused across seed and parameter changes. The tokenizer is emitted as a Vite content-hashed module paired with the model in `src/engine/assetRelease.ts`.
+The library ships the score catalogue. Opening a piece fetches its source. Generating starts score preparation and model loading concurrently. The browser Worker extracts MIDI and arpeggio events without fitting pages. The SVG pass engraves the score with LilyPond, caching repeated named glyph paths for that run. On devices reporting four or more logical cores, engraving overlaps model inference. Other devices request it when opening the listening or sheet view. The most recently prepared source is reused across seed and parameter changes. The tokenizer is emitted as a Vite content-hashed module paired with the model in `src/engine/assetRelease.ts`.
 
 `public/_headers` gives hashed `/assets/*` a one-year browser TTL. HTML keeps the Workers Static Assets revalidation default. Model and soundfont requests use a revision from the release manifest. The same-origin Worker checks the R2 ETag, caches successful full GETs in the local Cloudflare edge cache, and supports range reads from those cached objects. Unversioned URLs remain available for older clients.
+
+The default piano, model and ORT runtime are split into individually verified gzip chunks. A visible library or editor can fetch them during idle time. Data-saving, cellular and slow connections skip background downloads. Choosing another piano loads it on demand. Foreground use shares in-flight chunks, and later visits reuse the compressed bytes in Cache Storage. If a pack is unavailable, the app falls back to the original asset. Run `scripts/verify-asset-packs.py` to exercise background transfer, cache reuse, recovery and playback.
 
 For an asset update, upload the file to a **new R2 key**, record its actual R2 ETag in the manifest, and update the matching tokenizer before building. Keep previous keys for older sessions. The first release references the existing keys in place.
 
@@ -143,6 +149,6 @@ To serve these public binaries via a dedicated CDN hostname instead, connect an 
 
 Run `scripts/verify-studio.py` against a production build as described in the script. `PIANORA_URL` selects the server and `PIANORA_ARTIFACTS` selects the evidence directory. Set `PIANORA_VERIFY_EDGE=1` against Wrangler or the deployed Worker to also check static headers, cached byte ranges, conditional requests and legacy URLs. For local Wrangler tests, populate its local R2 bucket with the release model, default soundfont and ORT WASM files using `wrangler r2 object put ... --local`. The browser run records the initial assets, overlap of model transfer and compilation, and soundfont request count in `loading-performance.json`.
 
-Run `scripts/verify-score-compilation.py` against a production build to verify browser compilation, on-demand engraving and source reuse across seed changes. The report is written to `score-compilation.json` in the evidence directory.
+Run `scripts/verify-score-compilation.py` against a production build to verify browser compilation, engraving and source reuse across seed changes. Run `scripts/verify-browser-engraving.py` to compare reference and optimized Worker timings, MIDI, arpeggio events and every SVG page through real playback. The scripts write `score-compilation.json` and `browser-engraving.json` to the evidence directory.
 
 The listening view follows the selected performance through up to three engraved systems. LilyPond supplies the system bounds, bar lines and volta events. The player maps measure boundaries to the actual note onsets for the selected take. Run `scripts/verify-follow-score.py` against the local production build to exercise playback, seeking, repeats and the mobile layout and capture screenshots.

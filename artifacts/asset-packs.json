@@ -1,0 +1,20 @@
+{
+  "coldBytes": {
+    "/soundfonts/abbey_steinway_d.sf2": {
+      "raw": 40243712,
+      "packed": 21762618
+    },
+    "/models/pianoflow_step_fp32.onnx": {
+      "raw": 99020348,
+      "packed": 83625827
+    },
+    "/ort/ort-wasm-simd-threaded.jsep.wasm": {
+      "raw": 29520971,
+      "packed": 6968717
+    }
+  },
+  "warmLargeAssetRequests": 0,
+  "recoveredChunks": 1,
+  "saveDataIdleRequests": 0,
+  "rawFallbackPlayed": true
+}

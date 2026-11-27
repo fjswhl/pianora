@@ -38,6 +38,19 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Restore compressed binary assets
+        id: packs
+        uses: actions/cache@v4
+        with:
+          path: public/packs
+          key: asset-packs-v1-${{ hashFiles('src/engine/assetSources.json', 'scripts/prepare-asset-packs.mjs', 'package-lock.json') }}
+
+      - name: Compress released binaries
+        if: steps.packs.outputs.cache-hit != 'true'
+        env:
+          PIANORA_PACK_ORIGIN: ${{ vars.VITE_R2_PUBLIC_ORIGIN || 'https://opuslin.uk' }}
+        run: npm run setup:packs
+
       - name: Build
         env:
           VITE_R2_PUBLIC_ORIGIN: ${{ vars.VITE_R2_PUBLIC_ORIGIN }}

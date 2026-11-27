@@ -528,6 +528,9 @@ export const useStudioStore = create<StudioState>((set, get) => {
           if (scoreResult.status === 'rejected') throw scoreResult.reason;
           if (modelResult.status === 'rejected') throw modelResult.reason;
           compiled = scoreResult.value;
+          // Start the listening view's engraving alongside inference when a core is available.
+          // sheetLoader shares this promise and lets the view retry an engraving failure.
+          if (navigator.hardwareConcurrency >= 4) void scoreResult.value.loadPages().catch(() => {});
         }
 
         const { cfmSteps, stepFactor, seed, batchCount } = get();

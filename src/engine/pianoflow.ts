@@ -13,6 +13,7 @@
  */
 import type * as Ort from 'onnxruntime-web';
 import { pianoFlowRelease, releaseUrl } from './assetRelease';
+import { packedAsset, ortWasmPath } from './assetPacks';
 import { downloadBytes } from './download';
 import { Midi } from '@tonejs/midi';
 import type { SimpleNote } from './arpeggio';
@@ -641,17 +642,23 @@ export class BrowserPianoFlow {
 
   async load(onProgress?: (msg: string, pct?: number) => void, signal?: AbortSignal): Promise<void> {
     if (this.session && this.meta) return;
-    const [ort, tokenizer, modelBytes] = await Promise.all([
+    const modelStart = performance.now();
+    const [ort, tokenizer, modelBytes, wasm] = await Promise.all([
       import('onnxruntime-web'),
       pianoFlowRelease.tokenizer(),
       downloadBytes(releaseUrl(pianoFlowRelease.model), (loaded, total) => {
         onProgress?.(`下载 PianoFlow ONNX: ${(loaded / 1e6).toFixed(1)} / ${(total / 1e6).toFixed(1)} MB`, 12 + Math.round(loaded / total * 70));
-      }, signal),
+      }, signal).then(bytes => {
+        performance.measure('pianora:model-bytes', { start: modelStart });
+        return bytes;
+      }),
+      packedAsset(ortWasmPath) ? downloadBytes(ortWasmPath, undefined, signal) : undefined,
     ]);
     signal?.throwIfAborted();
     this.runtime = ort;
     this.meta = { ...tokenizer.default, pitch_range: [tokenizer.default.pitch_range[0], tokenizer.default.pitch_range[1]] };
-    ort.env.wasm.wasmPaths = '/ort/';
+    ort.env.wasm.wasmPaths = { wasm: new URL(ortWasmPath, location.href).href };
+    ort.env.wasm.wasmBinary = wasm;
     ort.env.wasm.numThreads = 1;
 
     const hasWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator;
@@ -661,6 +668,7 @@ export class BrowserPianoFlow {
         this.session = await ort.InferenceSession.create(modelBytes, {
           executionProviders: ['webgpu'],
         });
+        ort.env.wasm.wasmBinary = undefined;
         this.provider = 'WebGPU';
         onProgress?.('PianoFlow-base (WebGPU) 就绪！', 100);
         return;
@@ -673,6 +681,7 @@ export class BrowserPianoFlow {
     this.session = await ort.InferenceSession.create(modelBytes, {
       executionProviders: ['wasm'],
     });
+    ort.env.wasm.wasmBinary = undefined;
     this.provider = 'WASM';
     onProgress?.('PianoFlow-base (WASM) 就绪！', 100);
   }

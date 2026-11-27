@@ -61,15 +61,17 @@ with sync_playwright() as playwright:
     elapsed = page.evaluate("performance.now()") - generation_start
     timing = page.evaluate("""() => {
       const compile = performance.getEntriesByName('pianora:score-compile').at(-1);
-      const model = performance.getEntriesByType('resource').find(r => new URL(r.name).pathname.endsWith('.onnx'));
+      const model = performance.getEntriesByName('pianora:model-bytes').at(-1);
       return {compileStart: compile.startTime, compileEnd: compile.startTime + compile.duration,
-              modelStart: model.startTime, modelEnd: model.responseEnd};
+              modelStart: model.startTime, modelEnd: model.startTime + model.duration};
     }""")
     assert page.evaluate("performance.getEntriesByName('pianora:score-ready').at(-1).detail.method") == "浏览器编译"
     assert not any(".score-" in path or ".pages-" in path for _, path in requests)
     assert any("lilypond" in path for _, path in requests)
     soundfont_requests = [m for m, path in requests if path.endswith(".sf2")]
-    assert soundfont_requests == ["GET"], soundfont_requests
+    sf_parts = [path for _, path in requests if path.startswith("/packs/abbey_steinway_d.sf2-")]
+    assert (soundfont_requests == ["GET"] or (sf_parts and not soundfont_requests)), requests
+    assert len(sf_parts) == len(set(sf_parts)), sf_parts
     assert [path for m, path in requests if path.endswith(".ly")] == ["/presets/clair_de_lune.ly", "/presets/short_etude.ly"]
     page.locator("#stopBtn").click()
     with page.expect_download() as midi:
@@ -133,7 +135,10 @@ with sync_playwright() as playwright:
         asset = urljoin(library_url, scripts[0]["path"])
         assert "immutable" in page.request.head(asset).headers["cache-control"]
         assert "must-revalidate" in page.request.head(library_url).headers["cache-control"]
-        model_url = page.evaluate("performance.getEntriesByType('resource').find(r => new URL(r.name).pathname.endsWith('.onnx')).name")
+        release = json.loads((root / "src/engine/assetSources.json").read_text())["model"]
+        model_url = urljoin(library_url, release["path"]) + "?rev=" + release["revision"]
+        # Packed clients bypass the raw model. Prime its legacy range cache explicitly.
+        assert page.request.get(model_url).status == 200
         partial = page.request.get(model_url, headers={"Range": "bytes=0-7"})
         assert partial.status == 206 and len(partial.body()) == 8
         assert partial.headers["x-pianora-cache"] == "HIT"

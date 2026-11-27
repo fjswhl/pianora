@@ -18,3 +18,7 @@ public/soundfonts/*.sf2
 public/soundfonts/*.sf3
 public/soundfonts/*.sf2.part*
 public/models/*.onnx
+
+# Generated content-addressed downloads
+public/packs/
+public/packs-*/

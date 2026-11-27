@@ -1,3 +1,5 @@
+import { packedAsset, unpackAsset } from './assetPacks';
+
 // Content-Length describes the wire representation. With transparent compression
 // (or an unknown length), let the browser collect the decoded bytes.
 export async function downloadBytes(
@@ -5,6 +7,11 @@ export async function downloadBytes(
   onProgress?: (loaded: number, total: number) => void,
   signal?: AbortSignal,
 ): Promise<Uint8Array<ArrayBuffer>> {
+  const packed = packedAsset(url);
+  if (packed) {
+    try { return await unpackAsset(packed, onProgress, signal); }
+    catch { signal?.throwIfAborted(); } // Old tabs and unavailable packs can still use R2.
+  }
   const response = await fetch(url, { signal });
   if (!response.ok)
     throw new Error(

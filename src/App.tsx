@@ -39,6 +39,16 @@ function currentPage(): Page {
 
 export function App() {
   const [page, setPage] = useState<Page>(currentPage);
+  useEffect(() => {
+    let disposed = false;
+    let stop: (() => void) | undefined;
+    const timer = window.setTimeout(() => {
+      void import('./engine/assetPacks').then(({ warmPerformanceAssets }) => {
+        if (!disposed) stop = warmPerformanceAssets();
+      }).catch(() => {});
+    }, 1000);
+    return () => { disposed = true; clearTimeout(timer); stop?.(); };
+  }, []);
   const upload = useRef<HTMLInputElement>(null);
   const pipelineBusy = useScoreStore((s) => s.pipelineBusy);
   const { selectPreset, importFile } = useScoreStore.getState();

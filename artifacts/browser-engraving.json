@@ -1,0 +1,65 @@
+{
+  "browser": "157.0.8103.80",
+  "scores": {
+    "short_etude": {
+      "midi": {
+        "referenceMs": 943,
+        "optimizedMs": 707,
+        "sha256": {
+          "annotations.json": "c8b9d6c273f60143ea75a431fb3396ddd0aef7ea573c7236da1f1f8af0c61324",
+          "score.midi": "a8c706435eadf8bbb5154c8aaa739c3f5627d50794459ac0feabc702c4bebd02"
+        }
+      },
+      "svg": {
+        "referenceMs": 1789,
+        "optimizedMs": 925,
+        "sha256": {
+          "annotations.json": "c8b9d6c273f60143ea75a431fb3396ddd0aef7ea573c7236da1f1f8af0c61324",
+          "score.midi": "a8c706435eadf8bbb5154c8aaa739c3f5627d50794459ac0feabc702c4bebd02",
+          "score.svg": "17215a3eae1a327cb102e7d113a387fc28d6187a7503f3ff22b82d10715cdea2"
+        }
+      }
+    },
+    "clair_de_lune": {
+      "midi": {
+        "referenceMs": 2536,
+        "optimizedMs": 1056,
+        "sha256": {
+          "annotations.json": "30876465b1edb394035f3355dfe6f8f29c0c25fcb72b9e4c38f2a588c4aa7054",
+          "score.midi": "dd9b9f2ccc6d706da448c8f63506db167d39e148c36ec0890f619ba1feaf4b13"
+        }
+      },
+      "svg": {
+        "referenceMs": 27046,
+        "optimizedMs": 2657,
+        "sha256": {
+          "annotations.json": "30876465b1edb394035f3355dfe6f8f29c0c25fcb72b9e4c38f2a588c4aa7054",
+          "score.midi": "dd9b9f2ccc6d706da448c8f63506db167d39e148c36ec0890f619ba1feaf4b13",
+          "score-1.svg": "cdaad129ea3eb6bf013c64eb1310657043941511d6c76ec7d162ea9d29336865",
+          "score-2.svg": "6c4dc5c64f59288036e79bd7b32bdcdedd0257afebdd52c018c00e898008c81f",
+          "score-3.svg": "7b4b2165ccd6caf7905314c983f172ca12cbe2a747b6e166906bd61526477e30",
+          "score-4.svg": "33514fe5bcee96a532fa5bef296113a6f14ead9e10eab8aa05348bb34ccc9f77"
+        }
+      }
+    },
+    "mozart_sonata_k331_tema": {
+      "midi": {
+        "referenceMs": 1202,
+        "optimizedMs": 869,
+        "sha256": {
+          "annotations.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "score.midi": "9979e674ec457a48e4c95bf8d7376472c9280eb854d68e6766703327a1240fe9"
+        }
+      },
+      "svg": {
+        "referenceMs": 4973,
+        "optimizedMs": 1492,
+        "sha256": {
+          "annotations.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "score.midi": "9979e674ec457a48e4c95bf8d7376472c9280eb854d68e6766703327a1240fe9",
+          "score.svg": "5aff204a442c243ee278e83ac53ca762121bb84738bf0c6ff6795cdf4af8c562"
+        }
+      }
+    }
+  }
+}

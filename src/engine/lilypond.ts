@@ -1,6 +1,8 @@
 import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
 import { injectSchemeHook, type RawArpeggioAnnotation } from './arpeggio';
+import midiOnly from './midiOnly.ily?raw';
+import glyphCache from './svgGlyphCache.ily?raw';
 import { readScoreFiles } from './scoreFiles';
 
 interface ScoreData {
@@ -56,8 +58,11 @@ export class BrowserLilyPondEngine {
     const compiler = await this.prepare();
     try {
       const start = performance.now();
+      const settings = `pianora-${format}.ily`;
       const { files } = await compiler.compile(injectSchemeHook(source), {
         format,
+        includeSettings: settings,
+        files: { [settings]: new TextEncoder().encode(format === 'svg' ? glyphCache : midiOnly) },
       });
       performance.measure('pianora:lilypond-' + format, { start });
       return readScoreFiles(files);

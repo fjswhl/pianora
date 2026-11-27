@@ -82,6 +82,16 @@ with sync_playwright() as pw:
         assert page.request.get(base+'/api/library/'+perf['id']+'/performance').body().startswith(b'MThd')
         page.get_by_role('button',name='关闭').click()
 
+    page.get_by_role('link',name='乐谱编辑').click()
+    page.locator('#presetSelect').select_option('sunny_day')
+    expect(page.get_by_role('button',name='保存到曲库')).to_be_enabled()
+    page.get_by_role('button',name='保存到曲库').click()
+    page.get_by_role('button',name='保存《晴天》').click()
+    expect(page.get_by_role('status')).to_contain_text('已保存')
+    bundled = next(s for s in page.request.get(base+'/api/library').json() if s['filename']=='晴天.mid')
+    assert page.request.get(base+'/api/library/'+bundled['id']+'/source').body().startswith(b'MThd')
+    page.get_by_role('button',name='关闭').click()
+
     other=browser.new_context()
     p2=other.new_page()
     p2.goto(base)
@@ -96,7 +106,7 @@ with sync_playwright() as pw:
     assert page.request.get(source_url).status==401
     browser.close()
 
-report={'simulatedOtp':True,'saveAfterLogin':True,'sessionAfterRefresh':True,'reopenSource':True,
+report={'simulatedOtp':True,'saveAfterLogin':True,'sessionAfterRefresh':True,'reopenSource':True,'bundledMidiSaved':True,
         'crossAccountRead':404,'signedOutRead':401,'foreignOriginWrite':403,'generatedTakeTested':bool(os.getenv('PIANORA_TEST_GENERATION'))}
 (out/'accounts.json').write_text(json.dumps(report,indent=2)+'\n')
 print('Account E2E passed')

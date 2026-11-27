@@ -47,7 +47,7 @@ async function preview(id: string) {
     v: Math.round(n.velocity * 127) }))).sort((a,b) => a.s - b.s);
   const studio = useStudioStore.getState();
   if (studio.liveActive || studio.busy) throw new Error('请在当前演奏生成结束后试听。');
-  await pianoPlayer.loadPreset(studio.activeTimbreId);
+  if (!pianoPlayer.ready) await pianoPlayer.loadPreset(studio.activeTimbreId);
   const previousTime = pianoPlayer.getCurrentTime();
   studio.stopPlayback();
   const restore = () => {

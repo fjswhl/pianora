@@ -3,6 +3,7 @@
   "saveAfterLogin": true,
   "sessionAfterRefresh": true,
   "reopenSource": true,
+  "bundledMidiSaved": true,
   "crossAccountRead": 404,
   "signedOutRead": 401,
   "foreignOriginWrite": 403,

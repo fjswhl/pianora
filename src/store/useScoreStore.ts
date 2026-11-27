@@ -111,6 +111,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
           const parsed = await parseDirectScoreFile(file);
           if (request === revision) {
             set({
+              originalFile: file,
               importedScore: { ...parsed, title: preset.name, composer: preset.composer },
               lyCode: '',
               loading: false,

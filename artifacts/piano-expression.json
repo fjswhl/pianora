@@ -1,0 +1,10 @@
+{
+  "noteWidthPx": {
+    "velocity32": 7,
+    "velocity118": 11
+  },
+  "travelIn200msPx": {
+    "bpm60": 6,
+    "bpm120": 11
+  }
+}

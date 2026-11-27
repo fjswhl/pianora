@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Music2 } from 'lucide-react';
 import { followTimeline, readFollowScore, type FollowScore } from '../engine/followScore';
 import { pianoPlayer } from '../engine/instances';
 import { getLiveSession, useStudioStore } from '../store/useStudioStore';
@@ -55,7 +54,7 @@ function ScoreWindow({ score, images }: { score: FollowScore; images: string[] }
   if (!active) return <p>这份乐谱没有可跟随的小节。</p>;
   const start = Math.max(0, Math.min(active.row - 1, score.rows.length - 3));
   return <>
-    <header><h3><Music2 size={16} />随奏谱</h3><span>第 <b>{active.number}</b> 小节</span></header>
+    <p className="follow-measure">第 <b>{active.number}</b> 小节</p>
     <div className="follow-systems">
       {score.rows.slice(start, start + 3).map((row, i) => {
         const page = score.pages[row.page];
@@ -102,9 +101,9 @@ export function FollowScorePanel() {
     };
   }, [load, attempt]);
   if (!load) return null;
-  return <section className="follow-score" aria-label="随奏谱">
+  return <div className="follow-score" role="group" aria-label="随奏谱">
     {loaded?.load === load ? <ScoreWindow {...loaded} /> : failed
       ? <p role="alert">随奏谱加载失败。 <button onClick={() => retry(n => n + 1)}>重试</button></p>
       : <p role="status">正在准备随奏谱…</p>}
-  </section>;
+  </div>;
 }

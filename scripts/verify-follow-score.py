@@ -30,6 +30,14 @@ with sync_playwright() as p:
     def seek_to(seconds):
         seek.fill(format(round(seconds, 1), "g"))
 
+    def check_score_above_piano():
+        player = page.locator(".roll-card")
+        score = player.get_by_role("group", name="随奏谱")
+        expect(score).to_be_visible()
+        staff = score.bounding_box()
+        keys = player.locator("#pianoCanvas").bounding_box()
+        assert 0 <= keys["y"] - (staff["y"] + staff["height"]) <= 20
+
     expect(systems).to_have_count(3, timeout=120000)
     expect(mark).to_have_attribute("data-bar", "1")
     expect(page.locator("#pianoCanvas")).to_be_visible()
@@ -66,13 +74,15 @@ with sync_playwright() as p:
     page.get_by_role("button", name="原谱演奏", exact=True).click()
     seek_to(bar_seconds * 18.4)
     expect(mark).to_have_attribute("data-bar", "11")
-    page.locator(".listening-desk").screenshot(path=artifacts / "follow-score.png")
+    check_score_above_piano()
+    page.locator(".roll-card").screenshot(path=artifacts / "follow-score.png")
     page.set_viewport_size({"width": 390, "height": 844})
     expect(systems).to_have_count(3)
     assert page.evaluate("document.documentElement.scrollWidth === innerWidth")
     page.emulate_media(reduced_motion="reduce")
     expect(rail).to_be_hidden()
-    page.locator(".follow-score").screenshot(path=artifacts / "follow-score-mobile.png")
+    check_score_above_piano()
+    page.locator(".roll-card").screenshot(path=artifacts / "follow-score-mobile.png")
     page.get_by_role("button", name="查看谱面").click()
     expect(page.locator(".svg-sheet-page svg").first).to_be_visible()
     page.get_by_role("button", name="试听与导出").click()

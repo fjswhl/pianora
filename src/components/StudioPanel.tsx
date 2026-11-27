@@ -56,10 +56,10 @@ export function StudioPanel() {
           <section className="listening-desk">
             <div className="roll-card">
               <PipelineHeader />
+              <FollowScorePanel />
               <PianoRollCanvas />
             </div>
             <TransportBar pianoStatus={pianoStatus} />
-            <FollowScorePanel />
             <GenerationRecord />
           </section>
         )}

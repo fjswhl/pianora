@@ -45,5 +45,7 @@ jobs:
       - name: Deploy Worker + static assets
         uses: cloudflare/wrangler-action@v3
         with:
+          # v4 understands wrangler.jsonc (v3 does not)
+          wranglerVersion: '4'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

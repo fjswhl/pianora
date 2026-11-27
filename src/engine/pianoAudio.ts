@@ -84,6 +84,11 @@ export const PIANO_PRESETS: PianoPresetSpec[] = [
   },
 ];
 
+/** Timbre preselected on first load: studio Steinway, small enough to start quickly. */
+export const DEFAULT_TIMBRE_ID = 'abbey_steinway_d';
+export const DEFAULT_TIMBRE =
+  PIANO_PRESETS.find((preset) => preset.id === DEFAULT_TIMBRE_ID) ?? PIANO_PRESETS[0];
+
 // 30 minor-third sampled pitches hosted on Tambien/Piano (Salamander Grand Piano v3)
 const SAL_MULTI_BASE = 'https://tambien.github.io/Piano/audio/';
 const SAL_NOTE_SPECS: Array<{ midi: number; filePrefix: string }> = [
@@ -211,7 +216,7 @@ export class StudioGrandPianoPlayer {
   private sf2CacheOrder: string[] = [];
   private activeSf2Id: string | null = null;
 
-  public activePresetId = 'salamander_c5_multi';
+  public activePresetId = DEFAULT_TIMBRE_ID;
   public activeEngine: 'salamander_multi' | 'sf2' = 'salamander_multi';
   public ready = false;
   public isPlaying = false;
@@ -566,7 +571,7 @@ export class StudioGrandPianoPlayer {
     presetId: string,
     onStatus?: (loading: boolean, text: string) => void,
   ): Promise<PianoPresetSpec> {
-    const spec = PIANO_PRESETS.find((p) => p.id === presetId) ?? PIANO_PRESETS[0];
+    const spec = PIANO_PRESETS.find((p) => p.id === presetId) ?? DEFAULT_TIMBRE;
     this.activePresetId = spec.id;
     this.releaseAll();
 

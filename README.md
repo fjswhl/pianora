@@ -43,7 +43,7 @@ npm install
 npm run setup:runtime
 
 # 2. (Optional) Download curated studio concert grand SF2 soundfonts (~1.1 GB total)
-#    Note: The default 5-velocity-layer Yamaha C5 works out of the box with zero local SF2 files!
+#    The default timbre (Abbey Steinway D, 38 MB) needs at least: npm run setup:soundfonts abbey
 npm run setup:soundfonts
 
 # 3. Export SyMuPe/PianoFlow-base to public/models/pianoflow_step_fp32.onnx
@@ -80,6 +80,19 @@ npx wrangler r2 object put pianora-assets/models/pianoflow_step_fp32.onnx \
 `run_worker_first` routes `/soundfonts/*`, `/models/*`, `/ort/*` through the Worker so R2
 stays same-origin (no CORS, no Hugging Face dependency at runtime). Note that R2's
 single-PUT limit is 300 MiB — anything larger must be split before upload.
+
+### Continuous deployment (GitHub Actions)
+
+`.github/workflows/deploy.yml` builds and deploys on every push to `main` (also manually via
+`workflow_dispatch`). It restores the gitignored runtime files with `npm run setup:runtime`,
+typechecks, builds, then runs `wrangler deploy`. R2 objects are untouched by CI.
+
+Required repository secrets (**Settings → Secrets and variables → Actions**):
+
+| Secret | Value |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | API token using the **Edit Cloudflare Workers** template, scoped to zone `opuslin.uk` |
+| `CLOUDFLARE_ACCOUNT_ID` | `01f3df81c128766bf8244570b541f131` |
 
 ---
 

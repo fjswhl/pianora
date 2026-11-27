@@ -16,7 +16,12 @@ import {
   type ConductorCue,
   type PerfState,
 } from '../engine/pianoflow';
-import { PIANO_PRESETS, HALL_IR_PRESETS } from '../engine/pianoAudio';
+import {
+  DEFAULT_TIMBRE,
+  DEFAULT_TIMBRE_ID,
+  HALL_IR_PRESETS,
+  PIANO_PRESETS,
+} from '../engine/pianoAudio';
 import { loadScorePresets, SHORT_ETUDE_LY, type ScorePreset } from '../engine/presets';
 import { lilypondEngine, pianoFlowEngine, pianoPlayer } from '../engine/instances';
 
@@ -234,10 +239,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
     ortStatus: 'PianoFlow ONNX 待加载',
     pianoReady: false,
     pianoLoading: true,
-    pianoStatus: '加载 5 层 Yamaha C5...',
+    pianoStatus: `加载 ${DEFAULT_TIMBRE.shortName}...`,
 
-    activeTimbreId: 'salamander_c5_multi',
-    timbreDesc: PIANO_PRESETS[0].desc,
+    activeTimbreId: DEFAULT_TIMBRE_ID,
+    timbreDesc: DEFAULT_TIMBRE.desc,
     customTimbres: [],
     activeHallId: HALL_IR_PRESETS[0].id,
     reverbWet: 0.28,
@@ -263,7 +268,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       st2: { status: 'idle', stat: '待运行' },
       st3: { status: 'idle', stat: '待运行' },
       st4: { status: 'idle', stat: '待运行' },
-      st5: { status: 'idle', stat: 'Yamaha C5 (5层)' },
+      st5: { status: 'idle', stat: DEFAULT_TIMBRE.shortName },
     },
 
     scoreMidi: null,
@@ -292,7 +297,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       booted = true;
       const presets = await loadScorePresets();
       set({ presets, selectedPresetId: presets[0].id, lyCode: presets[0].ly });
-      void get().switchTimbre('salamander_c5_multi');
+      void get().switchTimbre(DEFAULT_TIMBRE_ID);
     },
 
     setLyCode: (code) => set({ lyCode: code }),

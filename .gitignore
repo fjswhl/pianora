@@ -1,6 +1,7 @@
 # Dependencies & build outputs
 node_modules/
 dist/
+.wrangler/
 *.tsbuildinfo
 
 # Logs & OS files
@@ -15,4 +16,5 @@ public/ort/
 public/spessa/
 public/soundfonts/*.sf2
 public/soundfonts/*.sf3
+public/soundfonts/*.sf2.part*
 public/models/*.onnx

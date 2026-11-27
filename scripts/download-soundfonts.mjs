@@ -25,7 +25,7 @@ const CATALOG = {
   },
   fazioli: {
     file: 'fazioli_f308.sf2',
-    url: 'https://huggingface.co/datasets/projectlosangeles/soundfonts4u/resolve/main/Fazioli-F308-v2.5.sf2',
+    url: 'https://huggingface.co/datasets/projectlosangeles/soundfonts4u/resolve/main/Dore%20Mark%27s%20Fazioli%20F308-v2.6.sf2',
   },
   salamander: {
     file: 'salamander_c5_full.sf2',

@@ -56,15 +56,6 @@ export const PIANO_PRESETS: PianoPresetSpec[] = [
     engine: 'salamander_multi',
   },
   {
-    id: 'salamander_c5_full',
-    name: '👑 雅马哈 C5 三角旗舰（Salamander JNv5.1 · 620 MB 完整 SF2）',
-    shortName: 'Yamaha C5 旗舰版',
-    desc: '不省流量的完整 620 MB 多力度雅马哈 C5 无损级采样 SF2 + 琴弦交感共鸣 + 真实音乐厅卷积',
-    engine: 'sf2',
-    sf2Url: '/soundfonts/salamander_c5_full.sf2',
-    sizeLabel: '620 MB',
-  },
-  {
     id: 'abbey_steinway_d',
     name: '🏛️ Abbey Road 施坦威 Model D（38 MB · SF2）',
     shortName: 'Abbey Steinway D',
@@ -136,6 +127,56 @@ interface ActiveMultiVoice {
   gain: GainNode;
   midi: number;
   stopAt: number;
+}
+
+async function readBodyIntoBuffer(
+  resp: Response,
+  target: Uint8Array,
+  onProgress?: (loaded: number, total: number) => void,
+): Promise<number> {
+  const total = target.byteLength;
+  if (!resp.body) {
+    const bytes = new Uint8Array(await resp.arrayBuffer());
+    target.set(bytes);
+    onProgress?.(bytes.byteLength, total);
+    return bytes.byteLength;
+  }
+
+  const reader = resp.body.getReader();
+  let loaded = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    target.set(value, loaded);
+    loaded += value.byteLength;
+    onProgress?.(loaded, total);
+  }
+  return loaded;
+}
+
+/**
+ * Downloads an SF2 into a single pre-allocated ArrayBuffer. A HEAD request first
+ * keeps peak RAM at 1× the file size.
+ */
+async function downloadSf2(
+  spec: PianoPresetSpec,
+  onProgress?: (loaded: number, total: number) => void,
+): Promise<ArrayBuffer> {
+  const url = spec.sf2Url;
+  if (!url) throw new Error(`音色 ${spec.shortName} 缺少音源地址`);
+
+  const head = await fetch(url, { method: 'HEAD' });
+  if (!head.ok) throw new Error(`无法加载音色文件 ${url}`);
+  const total = Number(head.headers.get('content-length') || 0);
+  if (total <= 0) throw new Error(`无法获取音色文件大小 ${spec.shortName}`);
+
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`无法加载音色文件 ${url}`);
+  const merged = new Uint8Array(total);
+  const read = await readBodyIntoBuffer(resp, merged, onProgress);
+  if (read !== total) throw new Error(`音色文件不完整 ${spec.shortName}`);
+  onProgress?.(total, total);
+  return merged.buffer;
 }
 
 export class StudioGrandPianoPlayer {
@@ -483,7 +524,7 @@ export class StudioGrandPianoPlayer {
     this.sf2CacheOrder = this.sf2CacheOrder.filter((k) => k !== id);
     this.sf2CacheOrder.push(id);
 
-    // Keep memory bounded (~650 MB max cache besides active buffer) so switching between 620MB & 299MB never OOMs
+    // Keep memory bounded (~400 MB max cache besides active buffer) so switching between 299MB & 205MB never OOMs
     let totalBytes = 0;
     for (const v of this.sf2Cache.values()) totalBytes += v.byteLength;
     while (totalBytes > 700_000_000 && this.sf2CacheOrder.length > 1) {
@@ -555,58 +596,19 @@ export class StudioGrandPianoPlayer {
     }
 
     onStatus?.(true, `加载 ${spec.shortName} (${spec.sizeLabel || 'SF2'})...`);
-    const resp = await fetch(spec.sf2Url!);
-    if (!resp.ok) throw new Error(`无法加载音色文件 ${spec.sf2Url}`);
-
-    const total = Number(resp.headers.get('content-length') || 0);
-    let ab: ArrayBuffer;
-    if (resp.body) {
-      const reader = resp.body.getReader();
-      let loaded = 0;
-      let lastReport = 0;
-
-      if (total > 0) {
-        // Pre-allocate exact buffer to cut peak RAM in half for 620 MB SF2!
-        const merged = new Uint8Array(total);
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (loaded + value.byteLength <= total) {
-            merged.set(value, loaded);
-          }
-          loaded += value.byteLength;
-          const now = performance.now();
-          if (now - lastReport > 120) {
-            lastReport = now;
-            const pct = Math.min(99, Math.round((loaded / total) * 100));
-            onStatus?.(true, `加载 ${spec.shortName}: ${(loaded / 1e6).toFixed(0)}/${(total / 1e6).toFixed(0)} MB (${pct}%)`);
-          }
-        }
-        ab = loaded === total ? merged.buffer : merged.slice(0, loaded).buffer;
-      } else {
-        const chunks: Uint8Array[] = [];
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          loaded += value.byteLength;
-          const now = performance.now();
-          if (now - lastReport > 120) {
-            lastReport = now;
-            onStatus?.(true, `加载 ${spec.shortName}: ${(loaded / 1e6).toFixed(0)} MB...`);
-          }
-        }
-        const merged = new Uint8Array(loaded);
-        let off = 0;
-        for (const c of chunks) {
-          merged.set(c, off);
-          off += c.byteLength;
-        }
-        ab = merged.buffer;
-      }
-    } else {
-      ab = await resp.arrayBuffer();
-    }
+    let lastReport = 0;
+    const ab = await downloadSf2(spec, (loaded, total) => {
+      const now = performance.now();
+      if (now - lastReport < 120 && loaded < total) return;
+      lastReport = now;
+      const pct = total > 0 ? Math.min(99, Math.round((loaded / total) * 100)) : 0;
+      onStatus?.(
+        true,
+        total > 0
+          ? `加载 ${spec.shortName}: ${(loaded / 1e6).toFixed(0)}/${(total / 1e6).toFixed(0)} MB (${pct}%)`
+          : `加载 ${spec.shortName}: ${(loaded / 1e6).toFixed(0)} MB...`,
+      );
+    });
 
     if (this.activePresetId === spec.id) {
       await this.activateSf2Buffer(spec.id, ab, spec.shortName, onStatus);

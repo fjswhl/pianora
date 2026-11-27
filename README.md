@@ -16,7 +16,7 @@
 4. **Stage 4 · Symbolic Precision Restoration**
    Restores rolled arpeggios bottom-to-top while preserving 100% of the AI pianist's rubato, dynamics, and voicing — with real-time slider retuning (< 1 ms).
 5. **Stage 5 · Studio Acoustic Grand Piano Engine (Pure Web Audio + AudioWorklet)**
-   - **5-Velocity-Layer Yamaha C5 (Salamander)** fast-start engine + **SpessaSynth AudioWorklet** SoundFont2 engine (`620 MB Full Salamander C5`, `Abbey Steinway D`, `Nice Steinway v3.8`, `Dore Mark Fazioli F308`, plus local `.sf2/.sf3/.dls` import)
+   - **5-Velocity-Layer Yamaha C5 (Salamander)** fast-start engine + **SpessaSynth AudioWorklet** SoundFont2 engine (`Abbey Steinway D`, `Nice Steinway v3.8`, `Dore Mark Fazioli F308`, plus local `.sf2/.sf3/.dls` import)
    - **Custom AudioWorklet Sympathetic String & Soundboard Resonance** (`public/audio/sympathetic_resonance.js`): 28-mode damped harmonic resonator bank with realistic string inharmonicity + 4-line diffused spruce soundboard body halo
    - **Real Concert Hall Convolution Reverb (`ConvolverNode`)**: Vienna Musikverein, 18th-Century French Salon, La Scala Opera Hall, St. Nicolaes Church
    - **Sample-Accurate Offline WAV Export**: renders through the exact same sympathetic resonance + hall convolution chain via `OfflineAudioContext`.
@@ -55,6 +55,31 @@ npm run dev
 # or
 npm run build && npm run preview
 ```
+
+## Deployment (Cloudflare Workers + R2)
+
+Production runs as a single Cloudflare Worker on **https://opuslin.uk** (`wrangler.jsonc` → `routes[].custom_domain`).
+
+| Payload | Served from |
+| --- | --- |
+| UI bundle, IRs, small runtime files (≤ 25 MiB each) | Workers Static Assets (`dist/`) |
+| ONNX model, ORT WASM, SF2 SoundFonts | R2 bucket `pianora-assets`, streamed by `worker/index.ts` with full `Range` support |
+
+```bash
+# Deploy UI + Worker + custom domain (R2 objects are unchanged by redeploys)
+npm run deploy
+
+# One-time: upload the large binaries. ALWAYS pass --remote,
+# otherwise wrangler 4 writes them to local .wrangler/state instead!
+npx wrangler r2 object put pianora-assets/models/pianoflow_step_fp32.onnx \
+  --file public/models/pianoflow_step_fp32.onnx \
+  --content-type application/octet-stream --remote
+```
+
+`public/.assetsignore` keeps the oversized binaries out of the static asset manifest, and
+`run_worker_first` routes `/soundfonts/*`, `/models/*`, `/ort/*` through the Worker so R2
+stays same-origin (no CORS, no Hugging Face dependency at runtime). Note that R2's
+single-PUT limit is 300 MiB — anything larger must be split before upload.
 
 ---
 

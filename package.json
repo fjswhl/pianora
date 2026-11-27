@@ -10,7 +10,8 @@
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "typecheck": "tsc --noEmit",
     "setup:runtime": "node scripts/setup-runtime.mjs",
-    "setup:soundfonts": "node scripts/download-soundfonts.mjs"
+    "setup:soundfonts": "node scripts/download-soundfonts.mjs",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@sightread/lilypond-wasm": "^0.2.0",

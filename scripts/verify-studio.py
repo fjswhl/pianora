@@ -65,9 +65,9 @@ with sync_playwright() as playwright:
       return {compileStart: compile.startTime, compileEnd: compile.startTime + compile.duration,
               modelStart: model.startTime, modelEnd: model.responseEnd};
     }""")
-    assert page.evaluate("performance.getEntriesByName('pianora:score-ready').at(-1).detail.method") == "读取预编译谱"
-    assert any(".score" in path and path.endswith(".json") for _, path in requests)
-    assert not any("lilypond" in path or "runtime.data-" in path for _, path in requests)
+    assert page.evaluate("performance.getEntriesByName('pianora:score-ready').at(-1).detail.method") == "浏览器编译"
+    assert not any(".score-" in path or ".pages-" in path for _, path in requests)
+    assert any("lilypond" in path for _, path in requests)
     soundfont_requests = [m for m, path in requests if path.endswith(".sf2")]
     assert soundfont_requests == ["GET"], soundfont_requests
     assert [path for m, path in requests if path.endswith(".ly")] == ["/presets/clair_de_lune.ly", "/presets/short_etude.ly"]

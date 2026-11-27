@@ -1,6 +1,5 @@
 import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
-import compiledScores from 'virtual:pianora-compiled-scores';
 import { injectSchemeHook, type RawArpeggioAnnotation } from './arpeggio';
 import { readScoreFiles } from './scoreFiles';
 
@@ -49,22 +48,8 @@ export class BrowserLilyPondEngine {
     }
   }
 
-  private async presetUrl(source: string) {
-    if (!globalThis.crypto?.subtle || !Object.keys(compiledScores).length)
-      return;
-    const hash = await crypto.subtle.digest(
-      'SHA-256',
-      new TextEncoder().encode(source),
-    );
-    const key = Array.from(new Uint8Array(hash), (b) =>
-      b.toString(16).padStart(2, '0'),
-    ).join('');
-    return compiledScores[key];
-  }
-
   async warmForSource(source: string) {
-    if (this.last?.source !== source && !(await this.presetUrl(source)))
-      await this.prepare();
+    if (this.last?.source !== source) await this.prepare();
   }
 
   private async run(source: string, format: 'midi' | 'svg') {
@@ -85,51 +70,13 @@ export class BrowserLilyPondEngine {
     }
   }
 
-  private sheetLoader(source: string, url?: string) {
-    const load = async (): Promise<string[]> => {
-      if (url) {
-        try {
-          const response = await fetch(url);
-          if (response.ok) {
-            const pages = await response.json();
-            if (
-              Array.isArray(pages) &&
-              pages.every((p) => typeof p === 'string')
-            )
-              return pages;
-          }
-        } catch {
-          /* Fall back to the score snapshot that produced this performance. */
-        }
-      }
-      return (await this.run(source, 'svg')).svgPages;
-    };
+  private sheetLoader(source: string) {
     let pending: Promise<string[]> | undefined;
     return () =>
-      (pending ??= load().catch((error) => {
+      (pending ??= this.run(source, 'svg').then(result => result.svgPages).catch(error => {
         pending = undefined;
         throw error;
       }));
-  }
-
-  private async loadPreset(source: string): Promise<ScoreData | undefined> {
-    const urls = await this.presetUrl(source);
-    if (!urls) return;
-    try {
-      const response = await fetch(urls[0]);
-      if (!response.ok) return;
-      const { midi, rawAnnotations } = await response.json();
-      if (typeof midi !== 'string' || !Array.isArray(rawAnnotations)) return;
-      return {
-        scoreMidi: new Midi(
-          Uint8Array.from(atob(midi), (c) => c.charCodeAt(0)),
-        ),
-        loadPages: this.sheetLoader(source, urls[1]),
-        rawAnnotations,
-      };
-    } catch {
-      return;
-    }
   }
 
   async compile(source: string, onProgress?: Progress) {
@@ -145,12 +92,6 @@ export class BrowserLilyPondEngine {
     };
     if (this.last?.source === source)
       return result(this.last.data, '复用上次结果');
-
-    const preset = await this.loadPreset(source);
-    if (preset) {
-      this.last = { source, data: preset };
-      return result(preset, '读取预编译谱');
-    }
 
     onProgress?.('正在准备浏览器 LilyPond 编译器…', 5);
     this.progress = onProgress;

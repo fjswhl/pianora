@@ -1,10 +1,9 @@
-import { compiledScores } from './scripts/compiled-scores';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), compiledScores()],
+  plugins: [react(), tailwindcss()],
   optimizeDeps: {
     exclude: ['@sightread/lilypond-wasm', 'onnxruntime-web'],
   },

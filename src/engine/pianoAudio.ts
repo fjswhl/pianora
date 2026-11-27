@@ -1,5 +1,6 @@
-import { WorkletSynthesizer, audioBufferToWav } from 'spessasynth_lib';
-import { BasicMIDI } from 'spessasynth_core';
+import type { WorkletSynthesizer } from 'spessasynth_lib';
+import { releaseUrl, soundfonts } from './assetRelease';
+import { downloadBytes } from './download';
 import type { SimpleNote } from './arpeggio';
 import { notesToMidiBytes } from './pianoflow';
 
@@ -61,7 +62,7 @@ export const PIANO_PRESETS: PianoPresetSpec[] = [
     shortName: 'Abbey Steinway D',
     desc: 'Abbey Steinway Model D 38 MB 专业 SF2 + 琴弦交感共鸣 + 真实音乐厅卷积',
     engine: 'sf2',
-    sf2Url: '/soundfonts/abbey_steinway_d.sf2',
+    sf2Url: releaseUrl(soundfonts.abbey),
     sizeLabel: '38 MB',
   },
   {
@@ -70,7 +71,7 @@ export const PIANO_PRESETS: PianoPresetSpec[] = [
     shortName: 'Nice Steinway v3.8',
     desc: '205 MB 多力度立体声音乐会施坦威 + 琴弦交感共鸣 + 真实音乐厅卷积',
     engine: 'sf2',
-    sf2Url: '/soundfonts/nice_steinway_v38.sf2',
+    sf2Url: releaseUrl(soundfonts.nice),
     sizeLabel: '205 MB',
   },
   {
@@ -79,7 +80,7 @@ export const PIANO_PRESETS: PianoPresetSpec[] = [
     shortName: 'Fazioli F308 大三角',
     desc: '意大利 3.08 米 Fazioli F308 旗舰大三角（299 MB 多力度 SF2）+ 琴弦交感共鸣 + 真实音乐厅卷积',
     engine: 'sf2',
-    sf2Url: '/soundfonts/fazioli_f308.sf2',
+    sf2Url: releaseUrl(soundfonts.fazioli),
     sizeLabel: '299 MB',
   },
 ];
@@ -134,35 +135,6 @@ interface ActiveMultiVoice {
   stopAt: number;
 }
 
-async function readBodyIntoBuffer(
-  resp: Response,
-  target: Uint8Array,
-  onProgress?: (loaded: number, total: number) => void,
-): Promise<number> {
-  const total = target.byteLength;
-  if (!resp.body) {
-    const bytes = new Uint8Array(await resp.arrayBuffer());
-    target.set(bytes);
-    onProgress?.(bytes.byteLength, total);
-    return bytes.byteLength;
-  }
-
-  const reader = resp.body.getReader();
-  let loaded = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    target.set(value, loaded);
-    loaded += value.byteLength;
-    onProgress?.(loaded, total);
-  }
-  return loaded;
-}
-
-/**
- * Downloads an SF2 into a single pre-allocated ArrayBuffer. A HEAD request first
- * keeps peak RAM at 1× the file size.
- */
 async function downloadSf2(
   spec: PianoPresetSpec,
   onProgress?: (loaded: number, total: number) => void,
@@ -170,18 +142,7 @@ async function downloadSf2(
   const url = spec.sf2Url;
   if (!url) throw new Error(`音色 ${spec.shortName} 缺少音源地址`);
 
-  const head = await fetch(url, { method: 'HEAD' });
-  if (!head.ok) throw new Error(`无法加载音色文件 ${url}`);
-  const total = Number(head.headers.get('content-length') || 0);
-  if (total <= 0) throw new Error(`无法获取音色文件大小 ${spec.shortName}`);
-
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`无法加载音色文件 ${url}`);
-  const merged = new Uint8Array(total);
-  const read = await readBodyIntoBuffer(resp, merged, onProgress);
-  if (read !== total) throw new Error(`音色文件不完整 ${spec.shortName}`);
-  onProgress?.(total, total);
-  return merged.buffer;
+  return (await downloadBytes(url, onProgress)).buffer;
 }
 
 export class StudioGrandPianoPlayer {
@@ -516,6 +477,7 @@ export class StudioGrandPianoPlayer {
       return this.sfSynth;
     }
     await ctx.audioWorklet.addModule('/spessa/spessasynth_processor.min.js');
+    const { WorkletSynthesizer } = await import('spessasynth_lib');
     const synth = new WorkletSynthesizer(ctx);
     // Route SpessaSynth DRY into our Master Acoustic Chain (Sympathetic Worklet + Real Concert Hall IR)
     synth.connect(this.dryBus!);
@@ -824,6 +786,7 @@ export class StudioGrandPianoPlayer {
     reverbWet: number,
     resonanceAmount = this.resonanceAmount,
   ): Promise<Blob> {
+    const { WorkletSynthesizer, audioBufferToWav } = await import('spessasynth_lib');
     const sr = 44100;
     const leadIn = 0.05;
     const totalSamples = Math.ceil((duration + 3.8) * sr);
@@ -906,6 +869,7 @@ export class StudioGrandPianoPlayer {
 
         const shiftedNotes = notes.map((n) => ({ ...n, s: n.s + leadIn }));
         const midiBytes = notesToMidiBytes(shiftedNotes, 'PianoFlow');
+        const { BasicMIDI } = await import('spessasynth_core');
         const basicMidi = BasicMIDI.fromArrayBuffer(midiBytes.buffer as ArrayBuffer);
         await offSynth.startOfflineRender({
           midiSequence: basicMidi,

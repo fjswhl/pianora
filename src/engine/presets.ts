@@ -2,52 +2,16 @@ export interface ScorePreset {
   id: string;
   name: string;
   subtitle: string;
-  ly: string;
-}
-
-export const SHORT_ETUDE_LY = String.raw`\version "2.24.3"
-\header {
-  title = "Lune Miniature"
-  subtitle = "Pure-Browser Quick Etude"
-  composer = "Pianora Etude"
-  tagline = ##f
-}
-\include "english.ly"
-
-\score {
-  \new PianoStaff <<
-    \new Staff = "upper" {
-      \key df \major
-      \time 9/8
-      \tempo 4. = 46
-      r8\pp <f' af'>4 <f'' af''>4. <df'' f''>4.~ |
-      <df'' f''>8 <c'' ef''> <df'' f''> <c'' ef''>2. |
-      <af'' df''' af'''>2.\arpeggio <af'' df''' af'''>4.\arpeggio |
-      <af' df'' f'' af''>2.\arpeggio r4. \bar "|."
-    }
-    \new Staff = "lower" {
-      \clef bass
-      \key df \major
-      \time 9/8
-      r8 <df, af,>4~ <df, af,>2. |
-      <gf, bf, df>2.~ <gf, bf, df>4. |
-      <f af df' f'>2.\arpeggio <ff af bf df' ff'>4.\arpeggio |
-      <df, af, df f>2.\arpeggio r4. \bar "|."
-    }
-  >>
-  \layout { }
-  \midi { }
-}
-`;
-
-interface RemotePresetSpec {
-  id: string;
-  name: string;
-  subtitle: string;
   url: string;
 }
 
-const REMOTE_PRESETS: RemotePresetSpec[] = [
+export const scorePresets: ScorePreset[] = [
+  {
+    id: 'short_etude',
+    name: '4 小节快速体验片段',
+    subtitle: '含 3 处原谱琶音',
+    url: '/presets/short_etude.ly',
+  },
   {
     id: 'clair_de_lune',
     name: '德彪西《月光》全曲',
@@ -85,36 +49,3 @@ const REMOTE_PRESETS: RemotePresetSpec[] = [
     url: '/presets/mozart/mozart_sonata_k545_2.ly',
   },
 ];
-
-export async function loadScorePresets(): Promise<ScorePreset[]> {
-  const list: ScorePreset[] = [
-    {
-      id: 'short_etude',
-      name: '4 小节快速体验片段',
-      subtitle: '含 3 处原谱琶音 · 秒出声',
-      ly: SHORT_ETUDE_LY,
-    },
-  ];
-
-  const loaded = await Promise.all(
-    REMOTE_PRESETS.map(async (spec): Promise<ScorePreset | null> => {
-      try {
-        const res = await fetch(spec.url);
-        if (!res.ok) return null;
-        return {
-          id: spec.id,
-          name: spec.name,
-          subtitle: spec.subtitle,
-          ly: await res.text(),
-        };
-      } catch {
-        return null;
-      }
-    }),
-  );
-
-  for (const item of loaded) {
-    if (item) list.push(item);
-  }
-  return list;
-}

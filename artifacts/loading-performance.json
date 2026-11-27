@@ -1,0 +1,48 @@
+{
+  "homepageAssets": [
+    {
+      "path": "/assets/index-BgyloUcg.js",
+      "bytes": 240998
+    },
+    {
+      "path": "/assets/index-CzQ5V-lJ.css",
+      "bytes": 39880
+    }
+  ],
+  "generationToPlayMs": 3315,
+  "pipelineMs": {
+    "compileStart": 1316.0999999642372,
+    "compileEnd": 3986.399999976158,
+    "modelStart": 1316.699999988079,
+    "modelEnd": 2104.899999976158
+  },
+  "soundfontRequests": [
+    "GET"
+  ],
+  "verified": [
+    "MIDI",
+    "WAV",
+    "score SVG",
+    "track selection",
+    "mobile layout",
+    "direct editor entry",
+    "preset retry and late response"
+  ],
+  "edge": {
+    "warmAssets": [
+      {
+        "path": "/assets/index-BgyloUcg.js",
+        "transferred": 0
+      },
+      {
+        "path": "/assets/index-CzQ5V-lJ.css",
+        "transferred": 0
+      }
+    ],
+    "range": "bytes 0-7/99020348",
+    "cache": "HIT",
+    "conditional": 304,
+    "wrongRevision": 404,
+    "legacy": 200
+  }
+}

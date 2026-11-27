@@ -2,7 +2,7 @@
  * Browser LilyPond WebAssembly compiler wrapper with Scheme arpeggio extraction,
  * Mutopia/2.18 compatibility sanitization, and automatic WASM worker crash recovery.
  */
-import { createReusableCompiler } from '@sightread/lilypond-wasm';
+import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
 import { injectSchemeHook, type RawArpeggioAnnotation } from './arpeggio';
 
@@ -14,7 +14,7 @@ export interface LilyPondCompileOutput {
 }
 
 export class BrowserLilyPondEngine {
-  private compiler = createReusableCompiler();
+  private compiler?: ReturnType<typeof createReusableCompiler>;
   public preloaded = false;
 
   async compile(
@@ -23,6 +23,7 @@ export class BrowserLilyPondEngine {
   ): Promise<LilyPondCompileOutput> {
     const t0 = performance.now();
     try {
+      this.compiler ??= (await import('@sightread/lilypond-wasm')).createReusableCompiler();
       if (!this.preloaded) {
         onProgress?.('首次加载 LilyPond WebAssembly 引擎 (~31 MB)...', 5);
         await this.compiler.preload({
@@ -81,7 +82,7 @@ export class BrowserLilyPondEngine {
         try {
           await (this.compiler as unknown as { dispose?: () => Promise<void> }).dispose?.();
         } catch {}
-        this.compiler = createReusableCompiler();
+        this.compiler = undefined;
         this.preloaded = false;
       }
       throw err;

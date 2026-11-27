@@ -1,10 +1,12 @@
+import { useScoreStore } from '../store/useScoreStore';
+import { scorePresets as presets } from '../engine/presets';
 import { FileUp, Play, Sparkles, AlertCircle } from 'lucide-react';
 import { useStudioStore } from '../store/useStudioStore';
 
 export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
-  const presets = useStudioStore((s) => s.presets);
-  const selectedPresetId = useStudioStore((s) => s.selectedPresetId);
-  const lyCode = useStudioStore((s) => s.lyCode);
+  const { loading, error } = useScoreStore();
+  const selectedPresetId = useScoreStore((s) => s.selectedPresetId);
+  const lyCode = useScoreStore((s) => s.lyCode);
   const cfmSteps = useStudioStore((s) => s.cfmSteps);
   const stepFactor = useStudioStore((s) => s.stepFactor);
   const seed = useStudioStore((s) => s.seed);
@@ -15,8 +17,8 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
   const progressPct = useStudioStore((s) => s.progressPct);
   const errorMsg = useStudioStore((s) => s.errorMsg);
 
-  const selectPreset = useStudioStore((s) => s.selectPreset);
-  const setLyCode = useStudioStore((s) => s.setLyCode);
+  const selectPreset = useScoreStore((s) => s.selectPreset);
+  const setLyCode = useScoreStore((s) => s.setLyCode);
   const setCfmSteps = useStudioStore((s) => s.setCfmSteps);
   const setStepFactor = useStudioStore((s) => s.setStepFactor);
   const setSeed = useStudioStore((s) => s.setSeed);
@@ -45,7 +47,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
 
       <select
         aria-label="选择曲谱" id="presetSelect"
-        value={presets.find(p => p.id === selectedPresetId)?.ly === lyCode ? selectedPresetId : "custom"}
+        value={selectedPresetId}
         onChange={(e) => selectPreset(e.target.value)}
         className="w-full rounded-lg border border-slate-700/80 bg-[#0b101c] px-3 py-2 text-xs text-slate-100 outline-none transition focus:border-[#e8be6a]"
       >
@@ -57,7 +59,9 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         ))}
       </select>
 
-      <textarea
+      {loading && <p role="status">正在读取曲谱…</p>}
+      {error && <p role="alert">{error}</p>}
+      <textarea disabled={loading}
         aria-label="LilyPond 乐谱源码" id="lyEditor"
         value={lyCode}
         onChange={(e) => setLyCode(e.target.value)}
@@ -143,7 +147,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
       </details>
       <button
         id="renderBtn"
-        disabled={busy || !lyCode.trim()}
+        disabled={busy || loading || Boolean(error) || !lyCode.trim()}
         onClick={async () => { await runFullPipeline(); if (!useStudioStore.getState().errorMsg) onGenerated(); }}
         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f1cc7d] to-[#d09638] px-4 py-3 text-sm font-bold text-[#090d16] shadow-lg shadow-amber-500/15 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
       >

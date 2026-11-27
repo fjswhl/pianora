@@ -22,7 +22,7 @@ import {
   HALL_IR_PRESETS,
   PIANO_PRESETS,
 } from '../engine/pianoAudio';
-import { loadScorePresets, SHORT_ETUDE_LY, type ScorePreset } from '../engine/presets';
+import { useScoreStore } from './useScoreStore';
 import { lilypondEngine, pianoFlowEngine, pianoPlayer } from '../engine/instances';
 
 export type TrackKey = 'score' | 'pianoflow_raw' | 'final_restored';
@@ -111,10 +111,7 @@ interface StudioState {
   exportingWav: boolean;
 
   // Score & Pipeline params
-  presets: ScorePreset[];
-  selectedPresetId: string;
   performanceTitle: string;
-  lyCode: string;
   cfmSteps: number;
   stepFactor: number;
   seed: number;
@@ -154,9 +151,6 @@ interface StudioState {
   m7Status: string;
 
   // Actions
-  init: () => Promise<void>;
-  setLyCode: (code: string) => void;
-  selectPreset: (id: string) => void;
   setCfmSteps: (v: number) => void;
   setStepFactor: (v: number) => void;
   setSeed: (v: number) => void;
@@ -197,7 +191,6 @@ interface StudioState {
   runMode7MasterRelay: (prefixBars: number, seed: number) => Promise<void>;
 }
 
-let booted = false;
 
 export const useStudioStore = create<StudioState>((set, get) => {
   const buildTake = (id: string, label: string, seed: number, perfState: PerfState): TakeRecord => {
@@ -251,10 +244,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     isPlaying: false,
     exportingWav: false,
 
-    presets: [{ id: 'short_etude', name: '4 小节快速体验片段', subtitle: '含 3 处原谱琶音 · 秒出声', ly: SHORT_ETUDE_LY }],
-    selectedPresetId: 'short_etude',
     performanceTitle: '',
-    lyCode: SHORT_ETUDE_LY,
     cfmSteps: 10,
     stepFactor: 0.75,
     seed: 42,
@@ -294,19 +284,6 @@ export const useStudioStore = create<StudioState>((set, get) => {
     refMasterLabel: '',
     m7Status: '尚未选择参考演奏 MIDI（可直接点击上方内置大师引子试玩）',
 
-    init: async () => {
-      if (booted) return;
-      booted = true;
-      const presets = await loadScorePresets();
-      set({ presets });
-
-    },
-
-    setLyCode: (code) => set({ lyCode: code }),
-    selectPreset: (id) => {
-      const p = get().presets.find((x) => x.id === id);
-      if (p) set({ selectedPresetId: id, lyCode: p.ly });
-    },
     setCfmSteps: (v) => set({ cfmSteps: v }),
     setStepFactor: (v) => set({ stepFactor: v }),
     setSeed: (v) => set({ seed: v }),
@@ -465,8 +442,9 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
     runFullPipeline: async () => {
       const st = get();
-      const lyCode = st.lyCode.trim();
-      if (!lyCode || st.busy) return;
+      const score = useScoreStore.getState();
+      const lyCode = score.lyCode.trim();
+      if (!lyCode || st.busy || score.loading || score.error) return;
       if (st.liveActive) st.stopLiveConductor(false);
 
       pianoPlayer.stop(true);
@@ -486,27 +464,42 @@ export const useStudioStore = create<StudioState>((set, get) => {
       });
 
       try {
-        // Stage 1 + 2: LilyPond WASM + Scheme
-        const compiled = await lilypondEngine.compile(lyCode, (msg, pct) => {
-          set({ progressMsg: `Stage 1/5: ${msg}`, progressPct: pct ?? 15 });
+        const controller = new AbortController();
+        let compileProgress = 0;
+        let modelProgress = 0;
+        const report = (msg: string) => set({
+          progressMsg: msg,
+          progressPct: 4 + compileProgress * 0.7 + modelProgress * 0.28,
         });
-        set((s) => ({
-          wasmReady: true,
-          wasmStatus: 'LilyPond WASM 就绪',
-          stages: {
-            ...s.stages,
-            st1: { status: 'done', stat: `${compiled.compileSec}s · ${compiled.svgPages.length} 页 SVG` },
-            st2: { status: 'done', stat: `提取 ${compiled.rawAnnotations.length} 条事件` },
-          },
-        }));
-
-        // Stage 3: PianoFlow ONNX
-        if (pianoFlowEngine.provider === 'unloaded') {
-          await pianoFlowEngine.load((msg, pct) => {
-            set({ progressMsg: `Stage 3/5: ${msg}`, progressPct: 24 + (pct ?? 0) * 0.28, ortStatus: msg.slice(0, 26) });
-          });
+        const compileStarted = performance.now();
+        const compile = lilypondEngine.compile(lyCode, (msg, pct) => {
+          compileProgress = pct ?? compileProgress;
+          report(msg);
+        }).then(compiled => {
+          performance.measure('pianora:score-compile', { start: compileStarted });
+          set(s => ({
+            wasmReady: true,
+            wasmStatus: 'LilyPond WASM 就绪',
+            stages: {
+              ...s.stages,
+              st1: { status: 'done', stat: `${compiled.compileSec}s · ${compiled.svgPages.length} 页 SVG` },
+              st2: { status: 'done', stat: `提取 ${compiled.rawAnnotations.length} 条事件` },
+            },
+          }));
+          return compiled;
+        }).catch(error => { controller.abort(); throw error; });
+        const model = pianoFlowEngine.load((msg, pct) => {
+          if (pct === modelProgress) return;
+          modelProgress = pct ?? modelProgress;
+          report(msg);
+        }, controller.signal).then(() => {
           set({ ortReady: true, ortStatus: `PianoFlow (${pianoFlowEngine.provider}) 就绪` });
-        }
+        });
+        // Let both jobs settle before allowing a retry or another generation.
+        const [scoreResult, modelResult] = await Promise.allSettled([compile, model]);
+        if (scoreResult.status === 'rejected') throw scoreResult.reason;
+        if (modelResult.status === 'rejected') throw modelResult.reason;
+        const compiled = scoreResult.value;
 
         const { cfmSteps, stepFactor, seed, batchCount } = get();
         const t3 = performance.now();
@@ -1004,3 +997,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
 function specShort(id: string): string {
   return PIANO_PRESETS.find((p) => p.id === id)?.shortName ?? 'SF2 Grand';
 }
+
+useStudioStore.subscribe((state, previous) => {
+  if (state.busy !== previous.busy) useScoreStore.setState({ pipelineBusy: state.busy });
+});

@@ -130,3 +130,15 @@ src/
 - Browser SoundFont2 AudioWorklet: [SpessaSynth](https://github.com/spessasus/spessasynth_lib)
 - Acoustic piano samples: Salamander Grand Piano v3 (Alexander Holm, CC-BY-3.0) & Soundfonts4U
 - Measured acoustic hall impulse responses: Voxengo Free Impulse Responses via `oramics/sampled`
+
+### Loading and caching
+
+The library ships the score catalogue. Opening a piece fetches its source, and generating a performance starts LilyPond compilation and model loading concurrently. The tokenizer is emitted as a Vite content-hashed module paired with the model in `src/engine/assetRelease.ts`.
+
+`public/_headers` gives hashed `/assets/*` a one-year browser TTL. HTML keeps the Workers Static Assets revalidation default. Model and soundfont requests use a revision from the release manifest. The same-origin Worker checks the R2 ETag, caches successful full GETs in the local Cloudflare edge cache, and supports range reads from those cached objects. Unversioned URLs remain available for older clients.
+
+For an asset update, upload the file to a **new R2 key**, record its actual R2 ETag in the manifest, and update the matching tokenizer before building. Keep previous keys for older sessions. The first release references the existing keys in place.
+
+To serve these public binaries via a dedicated CDN hostname instead, connect an R2 custom domain, enable a Cache Rule for the model and soundfont paths (keep the revision in the cache key), set object cache metadata, and configure CORS for the studio origin. Set `VITE_R2_PUBLIC_ORIGIN` to that HTTPS origin **at build time** (or set the identically named GitHub repository variable for CI). This bypasses the same-origin Worker for these files. Without this setting, no Cloudflare account changes are required.
+
+Run `scripts/verify-studio.py` against a production build as described in the script. `PIANORA_URL` selects the server and `PIANORA_ARTIFACTS` selects the evidence directory. Set `PIANORA_VERIFY_EDGE=1` against Wrangler or the deployed Worker to also check static headers, cached byte ranges, conditional requests and legacy URLs. For local Wrangler tests, populate its local R2 bucket with the release model, default soundfont and ORT WASM files using `wrangler r2 object put ... --local`. The browser run records the initial assets, overlap of model transfer and compilation, and soundfont request count in `loading-performance.json`.

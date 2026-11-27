@@ -5,7 +5,7 @@ import {
   Feather,
   Music2,
 } from 'lucide-react';
-import { useStudioStore } from '../store/useStudioStore';
+import { scorePresets } from '../engine/presets';
 import { CoverArt, type CoverEdition } from './CoverArt';
 
 interface EditionMeta {
@@ -69,7 +69,7 @@ export const editions: Record<string, EditionMeta> = {
 };
 
 export function Library({ openScore }: { openScore: (id: string) => void }) {
-  const presets = useStudioStore((s) => s.presets);
+  const presets = scorePresets;
   return (
     <>
       <section className="feature">

@@ -11,7 +11,9 @@
  *  6. Live Real-Time Interactive Conductor (0.25s sliding window + instant drop-future re-steering)
  *  7. Master Style Relay (pure-TS DP score-to-performance MIDI alignment -> prefix lock -> continue)
  */
-import * as ort from 'onnxruntime-web';
+import type * as Ort from 'onnxruntime-web';
+import { pianoFlowRelease, releaseUrl } from './assetRelease';
+import { downloadBytes } from './download';
 import { Midi } from '@tonejs/midi';
 import type { SimpleNote } from './arpeggio';
 
@@ -632,48 +634,25 @@ export function synthesizeRomanticDemoMidi(
 }
 
 export class BrowserPianoFlow {
-  private session: ort.InferenceSession | null = null;
+  private runtime?: typeof Ort;
+  private session: Ort.InferenceSession | null = null;
   public meta: TokenizerMeta | null = null;
   public provider = 'unloaded';
 
-  async load(onProgress?: (msg: string, pct?: number) => void): Promise<void> {
+  async load(onProgress?: (msg: string, pct?: number) => void, signal?: AbortSignal): Promise<void> {
     if (this.session && this.meta) return;
-
+    const [ort, tokenizer, modelBytes] = await Promise.all([
+      import('onnxruntime-web'),
+      pianoFlowRelease.tokenizer(),
+      downloadBytes(releaseUrl(pianoFlowRelease.model), (loaded, total) => {
+        onProgress?.(`下载 PianoFlow ONNX: ${(loaded / 1e6).toFixed(1)} / ${(total / 1e6).toFixed(1)} MB`, 12 + Math.round(loaded / total * 70));
+      }, signal),
+    ]);
+    signal?.throwIfAborted();
+    this.runtime = ort;
+    this.meta = { ...tokenizer.default, pitch_range: [tokenizer.default.pitch_range[0], tokenizer.default.pitch_range[1]] };
     ort.env.wasm.wasmPaths = '/ort/';
     ort.env.wasm.numThreads = 1;
-
-    onProgress?.('加载 SyMuPe Tokenizer 配置 (28 KB)...', 5);
-    const metaResp = await fetch('/models/pianoflow_tokenizer_meta.json');
-    if (!metaResp.ok) throw new Error('无法加载 tokenizer 配置');
-    this.meta = (await metaResp.json()) as TokenizerMeta;
-
-    onProgress?.('下载 PianoFlow-base FP32 模型 (99 MB，浏览器会自动缓存)...', 12);
-    const modelResp = await fetch('/models/pianoflow_step_fp32.onnx');
-    if (!modelResp.ok) throw new Error('无法加载 PianoFlow ONNX 模型');
-
-    const total = Number(modelResp.headers.get('content-length') || 99_020_000);
-    let modelBytes: Uint8Array;
-    if (modelResp.body) {
-      const reader = modelResp.body.getReader();
-      const chunks: Uint8Array[] = [];
-      let loaded = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        loaded += value.byteLength;
-        const pct = Math.min(82, 12 + Math.round((loaded / total) * 70));
-        onProgress?.(`下载 PianoFlow ONNX: ${(loaded / 1e6).toFixed(1)} / ${(total / 1e6).toFixed(1)} MB`, pct);
-      }
-      modelBytes = new Uint8Array(loaded);
-      let off = 0;
-      for (const c of chunks) {
-        modelBytes.set(c, off);
-        off += c.byteLength;
-      }
-    } else {
-      modelBytes = new Uint8Array(await modelResp.arrayBuffer());
-    }
 
     const hasWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator;
     if (hasWebGPU) {
@@ -768,6 +747,7 @@ export class BrowserPianoFlow {
 
     if (!anyMasked) return;
 
+    const ort = this.runtime!;
     const tokTensor = new ort.Tensor('int64', wTokens, [1, L, 8]);
     const valTensor = new ort.Tensor('float32', wValues, [1, L, 8]);
     const maskTensor = new ort.Tensor('bool', wMask, [1, L]);

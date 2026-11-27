@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
-  ArrowRight,
   AudioLines,
   BookOpen,
   ChevronRight,
@@ -10,10 +9,10 @@ import {
   SlidersHorizontal,
   Upload,
 } from 'lucide-react';
-import { ScoreSidebar } from './components/ScoreSidebar';
-import { StudioPanel } from './components/StudioPanel';
 import { Library } from './components/Library';
-import { useStudioStore } from './store/useStudioStore';
+import { useScoreStore } from './store/useScoreStore';
+
+const Workspace = lazy(() => import('./components/Workspace'));
 
 const pages = {
   library: {
@@ -41,44 +40,17 @@ function currentPage(): Page {
 export function App() {
   const [page, setPage] = useState<Page>(currentPage);
   const upload = useRef<HTMLInputElement>(null);
-  const init = useStudioStore((s) => s.init);
-  const takes = useStudioStore((s) => s.takes);
-  const busy = useStudioStore((s) => s.busy);
-  const selectPreset = useStudioStore((s) => s.selectPreset);
-  const setLyCode = useStudioStore((s) => s.setLyCode);
+  const pipelineBusy = useScoreStore((s) => s.pipelineBusy);
+  const { selectPreset, setLyCode } = useScoreStore.getState();
   const [fileError, setFileError] = useState('');
   useEffect(() => {
-    void init();
     const navigate = () => {
       setPage(currentPage());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [init]);
-  useEffect(() => {
-    const studio = useStudioStore.getState();
-    if (page === 'editor' && !studio.pianoReady && !studio.pianoLoading) {
-      void studio.switchTimbre(studio.activeTimbreId);
-    }
-    const play = (e: KeyboardEvent) => {
-      if (
-        page !== 'studio' ||
-        e.code !== 'Space' ||
-        (e.target as HTMLElement).closest(
-          'button,input,select,textarea,a,summary,[contenteditable]',
-        )
-      )
-        return;
-      const st = useStudioStore.getState();
-      if (st.scoreMidi) {
-        e.preventDefault();
-        st.togglePlay();
-      }
-    };
-    window.addEventListener('keydown', play);
-    return () => window.removeEventListener('keydown', play);
-  }, [page]);
+  }, []);
   return (
     <div className="shell">
       <aside className="rail">
@@ -111,21 +83,21 @@ export function App() {
           <strong>{pages[page].title}</strong>
         </header>
         <main className="content">
-          {(page !== 'studio' || takes.length === 0) && <div className="page-title">
-            <div>
-              <h1>{pages[page].title}</h1>
-              <p>{pages[page].desc}</p>
-            </div>
-            {page === 'library' && (
+          {page === 'library' && (
+            <div className="page-title">
+              <div>
+                <h1>{pages[page].title}</h1>
+                <p>{pages[page].desc}</p>
+              </div>
               <button
                 className="import"
-                disabled={busy}
+                disabled={pipelineBusy}
                 onClick={() => upload.current?.click()}
               >
                 <Upload size={16} /> 导入乐谱
               </button>
-            )}
-          </div>}
+            </div>
+          )}
           <input
             type="file"
             hidden
@@ -153,32 +125,15 @@ export function App() {
               }}
             />
           )}
-          {page === 'editor' && (
-            <div className="editing">
-              <ScoreSidebar
-                onGenerated={() => {
-                  if (currentPage() === 'editor') location.hash = 'studio';
-                }}
+          {page !== 'library' && (
+            <Suspense fallback={<p role="status">正在打开工作区…</p>}>
+              <Workspace
+                page={page}
+                title={pages[page].title}
+                description={pages[page].desc}
               />
-            </div>
+            </Suspense>
           )}
-          {page === 'studio' &&
-            (takes.length ? (
-              <StudioPanel />
-            ) : (
-              <section className="empty">
-                <AudioLines size={38} />
-                <h2>{busy ? '正在生成演奏' : '演奏室等待第一份乐谱'}</h2>
-                <p>
-                  {busy
-                    ? '可以在编辑页查看生成进度。'
-                    : '在编辑页生成演奏后，就能试听、调整音色和导出音频。'}
-                </p>
-                <a href="#editor">
-                  前往乐谱编辑 <ArrowRight size={16} />
-                </a>
-              </section>
-            ))}
         </main>
       </div>
     </div>

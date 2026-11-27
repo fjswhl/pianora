@@ -31,6 +31,11 @@ def generate(page):
 with sync_playwright() as p:
     browser = p.chromium.launch(channel=os.getenv("PIANORA_BROWSER", "chrome"))
     context = browser.new_context()
+    context.add_init_script("""window.modelProgress = [];
+      new MutationObserver(() => {
+        const msg = document.querySelector('#progressMsg')?.textContent;
+        if (msg?.includes('PianoFlow 模型') && msg !== modelProgress.at(-1)) modelProgress.push(msg);
+      }).observe(document, {subtree:true, childList:true, characterData:true});""")
     page = context.new_page()
     manifest = page.request.get(base + "/packs/manifest.json").json()
     count = sum(len(manifest[path]["parts"]) for path in paths)
@@ -65,9 +70,10 @@ with sync_playwright() as p:
     report["coldBytes"] = {path: {"raw": manifest[path]["size"], "packed": sum(n for u, n in sizes if Path(path).name in u)}
                            for path in paths}
 
-    # A new page destroys all in-memory model, synth and transfer state.
-    page.close()
-    page = context.new_page()
+    cold = page.evaluate("modelProgress")
+    assert any("获取" in msg for msg in cold), cold
+    # Reload the editor to destroy the in-memory model and synth on the same origin.
+    page.get_by_role("link", name="乐谱编辑").click()
     forbidden = []
     def block(route):
         forbidden.append(route.request.url)
@@ -75,8 +81,11 @@ with sync_playwright() as p:
     page.route("**/packs/*.pack", block)
     for path in paths:
         page.route("**" + path + "*", block)
-    page.goto(base + "/#editor")
+    page.reload()
     generate(page)
+    warm = page.evaluate("modelProgress")
+    assert warm and all("本地缓存" in msg and "获取" not in msg for msg in warm), warm
+    report["warmModelProgress"] = warm[-1]
     assert not forbidden, forbidden
     report["warmLargeAssetRequests"] = len(forbidden)
 
@@ -84,7 +93,7 @@ with sync_playwright() as p:
     page.close()
     page = context.new_page()
     page.goto(base)
-    await_key = paths[0].split("/")[-1] + "-" + manifest[paths[0]]["parts"][0] + ".pack"
+    await_key = paths[1].split("/")[-1] + "-" + manifest[paths[1]]["parts"][0] + ".pack"
     key = "/packs/" + await_key
     page.evaluate("async ([name,key]) => (await caches.open(name)).put(key, new Response('damaged'))",
                   [cache_name, key])
@@ -94,6 +103,8 @@ with sync_playwright() as p:
     expect(page.locator("#renderBtn")).to_be_visible()
     generate(page)
     assert [u for u in recovered if u.startswith("/packs/") and u.endswith(".pack")] == [key], recovered
+    partial = page.evaluate("modelProgress")
+    assert any("本地缓存" in msg and "获取 1 块" in msg for msg in partial), partial
     report["recoveredChunks"] = 1
     context.close()
 

@@ -1,10 +1,19 @@
-import { packedAsset, unpackAsset } from './assetPacks';
+import { packedAsset, unpackAsset, type AssetProgress, type PartProgress } from './assetPacks';
+
+export function assetLoadMessage(name: string, loaded: number, total: number, parts?: PartProgress) {
+  if (!parts) return `加载 ${name} · ${(loaded / 1e6).toFixed(1)} / ${(total / 1e6).toFixed(1)} MB`;
+  if (parts.fetched === 0)
+    return `从本地缓存还原 ${name} · ${parts.cached} / ${parts.total} 块`;
+  if (parts.cached === 0)
+    return `获取 ${name} · ${parts.fetched} / ${parts.total} 块`;
+  return `加载 ${name} · ${parts.cached + parts.fetched} / ${parts.total} 块（本地缓存 ${parts.cached} 块，获取 ${parts.fetched} 块）`;
+}
 
 // Content-Length describes the wire representation. With transparent compression
 // (or an unknown length), let the browser collect the decoded bytes.
 export async function downloadBytes(
   url: string,
-  onProgress?: (loaded: number, total: number) => void,
+  onProgress?: AssetProgress,
   signal?: AbortSignal,
 ): Promise<Uint8Array<ArrayBuffer>> {
   const packed = packedAsset(url);

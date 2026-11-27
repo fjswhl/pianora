@@ -13,6 +13,7 @@
       "packed": 6968717
     }
   },
+  "warmModelProgress": "从本地缓存还原 PianoFlow 模型 · 47 / 48 块",
   "warmLargeAssetRequests": 0,
   "recoveredChunks": 1,
   "saveDataIdleRequests": 0,

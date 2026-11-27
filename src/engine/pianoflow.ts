@@ -14,7 +14,7 @@
 import type * as Ort from 'onnxruntime-web';
 import { pianoFlowRelease, releaseUrl } from './assetRelease';
 import { packedAsset, ortWasmPath } from './assetPacks';
-import { downloadBytes } from './download';
+import { assetLoadMessage, downloadBytes } from './download';
 import { Midi } from '@tonejs/midi';
 import type { SimpleNote } from './arpeggio';
 
@@ -646,8 +646,8 @@ export class BrowserPianoFlow {
     const [ort, tokenizer, modelBytes, wasm] = await Promise.all([
       import('onnxruntime-web'),
       pianoFlowRelease.tokenizer(),
-      downloadBytes(releaseUrl(pianoFlowRelease.model), (loaded, total) => {
-        onProgress?.(`下载 PianoFlow ONNX: ${(loaded / 1e6).toFixed(1)} / ${(total / 1e6).toFixed(1)} MB`, 12 + Math.round(loaded / total * 70));
+      downloadBytes(releaseUrl(pianoFlowRelease.model), (loaded, total, parts) => {
+        onProgress?.(assetLoadMessage('PianoFlow 模型', loaded, total, parts), 12 + Math.round(loaded / total * 70));
       }, signal).then(bytes => {
         performance.measure('pianora:model-bytes', { start: modelStart });
         return bytes;

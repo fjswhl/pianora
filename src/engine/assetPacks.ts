@@ -13,7 +13,20 @@ const manifests = import.meta.glob<Record<string, Pack>>('/public/packs/manifest
 const packs = Object.values(manifests)[0] ?? {};
 export const ortWasmPath = '/ort/ort-wasm-simd-threaded.jsep.wasm';
 const defaultPaths = [sources.abbey.path, sources.model.path, ortWasmPath];
-const jobs = new Map<string, Promise<Uint8Array<ArrayBuffer>>>();
+interface PartRead {
+  bytes: Uint8Array<ArrayBuffer>;
+  fromCache: boolean;
+}
+
+export interface PartProgress {
+  cached: number;
+  fetched: number;
+  total: number;
+}
+
+export type AssetProgress = (loaded: number, total: number, parts?: PartProgress) => void;
+
+const jobs = new Map<string, Promise<PartRead>>();
 let activeReads = 0;
 let cachePromise: Promise<Cache | undefined> | undefined;
 let storageFull = false;
@@ -38,7 +51,7 @@ async function readPart(url: string, digest: string, background: boolean) {
   const cache = await diskCache();
   const hit = await cache?.match(url).catch(() => undefined);
   if (hit) {
-    try { return await verified(hit, digest); }
+    try { return { bytes: await verified(hit, digest), fromCache: true }; }
     catch { await cache?.delete(url).catch(() => {}); }
   }
   const response = await fetch(url, {
@@ -50,7 +63,7 @@ async function readPart(url: string, digest: string, background: boolean) {
     try { await cache.put(url, new Response(bytes, { headers: { Date: new Date().toUTCString() } })); }
     catch { storageFull = true; }
   }
-  return bytes;
+  return { bytes, fromCache: false };
 }
 
 function part(path: string, digest: string, background: boolean) {
@@ -75,20 +88,22 @@ export function packedAsset(url: string) {
 
 export async function unpackAsset(
   { path, pack }: NonNullable<ReturnType<typeof packedAsset>>,
-  progress?: (loaded: number, total: number) => void,
+  progress?: AssetProgress,
   signal?: AbortSignal,
 ) {
   activeReads++;
   try {
     const output = new Uint8Array(pack.size);
     let loaded = 0;
+    let cached = 0;
+    let fetched = 0;
     let next = 0;
     let failed = false;
     async function read() {
       while (!failed && next < pack.parts.length) {
         signal?.throwIfAborted();
         const index = next++;
-        const bytes = await part(path, pack.parts[index], false);
+        const { bytes, fromCache } = await part(path, pack.parts[index], false);
         signal?.throwIfAborted();
         const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
         const raw = new Uint8Array(await new Response(stream).arrayBuffer());
@@ -101,8 +116,11 @@ export async function unpackAsset(
           for (let lane = 0; lane < pack.stride; lane++)
             for (let i = lane; i < length; i += pack.stride) output[offset + i] = raw[src++];
         }
+        if (failed) return;
         loaded += length;
-        progress?.(loaded, pack.size);
+        if (fromCache) cached++;
+        else fetched++;
+        progress?.(loaded, pack.size, { cached, fetched, total: pack.parts.length });
       }
     }
     try { await Promise.all([read(), read()]); }

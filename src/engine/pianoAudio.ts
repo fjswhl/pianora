@@ -1,6 +1,7 @@
 import type { WorkletSynthesizer } from 'spessasynth_lib';
 import { releaseUrl, soundfonts } from './assetRelease';
-import { downloadBytes } from './download';
+import { assetLoadMessage, downloadBytes } from './download';
+import type { AssetProgress } from './assetPacks';
 import type { SimpleNote } from './arpeggio';
 import { notesToMidiBytes } from './pianoflow';
 
@@ -137,7 +138,7 @@ interface ActiveMultiVoice {
 
 async function downloadSf2(
   spec: PianoPresetSpec,
-  onProgress?: (loaded: number, total: number) => void,
+  onProgress?: AssetProgress,
 ): Promise<ArrayBuffer> {
   const url = spec.sf2Url;
   if (!url) throw new Error(`音色 ${spec.shortName} 缺少音源地址`);
@@ -564,17 +565,11 @@ export class StudioGrandPianoPlayer {
 
     onStatus?.(true, `加载 ${spec.shortName} (${spec.sizeLabel || 'SF2'})...`);
     let lastReport = 0;
-    const ab = await downloadSf2(spec, (loaded, total) => {
+    const ab = await downloadSf2(spec, (loaded, total, parts) => {
       const now = performance.now();
       if (now - lastReport < 120 && loaded < total) return;
       lastReport = now;
-      const pct = total > 0 ? Math.min(99, Math.round((loaded / total) * 100)) : 0;
-      onStatus?.(
-        true,
-        total > 0
-          ? `加载 ${spec.shortName}: ${(loaded / 1e6).toFixed(0)}/${(total / 1e6).toFixed(0)} MB (${pct}%)`
-          : `加载 ${spec.shortName}: ${(loaded / 1e6).toFixed(0)} MB...`,
-      );
+      onStatus?.(true, assetLoadMessage(spec.shortName, loaded, total, parts));
     });
 
     if (this.activePresetId === spec.id) {

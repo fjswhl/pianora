@@ -1,0 +1,1 @@
+MIDI parser and MusicXML converter from [PlanetScore](https://github.com/Planetbiru/PlanetScore/tree/3eb4c76209f337f8da8d3ef77192d70c4a40962e). The two JavaScript files use ES module imports and exports for bundling. The [upstream MIT license](../../../public/licenses/PlanetScore.txt) ships with the browser build.

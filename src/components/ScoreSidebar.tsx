@@ -163,7 +163,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
             <b className="text-slate-200">
               {importedScore.kind === 'musicxml'
                 ? '高清五线谱 + 实时三行随奏谱 + PianoFlow WebGPU AI 演奏 + 音乐厅大三角渲染'
-                : 'PianoFlow WebGPU AI 演奏 + 7 大指挥玩法 + 音乐厅大三角渲染'}
+                : 'MIDI 自动五线谱 + 实时三行随奏谱 + PianoFlow AI 演奏'}
             </b>
             {importedScore.rawAnnotations.length > 0
               ? `，并已提取 ${importedScore.rawAnnotations.length} 处 MusicXML 琶音记号用于符号级还原。`

@@ -131,6 +131,7 @@ interface StudioState {
   scoreNotes: SimpleNote[];
   scoreDuration: number;
   rawAnnotations: RawArpeggioAnnotation[];
+  midiNotation: boolean;
   loadSheetPages: (() => Promise<string[]>) | null;
   totalBars: number;
   takes: TakeRecord[];
@@ -268,6 +269,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     scoreNotes: [],
     scoreDuration: 0,
     rawAnnotations: [],
+    midiNotation: false,
     loadSheetPages: null,
     totalBars: 0,
     takes: [],
@@ -479,18 +481,30 @@ export const useStudioStore = create<StudioState>((set, get) => {
         };
         if (imported) {
           const method = imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI';
-          let loadPages: (() => Promise<string[]>) | null = null;
-          if (imported.kind === 'musicxml' && imported.musicXmlText) {
-            const xml = imported.musicXmlText;
-            let pending: Promise<string[]> | null = null;
-            loadPages = () => {
-              pending ??= renderMusicXmlToSvgPages(xml).catch((err) => {
-                pending = null;
-                throw err;
+          const render = async () => {
+            let xml = imported.musicXmlText;
+            if (imported.midiFile) {
+              const { default: MidiToMusicXML } = await import('../vendor/planetscore/MidiToMusicXML.js');
+              xml = new MidiToMusicXML().convert(await imported.midiFile.arrayBuffer(), {
+                title: imported.title,
+                creator: imported.composer === 'MIDI 导入' ? '' : imported.composer,
+                normalize: false, // Preserve leading rests for the playback cursor.
+                muteChannels: [9], // The piano playback path also excludes percussion.
+                autoSplit: true,
+                divisions: 12, // Represent both sixteenths and triplet eighths.
               });
-              return pending;
-            };
-          }
+            }
+            if (!xml) throw new Error('缺少可排版的乐谱数据');
+            return renderMusicXmlToSvgPages(xml);
+          };
+          let pending: Promise<string[]> | null = null;
+          const loadPages = () => {
+            pending ??= render().catch(err => {
+              pending = null;
+              throw err;
+            });
+            return pending;
+          };
           compiled = { method, scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages };
           set(s => ({ stages: { ...s.stages,
             st1: { status: 'done', stat: `${method} · ${imported.noteCount} 音` },
@@ -570,6 +584,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           scoreNotes: firstOut.scoreNotes,
           scoreDuration: firstOut.scoreDuration,
           rawAnnotations: compiled.rawAnnotations,
+          midiNotation: imported?.kind === 'midi',
           loadSheetPages: compiled.loadPages,
           totalBars,
           cues: defaultCuesForBars(totalBars),

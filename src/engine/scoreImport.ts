@@ -20,6 +20,7 @@ export interface ImportedScoreData {
   midi: Midi;
   rawAnnotations: RawArpeggioAnnotation[];
   musicXmlText?: string;
+  midiFile?: File;
   noteCount: number;
   barCount: number;
   durationSec: number;
@@ -134,6 +135,7 @@ export async function parseMidiScoreFile(file: File): Promise<ImportedScoreData>
   const title = raw.name?.trim() || cleanBaseName(file.name);
   return {
     kind: 'midi',
+    midiFile: file,
     fileName: file.name,
     title,
     composer: 'MIDI 导入',

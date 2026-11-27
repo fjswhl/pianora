@@ -8,7 +8,7 @@
 ## Core Architecture (5-Stage Pure-Browser Pipeline)
 
 1. **Stage 1 · In-Browser Sheet Music Compilation (`@sightread/lilypond-wasm`)**
-   When Generate is clicked, the browser Worker compiles the selected or edited LilyPond source. MIDI and MusicXML imports use their own browser parsers. MIDI and symbolic ornaments are prepared for playback first. The listening view loads the engraving independently and shares it with the full sheet view. Both paths use the same Mutopia/2.18 sanitization and Scheme hook.
+   When Generate is clicked, the browser Worker compiles the selected or edited LilyPond source. MIDI and MusicXML imports use their own browser parsers. For MIDI, opening the sheet or enabling the follow score loads PlanetScore locally and converts the original file to MusicXML. Both views reuse the same OSMD engraving. Playback uses the original performance timing. MIDI and symbolic ornaments are prepared for playback first. The listening view loads the engraving independently and shares it with the full sheet view. Both paths use the same Mutopia/2.18 sanitization and Scheme hook.
 2. **Stage 2 · Symbolic Ornament Extraction (Scheme Engraver)**
    Injects a custom LilyPond Scheme Engraver (`Demo_arpeggio_collector_engraver`) to extract exact symbolic moments (such as `\arpeggio`) that standard MIDI drops.
 3. **Stage 3 · Expressive Flow Matching AI Pianist (`SyMuPe/PianoFlow-base` ONNX on WebGPU/WASM)**

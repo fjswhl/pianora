@@ -17,6 +17,9 @@ const views = [
 export function StudioPanel() {
   const [view, setView] = useState<(typeof views)[number]['id']>('listen');
   const title = useStudioStore((s) => s.performanceTitle);
+  const midiNotation = useStudioStore(s => s.midiNotation);
+  const score = useStudioStore(s => s.scoreMidi);
+  const [requestedScore, setRequestedScore] = useState<typeof score>(null);
   const busy = useStudioStore((s) => s.busy);
   const progress = useStudioStore((s) => s.progressMsg);
   const error = useStudioStore((s) => s.errorMsg);
@@ -42,7 +45,10 @@ export function StudioPanel() {
           <button
             key={id}
             aria-pressed={view === id}
-            onClick={() => setView(id)}
+            onClick={() => {
+              if (id === 'sheet' && midiNotation) setRequestedScore(score);
+              setView(id);
+            }}
           >
             <Icon size={16} />
             {label}
@@ -56,7 +62,9 @@ export function StudioPanel() {
           <section className="listening-desk">
             <div className="roll-card">
               <PipelineHeader />
-              <FollowScorePanel />
+              {midiNotation && requestedScore !== score
+                ? <button onClick={() => setRequestedScore(score)}>显示 MIDI 随奏谱</button>
+                : <FollowScorePanel />}
               <PianoRollCanvas />
             </div>
             <TransportBar pianoStatus={pianoStatus} />

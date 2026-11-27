@@ -159,8 +159,12 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
           </div>
 
           <p className="mt-4 rounded-lg border border-slate-800/90 bg-[#0d1322] px-3 py-2 text-[11.5px] leading-relaxed text-slate-400">
-            本地浏览器直接解析完成（零上传服务器）。点击下方「生成演奏」将跳过 LilyPond 编译，直接进入{' '}
-            <b className="text-slate-200">PianoFlow WebGPU AI 演奏 + 7 大指挥玩法 + 音乐厅大三角渲染</b>
+            本地浏览器直接解析完成（零上传服务器）。点击下方「生成演奏」将直接进入{' '}
+            <b className="text-slate-200">
+              {importedScore.kind === 'musicxml'
+                ? '高清五线谱 + 实时三行随奏谱 + PianoFlow WebGPU AI 演奏 + 音乐厅大三角渲染'
+                : 'PianoFlow WebGPU AI 演奏 + 7 大指挥玩法 + 音乐厅大三角渲染'}
+            </b>
             {importedScore.rawAnnotations.length > 0
               ? `，并已提取 ${importedScore.rawAnnotations.length} 处 MusicXML 琶音记号用于符号级还原。`
               : '。'}

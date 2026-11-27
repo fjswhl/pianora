@@ -80,13 +80,13 @@ export function SheetMusicPanel() {
             <div role="alert">{sheetError} <button onClick={() => setAttempt(n => n + 1)}>重试排版</button></div>
           ) : svgPages.length === 0 ? (
             <div className="py-12 text-center text-xs text-[#576354]">
-              当前演奏来自直接导入的 MIDI / MusicXML 乐谱（跳过 LilyPond 排版），可在「试听与导出」中查看 88 键动态钢琴卷帘。
+              当前演奏来自直接导入的 MIDI 文件（不含五线谱排版信息），可在「试听与导出」中查看 88 键动态钢琴卷帘。
             </div>
           ) : (
             svgPages.map((svgHtml, i) => (
               <div
                 key={i}
-                className="svg-sheet-page mx-auto overflow-x-auto rounded-xl bg-white p-3 text-[#111111] shadow-inner"
+                className="svg-sheet-page mx-auto shrink-0 overflow-x-auto rounded-xl bg-white p-3 text-[#111111] shadow-inner"
                 style={{ width: `${zoom}%` }}
                 dangerouslySetInnerHTML={{ __html: svgHtml }}
               />

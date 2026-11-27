@@ -19,6 +19,7 @@ export interface ImportedScoreData {
   composer: string;
   midi: Midi;
   rawAnnotations: RawArpeggioAnnotation[];
+  musicXmlText?: string;
   noteCount: number;
   barCount: number;
   durationSec: number;
@@ -441,6 +442,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     composer,
     midi,
     rawAnnotations,
+    musicXmlText: xmlText,
     ...stats,
   };
 }

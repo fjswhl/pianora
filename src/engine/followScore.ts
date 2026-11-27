@@ -34,6 +34,10 @@ function translation(element: Element) {
 
 const engravedScores = new WeakMap<string[], FollowScore>();
 
+export function registerFollowScore(sources: string[], score: FollowScore): void {
+  engravedScores.set(sources, score);
+}
+
 export function readFollowScore(sources: string[]): FollowScore {
   const cached = engravedScores.get(sources);
   if (cached) return cached;

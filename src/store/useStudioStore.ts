@@ -24,6 +24,7 @@ import {
 } from '../engine/pianoAudio';
 import { useScoreStore } from './useScoreStore';
 import { lilypondEngine, pianoFlowEngine, pianoPlayer } from '../engine/instances';
+import { renderMusicXmlToSvgPages } from '../engine/musicXmlSheet';
 
 export type TrackKey = 'score' | 'pianoflow_raw' | 'final_restored';
 export type StageStatus = 'idle' | 'active' | 'done';
@@ -474,11 +475,23 @@ export const useStudioStore = create<StudioState>((set, get) => {
         });
         let compiled: Awaited<ReturnType<typeof lilypondEngine.compile>> | {
           scoreMidi: Midi; rawAnnotations: RawArpeggioAnnotation[]; compileSec: number;
-          loadPages: null; method: string;
+          loadPages: (() => Promise<string[]>) | null; method: string;
         };
         if (imported) {
           const method = imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI';
-          compiled = { method, scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages: null };
+          let loadPages: (() => Promise<string[]>) | null = null;
+          if (imported.kind === 'musicxml' && imported.musicXmlText) {
+            const xml = imported.musicXmlText;
+            let pending: Promise<string[]> | null = null;
+            loadPages = () => {
+              pending ??= renderMusicXmlToSvgPages(xml).catch((err) => {
+                pending = null;
+                throw err;
+              });
+              return pending;
+            };
+          }
+          compiled = { method, scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages };
           set(s => ({ stages: { ...s.stages,
             st1: { status: 'done', stat: `${method} · ${imported.noteCount} 音` },
             st2: { status: 'done', stat: `提取 ${imported.rawAnnotations.length} 条事件` },

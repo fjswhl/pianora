@@ -13,34 +13,34 @@ export function SheetMusicPanel() {
   const arpeggios = activeTake?.arpeggios ?? [];
 
   return (
-    <section className="rounded-2xl border border-slate-800/90 bg-[#101624] p-4 shadow-xl shadow-black/20">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+    <section className="rounded-2xl border border-[#cdd6c9]/90 bg-[#fffef9] p-4 ">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-[#cdd6c9] pb-2.5">
         <div className="flex gap-1.5">
           <button
             onClick={() => setTab('sheet')}
             className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-              tab === 'sheet' ? 'bg-[#1a2338] text-[#e8be6a]' : 'text-slate-400 hover:text-slate-200'
+              tab === 'sheet' ? 'bg-[#e0eadb] text-[#42674f]' : 'text-[#576354] hover:text-stone-800'
             }`}
           >
             <FileMusic className="h-3.5 w-3.5" />
-            五线谱预览（lilypond-wasm SVG）
+            五线谱
           </button>
           <button
             onClick={() => setTab('ann')}
             className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-              tab === 'ann' ? 'bg-[#1a2338] text-[#e8be6a]' : 'text-slate-400 hover:text-slate-200'
+              tab === 'ann' ? 'bg-[#e0eadb] text-[#42674f]' : 'text-[#576354] hover:text-stone-800'
             }`}
           >
             <Table2 className="h-3.5 w-3.5" />
-            Scheme 符号提取 &amp; 琶音还原明细
+            琶音明细
           </button>
         </div>
 
         {tab === 'sheet' && svgPages.length > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-[#576354]">
             <button
               onClick={() => setZoom((z) => Math.max(60, z - 15))}
-              className="cursor-pointer rounded-md border border-slate-800 bg-[#0d1322] p-1 hover:border-slate-600"
+              className="cursor-pointer rounded-md border border-[#cdd6c9] bg-[#f6f7ef] p-1 hover:border-slate-600"
               title="缩小"
             >
               <ZoomOut className="h-3.5 w-3.5" />
@@ -48,7 +48,7 @@ export function SheetMusicPanel() {
             <span className="w-10 text-center font-mono text-[11px]">{zoom}%</span>
             <button
               onClick={() => setZoom((z) => Math.min(145, z + 15))}
-              className="cursor-pointer rounded-md border border-slate-800 bg-[#0d1322] p-1 hover:border-slate-600"
+              className="cursor-pointer rounded-md border border-[#cdd6c9] bg-[#f6f7ef] p-1 hover:border-slate-600"
               title="放大"
             >
               <ZoomIn className="h-3.5 w-3.5" />
@@ -60,8 +60,8 @@ export function SheetMusicPanel() {
       {tab === 'sheet' ? (
         <div id="svgGallery" className="flex max-h-[560px] flex-col gap-3 overflow-y-auto pr-1">
           {svgPages.length === 0 ? (
-            <div className="py-12 text-center text-xs text-slate-400">
-              全流程 100% 在你的浏览器本地运行（无任何后端服务器）。点击左侧「执行 5 阶段 AI 演奏流水线」开始！
+            <div className="py-12 text-center text-xs text-[#576354]">
+              这次编译未生成谱面。
             </div>
           ) : (
             svgPages.map((svgHtml, i) => (
@@ -78,7 +78,7 @@ export function SheetMusicPanel() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-400">
+              <tr className="border-b border-[#cdd6c9] text-[#576354]">
                 <th className="px-3 py-2">小节</th>
                 <th className="px-3 py-2">时刻</th>
                 <th className="px-3 py-2">和弦音数</th>
@@ -90,21 +90,21 @@ export function SheetMusicPanel() {
             <tbody>
               {arpeggios.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-slate-400">
+                  <td colSpan={6} className="px-3 py-6 text-center text-[#576354]">
                     {activeTake ? '该乐谱未包含 \\arpeggio 记号' : '尚未运行'}
                   </td>
                 </tr>
               ) : (
                 arpeggios.map((a, idx) => (
-                  <tr key={`${a.bar}-${idx}`} className="border-b border-slate-800/70 text-slate-200">
+                  <tr key={`${a.bar}-${idx}`} className="border-b border-[#cdd6c9]/70 text-stone-800">
                     <td className="px-3 py-2 font-semibold">第 {a.bar} 小节</td>
-                    <td className="px-3 py-2 font-mono text-slate-300">
+                    <td className="px-3 py-2 font-mono text-stone-700">
                       {fmtTime(a.time_sec)} ({a.time_sec}s)
                     </td>
                     <td className="px-3 py-2">{a.note_count} 音</td>
                     <td className="px-3 py-2">{a.before_ms} ms</td>
-                    <td className="px-3 py-2 font-bold text-[#e8be6a]">{a.after_ms} ms</td>
-                    <td className="px-3 py-2 text-slate-400">{a.action}</td>
+                    <td className="px-3 py-2 font-bold text-[#42674f]">{a.after_ms} ms</td>
+                    <td className="px-3 py-2 text-[#576354]">{a.action}</td>
                   </tr>
                 ))
               )}

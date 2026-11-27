@@ -7,13 +7,25 @@ const MIN_MIDI = 21;
 const MAX_MIDI = 108;
 const IS_BLACK = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
 
+const pitches = Array.from(
+  { length: MAX_MIDI - MIN_MIDI + 1 },
+  (_, index) => MIN_MIDI + index,
+);
+let whiteKeys = 0;
+const keys = pitches.map((pitch) => {
+  const black = Boolean(IS_BLACK[pitch % 12]);
+  const center = black ? whiteKeys : whiteKeys++ + 0.5;
+  return { pitch, black, center };
+});
+
 export function PianoRollCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const takes = useStudioStore((s) => s.takes);
   const activeTakeId = useStudioStore((s) => s.activeTakeId);
   const playFrom = useStudioStore((s) => s.playFrom);
 
-  const activeTake = takes.find((t) => t.id === activeTakeId) ?? takes[0] ?? null;
+  const activeTake =
+    takes.find((t) => t.id === activeTakeId) ?? takes[0] ?? null;
   const arpeggios = activeTake?.arpeggios ?? [];
 
   useEffect(() => {
@@ -23,26 +35,38 @@ export function PianoRollCanvas() {
       if (canvas) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          const w = canvas.width;
-          const h = canvas.height;
-          const kbH = 44;
-          const rollH = h - kbH;
-
-          ctx.fillStyle = '#070b14';
-          ctx.fillRect(0, 0, w, h);
-
-          const keyW = w / (MAX_MIDI - MIN_MIDI + 1);
-          for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
-            if (m % 12 === 0) {
-              const x = (m - MIN_MIDI) * keyW;
-              ctx.strokeStyle = 'rgba(103, 212, 255, 0.08)';
-              ctx.beginPath();
-              ctx.moveTo(x, 0);
-              ctx.lineTo(x, rollH);
-              ctx.stroke();
-            }
+          const w = canvas.clientWidth;
+          const h = canvas.clientHeight;
+          const ratio = Math.min(window.devicePixelRatio, 2);
+          if (
+            canvas.width !== Math.round(w * ratio) ||
+            canvas.height !== Math.round(h * ratio)
+          ) {
+            canvas.width = Math.round(w * ratio);
+            canvas.height = Math.round(h * ratio);
           }
-
+          ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+          const kbH = 42;
+          const rollH = h - kbH;
+          ctx.fillStyle = '#eff2e6';
+          ctx.fillRect(0, 0, w, h);
+          const keyW = w / whiteKeys;
+          ctx.strokeStyle = '#d9dfcf';
+          ctx.lineWidth = 0.7;
+          for (const key of keys) {
+            if (key.pitch % 12 !== 0) continue;
+            const x = (key.center - 0.5) * keyW;
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, rollH);
+            ctx.stroke();
+          }
+          for (let y = 0; y < rollH; y += rollH / 6 || 1) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+            ctx.stroke();
+          }
           const st = useStudioStore.getState();
           const pressed = new Map<number, number>();
           if (st.scoreMidi || st.liveActive) {
@@ -53,7 +77,7 @@ export function PianoRollCanvas() {
             for (const n of tr.notes) {
               if (n.s > curT + WINDOW_SEC) break;
               if (n.s + n.d < curT - 0.15) continue;
-              const x = (n.p - MIN_MIDI) * keyW;
+              const x = ((keys[n.p - MIN_MIDI]?.center ?? -2) - 0.32) * keyW;
               const yBottom = rollH - ((n.s - curT) / WINDOW_SEC) * rollH;
               const yTop = rollH - ((n.s + n.d - curT) / WINDOW_SEC) * rollH;
               const rectH = Math.max(4, yBottom - yTop);
@@ -61,34 +85,39 @@ export function PianoRollCanvas() {
               if (isNow) pressed.set(n.p, n.v);
 
               const alpha = 0.36 + 0.64 * (n.v / 127);
-              if (st.liveActive) {
-                ctx.fillStyle = isNow ? 'rgba(74,222,128,1)' : `rgba(92,211,255,${alpha.toFixed(2)})`;
-              } else if (st.activeTrack === 'final_restored') {
-                ctx.fillStyle = isNow ? 'rgba(255,228,148,1)' : `rgba(232,190,106,${alpha.toFixed(2)})`;
-              } else if (st.activeTrack === 'pianoflow_raw') {
-                ctx.fillStyle = isNow ? 'rgba(148,232,255,1)' : `rgba(92,211,255,${alpha.toFixed(2)})`;
-              } else {
-                ctx.fillStyle = isNow ? 'rgba(203,213,225,1)' : `rgba(148,163,184,${alpha.toFixed(2)})`;
-              }
-              ctx.fillRect(x + 1, yTop, Math.max(3, keyW - 2), rectH);
+              const color =
+                st.activeTrack === 'pianoflow_raw'
+                  ? '67,105,132'
+                  : st.activeTrack === 'score'
+                    ? '131,100,76'
+                    : '54,100,76';
+              ctx.fillStyle = `rgba(${color},${isNow ? 1 : alpha})`;
+              ctx.fillRect(x, yTop, Math.max(2, keyW * 0.64), rectH);
             }
           }
 
-          // White keys
-          for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
-            if (IS_BLACK[m % 12]) continue;
-            const x = (m - MIN_MIDI) * keyW;
-            ctx.fillStyle = pressed.has(m) ? '#e8be6a' : '#dce4f5';
-            ctx.fillRect(x, rollH, keyW + 2, kbH);
-            ctx.strokeStyle = '#182034';
-            ctx.strokeRect(x, rollH, keyW + 2, kbH);
+          for (const key of keys) {
+            if (key.black) continue;
+            const x = (key.center - 0.5) * keyW;
+            ctx.fillStyle = pressed.has(key.pitch) ? '#95af92' : '#fffdf5';
+            ctx.fillRect(x, rollH, keyW, kbH);
+            ctx.strokeStyle = '#afbaac';
+            ctx.strokeRect(x, rollH, keyW, kbH);
+            if (key.pitch % 12 === 0 && w > 460) {
+              ctx.fillStyle = '#626c61';
+              ctx.font = '9px monospace';
+              ctx.fillText('C' + (key.pitch / 12 - 1), x + 1, h - 3);
+            }
           }
-          // Black keys
-          for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
-            if (!IS_BLACK[m % 12]) continue;
-            const x = (m - MIN_MIDI) * keyW;
-            ctx.fillStyle = pressed.has(m) ? '#5cd3ff' : '#0f1524';
-            ctx.fillRect(x, rollH, keyW, kbH * 0.62);
+          for (const key of keys) {
+            if (!key.black) continue;
+            ctx.fillStyle = pressed.has(key.pitch) ? '#5c876c' : '#37443b';
+            ctx.fillRect(
+              (key.center - 0.31) * keyW,
+              rollH,
+              keyW * 0.62,
+              kbH * 0.6,
+            );
           }
         }
       }
@@ -100,24 +129,32 @@ export function PianoRollCanvas() {
 
   return (
     <div className="space-y-2.5">
-      <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#070b14]">
-        <canvas ref={canvasRef} id="pianoCanvas" width={1060} height={220} className="block h-[220px] w-full" />
+      <div className="roll-surface">
+        <canvas
+          ref={canvasRef}
+          id="pianoCanvas"
+          width={1060}
+          height={220}
+          aria-label="实时钢琴卷帘与琴键"
+          className="roll-canvas"
+        />
       </div>
 
       {arpeggios.length > 0 && (
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-            <Sparkles className="h-3.5 w-3.5 text-violet-400" />
-            <span>点击任意检测到的 \arpeggio 位置，直达前 1.5 秒并随时切换 1/2/3 轨盲听对比：</span>
+          <div className="flex items-center gap-1.5 text-xs text-stone-600">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-800" />
+            <span>试听琶音片段</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {arpeggios.map((a, idx) => (
               <button
                 key={`${a.bar}-${idx}`}
                 onClick={() => playFrom(Math.max(0, a.time_sec - 1.5))}
-                className="cursor-pointer rounded-full border border-violet-500/35 bg-violet-500/10 px-2.5 py-1 text-[11px] font-medium text-violet-200 transition hover:bg-violet-500/25"
+                className="cue-chip"
+                title={`琶音跨度 ${a.before_ms} → ${a.after_ms} ms`}
               >
-                第 {a.bar} 小节 ({fmtTime(a.time_sec)}) · {a.before_ms}ms → {a.after_ms}ms
+                第 {a.bar} 小节 · {fmtTime(a.time_sec)}
               </button>
             ))}
           </div>

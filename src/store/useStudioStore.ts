@@ -113,6 +113,7 @@ interface StudioState {
   // Score & Pipeline params
   presets: ScorePreset[];
   selectedPresetId: string;
+  performanceTitle: string;
   lyCode: string;
   cfmSteps: number;
   stepFactor: number;
@@ -238,8 +239,8 @@ export const useStudioStore = create<StudioState>((set, get) => {
     ortReady: false,
     ortStatus: 'PianoFlow ONNX 待加载',
     pianoReady: false,
-    pianoLoading: true,
-    pianoStatus: `加载 ${DEFAULT_TIMBRE.shortName}...`,
+    pianoLoading: false,
+    pianoStatus: '钢琴音色待加载',
 
     activeTimbreId: DEFAULT_TIMBRE_ID,
     timbreDesc: DEFAULT_TIMBRE.desc,
@@ -252,6 +253,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
     presets: [{ id: 'short_etude', name: '4 小节快速体验片段', subtitle: '含 3 处原谱琶音 · 秒出声', ly: SHORT_ETUDE_LY }],
     selectedPresetId: 'short_etude',
+    performanceTitle: '',
     lyCode: SHORT_ETUDE_LY,
     cfmSteps: 10,
     stepFactor: 0.75,
@@ -296,8 +298,8 @@ export const useStudioStore = create<StudioState>((set, get) => {
       if (booted) return;
       booted = true;
       const presets = await loadScorePresets();
-      set({ presets, selectedPresetId: presets[0].id, lyCode: presets[0].ly });
-      void get().switchTimbre(DEFAULT_TIMBRE_ID);
+      set({ presets });
+
     },
 
     setLyCode: (code) => set({ lyCode: code }),
@@ -535,6 +537,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const totalBars = firstOut.perfState.scoreData.totalBars;
 
         set({
+          performanceTitle: lyCode.match(/^\s*title\s*=\s*"([^"\n]+)"/m)?.[1] || '自定义乐谱',
           scoreMidi: compiled.scoreMidi,
           scoreNotes: firstOut.scoreNotes,
           scoreDuration: firstOut.scoreDuration,
@@ -545,7 +548,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         });
 
         const takes = generated.map((item, idx) =>
-          buildTake(`take_${Date.now()}_${idx}`, `#${idx + 1} 盲盒 (Seed ${item.seed})`, item.seed, item.out.perfState),
+          buildTake(`take_${Date.now()}_${idx}`, `#${idx + 1} 演奏 (Seed ${item.seed})`, item.seed, item.out.perfState),
         );
         const dt4 = (performance.now() - t4).toFixed(1);
 

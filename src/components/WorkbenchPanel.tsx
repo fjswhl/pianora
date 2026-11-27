@@ -16,13 +16,13 @@ import { useStudioStore } from '../store/useStudioStore';
 type ModeId = 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm7';
 
 const MODE_TABS: Array<{ id: ModeId; label: string; icon: React.ReactNode }> = [
-  { id: 'm1', label: '① 批量盲盒抽卡', icon: <Dices className="h-3.5 w-3.5" /> },
-  { id: 'm2', label: '② 锁前半段续弹', icon: <Scissors className="h-3.5 w-3.5" /> },
-  { id: 'm3', label: '③ 局部挖空重弹', icon: <Bandage className="h-3.5 w-3.5" /> },
-  { id: 'm4', label: '④ 拆维度精修', icon: <SlidersHorizontal className="h-3.5 w-3.5" /> },
-  { id: 'm5', label: '⑤ 分段指挥家', icon: <Wand2 className="h-3.5 w-3.5" /> },
-  { id: 'm6', label: '⑥ 实时滑块指挥', icon: <Radio className="h-3.5 w-3.5" /> },
-  { id: 'm7', label: '⑦ 大师风格接力', icon: <Crown className="h-3.5 w-3.5" /> },
+  { id: 'm1', label: '多版本演奏', icon: <Dices className="h-3.5 w-3.5" /> },
+  { id: 'm2', label: '保留开头', icon: <Scissors className="h-3.5 w-3.5" /> },
+  { id: 'm3', label: '重演选段', icon: <Bandage className="h-3.5 w-3.5" /> },
+  { id: 'm4', label: '触键微调', icon: <SlidersHorizontal className="h-3.5 w-3.5" /> },
+  { id: 'm5', label: '分段指挥', icon: <Wand2 className="h-3.5 w-3.5" /> },
+  { id: 'm6', label: '实时指挥', icon: <Radio className="h-3.5 w-3.5" /> },
+  { id: 'm7', label: '参考演奏', icon: <Crown className="h-3.5 w-3.5" /> },
 ];
 
 export function WorkbenchPanel() {
@@ -87,16 +87,16 @@ export function WorkbenchPanel() {
   const velLabel = liveVel < -10 ? '柔和 pp' : liveVel > 10 ? '激昂 ff' : '自然';
 
   return (
-    <section className="rounded-2xl border border-slate-800/90 bg-[#101624] p-4 shadow-xl shadow-black/20">
+    <section className="rounded-2xl border border-[#cdd6c9]/90 bg-[#fffef9] p-4 ">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-slate-100">PianoFlow 7 大进阶演奏玩法</h2>
+        <h2 className="text-sm font-semibold text-stone-900">演奏调整</h2>
         <span
           id="barCountBadge"
           className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
-            hasScore ? 'bg-sky-500/15 text-sky-300' : 'bg-slate-800 text-slate-400'
+            hasScore ? 'bg-teal-600/15 text-teal-800' : 'bg-stone-200 text-[#576354]'
           }`}
         >
-          {hasScore ? `当前乐谱共 ${totalBars} 小节 · 全部 7 种玩法已解锁` : '先点击左侧执行流水线解锁'}
+          {hasScore ? `共 ${totalBars} 小节` : '请先生成演奏'}
         </span>
       </div>
 
@@ -109,8 +109,8 @@ export function WorkbenchPanel() {
             onClick={() => setActiveMode(t.id)}
             className={`mode-pill inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
               activeMode === t.id
-                ? 'border-[#e8be6a] bg-amber-400/15 text-[#f2cf82]'
-                : 'border-slate-800 bg-[#0c1220] text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                ? 'border-[#42674f] bg-emerald-700/15 text-[#264e36]'
+                : 'border-[#cdd6c9] bg-[#fafaf4] text-[#576354] hover:border-slate-600 hover:text-stone-800'
             }`}
           >
             {t.icon}
@@ -120,20 +120,20 @@ export function WorkbenchPanel() {
       </div>
 
       {/* Active Mode Workspace */}
-      <div className="rounded-xl border border-slate-800/80 bg-[#0b101c] p-3.5 text-xs">
+      <div className="rounded-xl border border-[#cdd6c9]/80 bg-[#f8f8f1] p-3.5 text-xs">
         {activeMode === 'm1' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
-              一次连抽多版不同虚拟钢琴家演绎（自动递增 Seed），全部放进上方「版本池」一键盲听对比。
+            <p className="text-[#576354]">
+              使用不同种子生成多个演奏版本，在试听页切换比较。
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-slate-300">
-                抽卡版数
+              <label className="flex items-center gap-2 text-stone-700">
+                版本数量
                 <select
                   id="m1Count"
                   value={m1Count}
                   onChange={(e) => setM1Count(Number(e.target.value))}
-                  className="rounded-lg border border-slate-700 bg-[#12192a] px-2.5 py-1 text-slate-100"
+                  className="rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1 text-stone-900"
                 >
                   {[2, 4, 6, 8].map((n) => (
                     <option key={n} value={n}>
@@ -142,13 +142,13 @@ export function WorkbenchPanel() {
                   ))}
                 </select>
               </label>
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 起始 Seed
                 <input
                   type="number"
                   value={m1Seed}
                   onChange={(e) => setM1Seed(Number(e.target.value) || 100)}
-                  className="w-20 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-20 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
               </label>
               <button
@@ -158,9 +158,9 @@ export function WorkbenchPanel() {
                   await runMode1Batch(m1Count, m1Seed);
                   setM1Seed((s) => s + m1Count);
                 }}
-                className="cursor-pointer rounded-lg border border-[#e8be6a]/70 bg-amber-400/15 px-3.5 py-1.5 font-semibold text-[#f2cf82] transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                开始批量抽卡
+                生成多个版本
               </button>
             </div>
           </div>
@@ -168,11 +168,11 @@ export function WorkbenchPanel() {
 
         {activeMode === 'm2' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
-              基于当前选中版本：将前 <b className="text-slate-200">X</b> 小节原封不动锁死为条件上下文，仅对后续段落重抽 1~4 种不同走向。
+            <p className="text-[#576354]">
+              基于当前选中版本：将前 <b className="text-stone-800">X</b> 小节原封不动锁死为条件上下文，仅对后续段落重抽 1~4 种不同走向。
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 锁死前
                 <input
                   type="number"
@@ -180,17 +180,17 @@ export function WorkbenchPanel() {
                   max={Math.max(1, totalBars - 1)}
                   value={m2LockBars}
                   onChange={(e) => setM2LockBars(Number(e.target.value) || 1)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
                 小节
               </label>
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 续弹版数
                 <select
                   id="m2Count"
                   value={m2Count}
                   onChange={(e) => setM2Count(Number(e.target.value))}
-                  className="rounded-lg border border-slate-700 bg-[#12192a] px-2.5 py-1 text-slate-100"
+                  className="rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1 text-stone-900"
                 >
                   {[1, 2, 4].map((n) => (
                     <option key={n} value={n}>
@@ -199,13 +199,13 @@ export function WorkbenchPanel() {
                   ))}
                 </select>
               </label>
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 新 Seed
                 <input
                   type="number"
                   value={m2Seed}
                   onChange={(e) => setM2Seed(Number(e.target.value) || 202)}
-                  className="w-20 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-20 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
               </label>
               <button
@@ -215,7 +215,7 @@ export function WorkbenchPanel() {
                   await runMode2Continuation(m2LockBars, m2Count, m2Seed);
                   setM2Seed((s) => s + m2Count);
                 }}
-                className="cursor-pointer rounded-lg border border-[#e8be6a]/70 bg-amber-400/15 px-3.5 py-1.5 font-semibold text-[#f2cf82] transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 锁死前段并续弹
               </button>
@@ -225,11 +225,11 @@ export function WorkbenchPanel() {
 
         {activeMode === 'm3' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
-              像 PS 局部重绘：同时锁死开头与结尾，仅清空第 <b className="text-slate-200">A ~ B</b> 小节的表现力，由双向 Flow Matching 窗口丝滑缝合重弹。
+            <p className="text-[#576354]">
+              像 PS 局部重绘：同时锁死开头与结尾，仅清空第 <b className="text-stone-800">A ~ B</b> 小节的表现力，由双向 Flow Matching 窗口丝滑缝合重弹。
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 挖空重弹：第
                 <input
                   type="number"
@@ -237,7 +237,7 @@ export function WorkbenchPanel() {
                   max={Math.max(1, totalBars)}
                   value={m3Start}
                   onChange={(e) => setM3Start(Number(e.target.value) || 1)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
                 至第
                 <input
@@ -246,17 +246,17 @@ export function WorkbenchPanel() {
                   max={Math.max(1, totalBars)}
                   value={m3End}
                   onChange={(e) => setM3End(Number(e.target.value) || 1)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
                 小节
               </label>
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 新 Seed
                 <input
                   type="number"
                   value={m3Seed}
                   onChange={(e) => setM3Seed(Number(e.target.value) || 303)}
-                  className="w-20 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-20 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
               </label>
               <button
@@ -266,7 +266,7 @@ export function WorkbenchPanel() {
                   await runMode3Inpainting(m3Start, m3End, m3Seed);
                   setM3Seed((s) => s + 1);
                 }}
-                className="cursor-pointer rounded-lg border border-[#e8be6a]/70 bg-amber-400/15 px-3.5 py-1.5 font-semibold text-[#f2cf82] transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 局部双向缝合重弹
               </button>
@@ -276,7 +276,7 @@ export function WorkbenchPanel() {
 
         {activeMode === 'm4' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
+            <p className="text-[#576354]">
               锁死满意的演奏维度，仅重算勾选的维度（例如完全锁死原节奏呼吸，只重打磨强弱力度，或只重配踏板延音）。
             </p>
             <div className="flex flex-wrap gap-2">
@@ -289,7 +289,7 @@ export function WorkbenchPanel() {
                 <button
                   key={p.label}
                   onClick={() => setDims(p.v)}
-                  className="cursor-pointer rounded-lg border border-slate-700 bg-[#141c2e] px-2.5 py-1 text-slate-200 transition hover:border-[#e8be6a]"
+                  className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1 text-stone-800 transition hover:border-[#42674f]"
                 >
                   {p.label}
                 </button>
@@ -300,7 +300,7 @@ export function WorkbenchPanel() {
                 (name, i) => (
                   <label
                     key={name}
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-800 bg-[#12192a] px-3 py-1.5 text-slate-200"
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#cdd6c9] bg-[#fffef9] px-3 py-1.5 text-stone-800"
                   >
                     <input
                       type="checkbox"
@@ -310,7 +310,7 @@ export function WorkbenchPanel() {
                         next[i] = e.target.checked;
                         setDims(next);
                       }}
-                      className="accent-[#e8be6a]"
+                      className="accent-[#42674f]"
                     />
                     {name}
                   </label>
@@ -318,7 +318,7 @@ export function WorkbenchPanel() {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 作用小节：第
                 <input
                   type="number"
@@ -326,7 +326,7 @@ export function WorkbenchPanel() {
                   max={Math.max(1, totalBars)}
                   value={m4Start}
                   onChange={(e) => setM4Start(Number(e.target.value) || 1)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
                 ~
                 <input
@@ -335,17 +335,17 @@ export function WorkbenchPanel() {
                   max={Math.max(1, totalBars)}
                   value={m4End}
                   onChange={(e) => setM4End(Number(e.target.value) || 1)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
                 小节
               </label>
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 新 Seed
                 <input
                   type="number"
                   value={m4Seed}
                   onChange={(e) => setM4Seed(Number(e.target.value) || 404)}
-                  className="w-20 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-20 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
               </label>
               <button
@@ -355,7 +355,7 @@ export function WorkbenchPanel() {
                   await runMode4Dimensions(dims, m4Start, m4End, m4Seed);
                   setM4Seed((s) => s + 1);
                 }}
-                className="cursor-pointer rounded-lg border border-[#e8be6a]/70 bg-amber-400/15 px-3.5 py-1.5 font-semibold text-[#f2cf82] transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 仅重算勾选维度
               </button>
@@ -365,16 +365,16 @@ export function WorkbenchPanel() {
 
         {activeMode === 'm5' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
+            <p className="text-[#576354]">
               像指挥家一样分段设定速度倍率与强弱方向，在 Flow Matching ODE 每一步施加端点引导，让 AI 自动补齐细腻呼吸与声部平衡。
             </p>
             <div className="space-y-2">
               {cues.map((cue, idx) => (
                 <div
                   key={cue.id}
-                  className="flex flex-wrap items-center gap-2.5 rounded-lg border border-slate-800 bg-[#12192a] px-3 py-2"
+                  className="flex flex-wrap items-center gap-2.5 rounded-lg border border-[#cdd6c9] bg-[#fffef9] px-3 py-2"
                 >
-                  <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="flex items-center gap-1.5 text-stone-700">
                     第
                     <input
                       type="number"
@@ -385,7 +385,7 @@ export function WorkbenchPanel() {
                         next[idx] = { ...cue, startBar: Number(e.target.value) || 1 };
                         setCues(next);
                       }}
-                      className="w-14 rounded border border-slate-700 bg-[#090d16] px-1.5 py-0.5 text-slate-100"
+                      className="w-14 rounded border border-[#bac7b8] bg-[#fffef9] px-1.5 py-0.5 text-stone-900"
                     />
                     ~
                     <input
@@ -397,11 +397,11 @@ export function WorkbenchPanel() {
                         next[idx] = { ...cue, endBar: Number(e.target.value) || 1 };
                         setCues(next);
                       }}
-                      className="w-14 rounded border border-slate-700 bg-[#090d16] px-1.5 py-0.5 text-slate-100"
+                      className="w-14 rounded border border-[#bac7b8] bg-[#fffef9] px-1.5 py-0.5 text-stone-900"
                     />
                     小节
                   </span>
-                  <span className="flex items-center gap-1 text-slate-300">
+                  <span className="flex items-center gap-1 text-stone-700">
                     速度
                     <input
                       type="number"
@@ -414,11 +414,11 @@ export function WorkbenchPanel() {
                         next[idx] = { ...cue, tempoScale: Number(e.target.value) || 1 };
                         setCues(next);
                       }}
-                      className="w-16 rounded border border-slate-700 bg-[#090d16] px-1.5 py-0.5 text-slate-100"
+                      className="w-16 rounded border border-[#bac7b8] bg-[#fffef9] px-1.5 py-0.5 text-stone-900"
                     />
                     x
                   </span>
-                  <span className="flex items-center gap-1 text-slate-300">
+                  <span className="flex items-center gap-1 text-stone-700">
                     力度
                     <input
                       type="number"
@@ -431,10 +431,10 @@ export function WorkbenchPanel() {
                         next[idx] = { ...cue, velOffset: Number(e.target.value) || 0 };
                         setCues(next);
                       }}
-                      className="w-16 rounded border border-slate-700 bg-[#090d16] px-1.5 py-0.5 text-slate-100"
+                      className="w-16 rounded border border-[#bac7b8] bg-[#fffef9] px-1.5 py-0.5 text-stone-900"
                     />
                   </span>
-                  <span className="flex items-center gap-1 text-slate-300">
+                  <span className="flex items-center gap-1 text-stone-700">
                     引导
                     <input
                       type="number"
@@ -447,12 +447,12 @@ export function WorkbenchPanel() {
                         next[idx] = { ...cue, strength: Number(e.target.value) || 0.8 };
                         setCues(next);
                       }}
-                      className="w-14 rounded border border-slate-700 bg-[#090d16] px-1.5 py-0.5 text-slate-100"
+                      className="w-14 rounded border border-[#bac7b8] bg-[#fffef9] px-1.5 py-0.5 text-stone-900"
                     />
                   </span>
                   <button
                     onClick={() => setCues(cues.filter((_, i) => i !== idx))}
-                    className="ml-auto cursor-pointer rounded p-1 text-slate-400 hover:bg-rose-500/15 hover:text-rose-300"
+                    className="ml-auto cursor-pointer rounded p-1 text-[#576354] hover:bg-rose-500/15 hover:text-rose-800"
                     title="删除段落"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -470,24 +470,24 @@ export function WorkbenchPanel() {
                     { id: `c_${Date.now()}`, startBar: Math.min(maxB, lastEnd + 1), endBar: maxB, tempoScale: 1.0, velOffset: 0, strength: 0.85 },
                   ]);
                 }}
-                className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-700 bg-[#141c2e] px-2.5 py-1.5 text-slate-200 hover:border-[#e8be6a]"
+                className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1.5 text-stone-800 hover:border-[#42674f]"
               >
                 <Plus className="h-3.5 w-3.5" />
                 添加段落
               </button>
               <button
                 onClick={resetDefaultCues}
-                className="cursor-pointer rounded-lg border border-slate-700 bg-[#141c2e] px-2.5 py-1.5 text-slate-200 hover:border-[#e8be6a]"
+                className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1.5 text-stone-800 hover:border-[#42674f]"
               >
                 填入推荐表情曲线
               </button>
-              <label className="flex items-center gap-1.5 text-slate-300">
+              <label className="flex items-center gap-1.5 text-stone-700">
                 Seed
                 <input
                   type="number"
                   value={m5Seed}
                   onChange={(e) => setM5Seed(Number(e.target.value) || 505)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
               </label>
               <button
@@ -497,7 +497,7 @@ export function WorkbenchPanel() {
                   await runMode5Conductor(m5Seed);
                   setM5Seed((s) => s + 1);
                 }}
-                className="cursor-pointer rounded-lg border border-[#e8be6a]/70 bg-amber-400/15 px-3.5 py-1.5 font-semibold text-[#f2cf82] transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 按指挥曲线生成
               </button>
@@ -507,14 +507,14 @@ export function WorkbenchPanel() {
 
         {activeMode === 'm6' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
+            <p className="text-[#576354]">
               边听边拖滑块！0.25s 实时滑动时间窗引擎：拖动速度或强弱滑块瞬间丢弃未播缓存，约 60–150 ms 内 AI 钢琴家实时响应你的手势。
             </p>
-            <div className="grid grid-cols-1 gap-4 rounded-xl border border-sky-500/25 bg-sky-500/5 p-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 rounded-xl border border-sky-500/25 bg-teal-600/5 p-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 flex justify-between text-slate-300">
+                <label className="mb-1.5 flex justify-between text-stone-700">
                   <span>实时速度倍率</span>
-                  <span className="font-semibold text-sky-300">
+                  <span className="font-semibold text-teal-800">
                     {liveTempo.toFixed(2)}x ({tempoLabel})
                   </span>
                 </label>
@@ -526,13 +526,13 @@ export function WorkbenchPanel() {
                   step={0.05}
                   value={liveTempo}
                   onChange={(e) => void updateLiveControls(parseFloat(e.target.value), liveVel)}
-                  className="w-full accent-sky-400"
+                  className="w-full accent-teal-700"
                 />
               </div>
               <div>
-                <label className="mb-1.5 flex justify-between text-slate-300">
+                <label className="mb-1.5 flex justify-between text-stone-700">
                   <span>实时强弱情绪</span>
-                  <span className="font-semibold text-[#e8be6a]">
+                  <span className="font-semibold text-[#42674f]">
                     {liveVel >= 0 ? `+${liveVel}` : liveVel} ({velLabel})
                   </span>
                 </label>
@@ -553,7 +553,7 @@ export function WorkbenchPanel() {
                 id="m6StartBtn"
                 disabled={disabled || liveActive}
                 onClick={() => void startLiveConductor()}
-                className="cursor-pointer rounded-lg border border-sky-400/70 bg-sky-500/15 px-3.5 py-1.5 font-semibold text-sky-200 transition hover:bg-sky-500/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-teal-700/70 bg-teal-600/15 px-3.5 py-1.5 font-semibold text-teal-900 transition hover:bg-teal-600/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 启动实时指挥演奏
               </button>
@@ -561,11 +561,11 @@ export function WorkbenchPanel() {
                 id="m6StopBtn"
                 disabled={!liveActive}
                 onClick={() => stopLiveConductor(true)}
-                className="cursor-pointer rounded-lg border border-slate-700 bg-[#141c2e] px-3 py-1.5 font-semibold text-slate-200 transition hover:border-[#e8be6a] disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 font-semibold text-stone-800 transition hover:border-[#42674f] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 停止并保存为版本
               </button>
-              <span id="liveStatus" className="text-sky-300">
+              <span id="liveStatus" className="text-teal-800">
                 {liveStatus}
               </span>
             </div>
@@ -574,13 +574,13 @@ export function WorkbenchPanel() {
 
         {activeMode === 'm7' && (
           <div className="space-y-3">
-            <p className="text-slate-400">
+            <p className="text-[#576354]">
               导入任意真人钢琴家演奏的 <code>.mid</code>（或一键选用内置浪漫/戏剧大师引子），浏览器内运行动态规划逐音符对齐前{' '}
-              <b className="text-slate-200">K</b> 小节并锁死触键与呼吸，让 PianoFlow 顺着大师风格续弹全曲。
+              <b className="text-stone-800">K</b> 小节并锁死触键与呼吸，让 PianoFlow 顺着大师风格续弹全曲。
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700 bg-[#141c2e] px-3 py-1.5 text-slate-200 hover:border-[#e8be6a]">
-                <Upload className="h-3.5 w-3.5 text-[#e8be6a]" />
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 text-stone-800 hover:border-[#42674f]">
+                <Upload className="h-3.5 w-3.5 text-[#42674f]" />
                 导入真人演奏 .mid
                 <input
                   type="file"
@@ -597,7 +597,7 @@ export function WorkbenchPanel() {
                 id="m7DemoPoeticBtn"
                 disabled={disabled}
                 onClick={() => loadBuiltinMasterDemo('debussy_poetic')}
-                className="cursor-pointer rounded-lg border border-slate-700 bg-[#141c2e] px-3 py-1.5 text-slate-200 hover:border-[#e8be6a] disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 text-stone-800 hover:border-[#42674f] disabled:opacity-40"
               >
                 内置：浪漫诗意大师引子
               </button>
@@ -605,13 +605,13 @@ export function WorkbenchPanel() {
                 id="m7DemoDramaticBtn"
                 disabled={disabled}
                 onClick={() => loadBuiltinMasterDemo('horowitz_dramatic')}
-                className="cursor-pointer rounded-lg border border-slate-700 bg-[#141c2e] px-3 py-1.5 text-slate-200 hover:border-[#e8be6a] disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 text-stone-800 hover:border-[#42674f] disabled:opacity-40"
               >
                 内置：戏剧炫技大师引子
               </button>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 锁死大师引子：前
                 <input
                   type="number"
@@ -619,17 +619,17 @@ export function WorkbenchPanel() {
                   max={Math.max(1, totalBars - 1)}
                   value={m7PrefixBars}
                   onChange={(e) => setM7PrefixBars(Number(e.target.value) || 1)}
-                  className="w-16 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
                 小节
               </label>
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-stone-700">
                 接力 Seed
                 <input
                   type="number"
                   value={m7Seed}
                   onChange={(e) => setM7Seed(Number(e.target.value) || 707)}
-                  className="w-20 rounded-lg border border-slate-700 bg-[#12192a] px-2 py-1 text-slate-100"
+                  className="w-20 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
               </label>
               <button
@@ -639,12 +639,12 @@ export function WorkbenchPanel() {
                   await runMode7MasterRelay(m7PrefixBars, m7Seed);
                   setM7Seed((s) => s + 1);
                 }}
-                className="cursor-pointer rounded-lg border border-[#e8be6a]/70 bg-amber-400/15 px-3.5 py-1.5 font-semibold text-[#f2cf82] transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 对齐并开始大师接力
               </button>
             </div>
-            <div id="m7Status" className="text-sky-300">
+            <div id="m7Status" className="text-teal-800">
               {m7Status}
             </div>
           </div>

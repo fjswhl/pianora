@@ -1,11 +1,17 @@
 import { useEffect, useRef } from 'react';
 
-// Resolution-independent prints for the three editions and the featured keyboard.
-export function CoverArt({
-  edition,
-}: {
-  edition: 'keyboard' | 'etude' | 'moon' | 'dew';
-}) {
+export type CoverEdition =
+  | 'keyboard'
+  | 'etude'
+  | 'moon'
+  | 'dew'
+  | 'fantasia'
+  | 'tema'
+  | 'allegro'
+  | 'andante';
+
+// Resolution-independent prints for all library editions and the featured keyboard.
+export function CoverArt({ edition }: { edition: CoverEdition }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -71,16 +77,19 @@ export function CoverArt({
         }
         return;
       }
-      const colors = {
-        etude: ['#b5c7ae', '#43664d'],
-        moon: ['#aebdcb', '#435c75'],
-        dew: ['#dcb9a6', '#875947'],
+      const colors: Record<Exclude<CoverEdition, 'keyboard'>, [string, string, number]> = {
+        etude: ['#b5c7ae', '#43664d', 111],
+        moon: ['#aebdcb', '#435c75', 269],
+        dew: ['#dcb9a6', '#875947', 205],
+        fantasia: ['#c6bdd3', '#493c63', 284],
+        tema: ['#dad0aa', '#6e5b2e', 142],
+        allegro: ['#bfd2c4', '#335d4c', 228],
+        andante: ['#d8c2b7', '#744c40', 168],
       };
-      const [paper, ink] = colors[edition];
+      const [paper, ink, moonX] = colors[edition];
       ctx.fillStyle = paper;
       ctx.fillRect(0, 0, width, height);
       ctx.scale(width / 400, height / 160);
-      const moonX = edition === 'moon' ? 269 : edition === 'dew' ? 205 : 111;
       ctx.fillStyle = '#f3ecce';
       ctx.beginPath();
       ctx.ellipse(
@@ -97,15 +106,20 @@ export function CoverArt({
         ctx.beginPath();
         for (let x = -2; x <= 404; x += 2) {
           const y =
-            edition === 'dew'
+            edition === 'dew' || edition === 'andante'
               ? 83 +
                 i * 2.9 -
-                56 * Math.exp(-((x - 240 + i * 0.9) ** 2) / 3200) +
+                56 * Math.exp(-((x - (edition === 'andante' ? 185 : 240) + i * 0.9) ** 2) / 3200) +
                 15 * Math.sin(x / 43 + i * 0.05)
-              : 83 +
-                i * 2.85 +
-                28 * Math.sin(x / (edition === 'moon' ? 73 : 54) + i * 0.048) +
-                16 * Math.cos(x / 40 - i * 0.04);
+              : edition === 'fantasia' || edition === 'allegro'
+                ? 86 +
+                  i * 2.8 +
+                  32 * Math.sin(x / (edition === 'fantasia' ? 62 : 46) - i * 0.052) +
+                  12 * Math.cos(x / 29 + i * 0.038)
+                : 83 +
+                  i * 2.85 +
+                  28 * Math.sin(x / (edition === 'moon' || edition === 'tema' ? 73 : 54) + i * 0.048) +
+                  16 * Math.cos(x / 40 - i * 0.04);
           ctx.lineTo(x, y);
         }
         ctx.strokeStyle = ink;

@@ -6,9 +6,17 @@ import {
   Music2,
 } from 'lucide-react';
 import { useStudioStore } from '../store/useStudioStore';
-import { CoverArt } from './CoverArt';
+import { CoverArt, type CoverEdition } from './CoverArt';
 
-export const editions = {
+interface EditionMeta {
+  name: string;
+  title: string;
+  credit: string;
+  bars: number;
+  art: Exclude<CoverEdition, 'keyboard'>;
+}
+
+export const editions: Record<string, EditionMeta> = {
   short_etude: {
     name: '月光小品',
     title: 'Lune Miniature',
@@ -30,7 +38,35 @@ export const editions = {
     bars: 48,
     art: 'dew',
   },
-} as const;
+  mozart_fantasia_k397: {
+    name: 'D 小调幻想曲 K.397',
+    title: 'Fantasia in D minor',
+    credit: 'W. A. Mozart',
+    bars: 91,
+    art: 'fantasia',
+  },
+  mozart_sonata_k331_tema: {
+    name: 'A 大调奏鸣曲主题 K.331',
+    title: 'Sonata KV 331 · Tema',
+    credit: 'W. A. Mozart',
+    bars: 36,
+    art: 'tema',
+  },
+  mozart_sonata_k545_1: {
+    name: 'C 大调奏鸣曲 K.545 I',
+    title: 'Sonata K.545 · Allegro',
+    credit: 'W. A. Mozart',
+    bars: 73,
+    art: 'allegro',
+  },
+  mozart_sonata_k545_2: {
+    name: 'C 大调奏鸣曲 K.545 II',
+    title: 'Sonata K.545 · Andante',
+    credit: 'W. A. Mozart',
+    bars: 74,
+    art: 'andante',
+  },
+};
 
 export function Library({ openScore }: { openScore: (id: string) => void }) {
   const presets = useStudioStore((s) => s.presets);
@@ -60,7 +96,13 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
         </header>
         <div className="score-grid">
           {presets.map((p, index) => {
-            const e = editions[p.id as keyof typeof editions];
+            const e = editions[p.id] ?? {
+              name: p.name,
+              title: p.name,
+              credit: p.subtitle,
+              bars: 0,
+              art: 'etude' as const,
+            };
             return (
               <button
                 className="score-card"
@@ -69,7 +111,7 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
               >
                 <div className="jacket">
                   <CoverArt edition={e.art} />
-                  <span className="catalogue-no">PN / 00{index + 1}</span>
+                  <span className="catalogue-no">PN / {String(index + 1).padStart(3, '0')}</span>
                 </div>
                 <div className="card-copy">
                   <div>

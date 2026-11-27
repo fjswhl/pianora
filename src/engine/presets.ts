@@ -40,6 +40,52 @@ export const SHORT_ETUDE_LY = String.raw`\version "2.24.3"
 }
 `;
 
+interface RemotePresetSpec {
+  id: string;
+  name: string;
+  subtitle: string;
+  url: string;
+}
+
+const REMOTE_PRESETS: RemotePresetSpec[] = [
+  {
+    id: 'clair_de_lune',
+    name: '德彪西《月光》全曲',
+    subtitle: '72 小节 · 7 处原谱琶音',
+    url: '/presets/clair_de_lune.ly',
+  },
+  {
+    id: 'rosee_dargent',
+    name: '印象派夜曲《银露》',
+    subtitle: '48 小节 · 原创测试曲',
+    url: '/presets/rosee_dargent.ly',
+  },
+  {
+    id: 'mozart_fantasia_k397',
+    name: '莫扎特《D 小调幻想曲》K.397',
+    subtitle: '91 小节 · 古典戏剧幻想曲',
+    url: '/presets/mozart/mozart_fantasia_k397_Dm.ly',
+  },
+  {
+    id: 'mozart_sonata_k331_tema',
+    name: '莫扎特《A 大调奏鸣曲主题》K.331',
+    subtitle: '36 小节 · 优雅行板主题',
+    url: '/presets/mozart/mozart_sonata_k331_1_tema.ly',
+  },
+  {
+    id: 'mozart_sonata_k545_1',
+    name: '莫扎特《C 大调奏鸣曲》K.545 第一乐章',
+    subtitle: '73 小节 · Allegro 简易奏鸣曲',
+    url: '/presets/mozart/mozart_sonata_k545_1.ly',
+  },
+  {
+    id: 'mozart_sonata_k545_2',
+    name: '莫扎特《C 大调奏鸣曲》K.545 第二乐章',
+    subtitle: '74 小节 · Andante 歌唱性行板',
+    url: '/presets/mozart/mozart_sonata_k545_2.ly',
+  },
+];
+
 export async function loadScorePresets(): Promise<ScorePreset[]> {
   const list: ScorePreset[] = [
     {
@@ -49,27 +95,26 @@ export async function loadScorePresets(): Promise<ScorePreset[]> {
       ly: SHORT_ETUDE_LY,
     },
   ];
-  try {
-    const r1 = await fetch('/presets/clair_de_lune.ly');
-    if (r1.ok) {
-      list.push({
-        id: 'clair_de_lune',
-        name: '德彪西《月光》全曲',
-        subtitle: '72 小节 · 7 处原谱琶音',
-        ly: await r1.text(),
-      });
-    }
-  } catch {}
-  try {
-    const r2 = await fetch('/presets/rosee_dargent.ly');
-    if (r2.ok) {
-      list.push({
-        id: 'rosee_dargent',
-        name: '印象派夜曲《银露》',
-        subtitle: '48 小节 · 原创测试曲',
-        ly: await r2.text(),
-      });
-    }
-  } catch {}
+
+  const loaded = await Promise.all(
+    REMOTE_PRESETS.map(async (spec): Promise<ScorePreset | null> => {
+      try {
+        const res = await fetch(spec.url);
+        if (!res.ok) return null;
+        return {
+          id: spec.id,
+          name: spec.name,
+          subtitle: spec.subtitle,
+          ly: await res.text(),
+        };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  for (const item of loaded) {
+    if (item) list.push(item);
+  }
   return list;
 }

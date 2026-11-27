@@ -61,7 +61,7 @@ export function SheetMusicPanel() {
         <div id="svgGallery" className="flex max-h-[560px] flex-col gap-3 overflow-y-auto pr-1">
           {svgPages.length === 0 ? (
             <div className="py-12 text-center text-xs text-[#576354]">
-              这次编译未生成谱面。
+              当前演奏来自直接导入的 MIDI / MusicXML 乐谱（跳过 LilyPond 排版），可在「试听与导出」中查看 88 键动态钢琴卷帘。
             </div>
           ) : (
             svgPages.map((svgHtml, i) => (

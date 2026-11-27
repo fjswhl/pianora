@@ -443,8 +443,9 @@ export const useStudioStore = create<StudioState>((set, get) => {
     runFullPipeline: async () => {
       const st = get();
       const score = useScoreStore.getState();
+      const imported = score.importedScore;
       const lyCode = score.lyCode.trim();
-      if (!lyCode || st.busy || score.loading || score.error) return;
+      if ((!imported && !lyCode) || st.busy || score.loading || score.error) return;
       if (st.liveActive) st.stopLiveConductor(false);
 
       pianoPlayer.stop(true);
@@ -452,12 +453,12 @@ export const useStudioStore = create<StudioState>((set, get) => {
         busy: true,
         isPlaying: false,
         errorMsg: '',
-        progressMsg: '准备编译乐谱...',
+        progressMsg: imported ? `准备解析 ${imported.kind.toUpperCase()} 乐谱并加载 AI 引擎...` : '准备编译乐谱...',
         progressPct: 4,
         stages: {
           ...st.stages,
-          st1: { status: 'active', stat: 'WASM 编译中...' },
-          st2: { status: 'active', stat: 'Scheme 监听中...' },
+          st1: { status: 'active', stat: imported ? `${imported.kind.toUpperCase()} 直通解析` : 'WASM 编译中...' },
+          st2: { status: 'active', stat: imported ? '读取符号标记...' : 'Scheme 监听中...' },
           st3: { status: 'active', stat: '等待 MIDI...' },
           st4: { status: 'active', stat: '等待 AI...' },
         },
@@ -465,41 +466,71 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
       try {
         const controller = new AbortController();
-        let compileProgress = 0;
+        let compileProgress = imported ? 100 : 0;
         let modelProgress = 0;
         const report = (msg: string) => set({
           progressMsg: msg,
           progressPct: 4 + compileProgress * 0.7 + modelProgress * 0.28,
         });
-        const compileStarted = performance.now();
-        const compile = lilypondEngine.compile(lyCode, (msg, pct) => {
-          compileProgress = pct ?? compileProgress;
-          report(msg);
-        }).then(compiled => {
-          performance.measure('pianora:score-compile', { start: compileStarted });
-          set(s => ({
-            wasmReady: true,
-            wasmStatus: 'LilyPond WASM 就绪',
+
+        let compiled: {
+          scoreMidi: Midi;
+          svgPages: string[];
+          rawAnnotations: RawArpeggioAnnotation[];
+          compileSec: number;
+        };
+
+        if (imported) {
+          set((s) => ({
             stages: {
               ...s.stages,
-              st1: { status: 'done', stat: `${compiled.compileSec}s · ${compiled.svgPages.length} 页 SVG` },
-              st2: { status: 'done', stat: `提取 ${compiled.rawAnnotations.length} 条事件` },
+              st1: { status: 'done', stat: `${imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI'} · ${imported.noteCount} 音` },
+              st2: { status: 'done', stat: `提取 ${imported.rawAnnotations.length} 条事件` },
             },
           }));
-          return compiled;
-        }).catch(error => { controller.abort(); throw error; });
-        const model = pianoFlowEngine.load((msg, pct) => {
-          if (pct === modelProgress) return;
-          modelProgress = pct ?? modelProgress;
-          report(msg);
-        }, controller.signal).then(() => {
+          await pianoFlowEngine.load((msg, pct) => {
+            if (pct === modelProgress) return;
+            modelProgress = pct ?? modelProgress;
+            report(msg);
+          }, controller.signal);
           set({ ortReady: true, ortStatus: `PianoFlow (${pianoFlowEngine.provider}) 就绪` });
-        });
-        // Let both jobs settle before allowing a retry or another generation.
-        const [scoreResult, modelResult] = await Promise.allSettled([compile, model]);
-        if (scoreResult.status === 'rejected') throw scoreResult.reason;
-        if (modelResult.status === 'rejected') throw modelResult.reason;
-        const compiled = scoreResult.value;
+          compiled = {
+            scoreMidi: imported.midi,
+            svgPages: [],
+            rawAnnotations: imported.rawAnnotations,
+            compileSec: 0,
+          };
+        } else {
+          const compileStarted = performance.now();
+          const compile = lilypondEngine.compile(lyCode, (msg, pct) => {
+            compileProgress = pct ?? compileProgress;
+            report(msg);
+          }).then(res => {
+            performance.measure('pianora:score-compile', { start: compileStarted });
+            set(s => ({
+              wasmReady: true,
+              wasmStatus: 'LilyPond WASM 就绪',
+              stages: {
+                ...s.stages,
+                st1: { status: 'done', stat: `${res.compileSec}s · ${res.svgPages.length} 页 SVG` },
+                st2: { status: 'done', stat: `提取 ${res.rawAnnotations.length} 条事件` },
+              },
+            }));
+            return res;
+          }).catch(error => { controller.abort(); throw error; });
+          const model = pianoFlowEngine.load((msg, pct) => {
+            if (pct === modelProgress) return;
+            modelProgress = pct ?? modelProgress;
+            report(msg);
+          }, controller.signal).then(() => {
+            set({ ortReady: true, ortStatus: `PianoFlow (${pianoFlowEngine.provider}) 就绪` });
+          });
+          // Let both jobs settle before allowing a retry or another generation.
+          const [scoreResult, modelResult] = await Promise.allSettled([compile, model]);
+          if (scoreResult.status === 'rejected') throw scoreResult.reason;
+          if (modelResult.status === 'rejected') throw modelResult.reason;
+          compiled = scoreResult.value;
+        }
 
         const { cfmSteps, stepFactor, seed, batchCount } = get();
         const t3 = performance.now();
@@ -530,7 +561,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const totalBars = firstOut.perfState.scoreData.totalBars;
 
         set({
-          performanceTitle: lyCode.match(/^\s*title\s*=\s*"([^"\n]+)"/m)?.[1] || '自定义乐谱',
+          performanceTitle:
+            imported?.title ||
+            lyCode.match(/^\s*title\s*=\s*"([^"\n]+)"/m)?.[1] ||
+            '自定义乐谱',
           scoreMidi: compiled.scoreMidi,
           scoreNotes: firstOut.scoreNotes,
           scoreDuration: firstOut.scoreDuration,

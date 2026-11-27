@@ -41,7 +41,7 @@ export function App() {
   const [page, setPage] = useState<Page>(currentPage);
   const upload = useRef<HTMLInputElement>(null);
   const pipelineBusy = useScoreStore((s) => s.pipelineBusy);
-  const { selectPreset, setLyCode } = useScoreStore.getState();
+  const { selectPreset, importFile } = useScoreStore.getState();
   const [fileError, setFileError] = useState('');
   useEffect(() => {
     const navigate = () => {
@@ -94,7 +94,7 @@ export function App() {
                 disabled={pipelineBusy}
                 onClick={() => upload.current?.click()}
               >
-                <Upload size={16} /> 导入乐谱
+                <Upload size={16} /> 导入乐谱 (.ly / .mid / MusicXML)
               </button>
             </div>
           )}
@@ -102,17 +102,17 @@ export function App() {
             type="file"
             hidden
             ref={upload}
-            accept=".ly,.txt"
+            accept=".ly,.txt,.mid,.midi,.musicxml,.xml,.mxl"
             onChange={async (e) => {
               const file = e.target.files?.[0];
               e.target.value = '';
               if (!file) return;
-              try {
-                setLyCode(await file.text());
+              const ok = await importFile(file);
+              if (ok) {
                 setFileError('');
                 location.hash = 'editor';
-              } catch {
-                setFileError('无法读取乐谱文件，请重新导入。');
+              } else {
+                setFileError(useScoreStore.getState().error || '无法读取乐谱文件，请重新导入。');
               }
             }}
           />

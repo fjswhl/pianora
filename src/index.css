@@ -389,6 +389,36 @@ body {
   padding: clamp(18px, 2.5vw, 36px);
   border-radius: 9px;
 }
+.imported-score-card {
+  background: #f6f7ef !important;
+  border-color: var(--line) !important;
+  color: var(--ink) !important;
+}
+.imported-score-card h3 {
+  color: var(--ink) !important;
+  font-family: Georgia, 'Songti SC', serif;
+}
+.imported-score-card p,
+.imported-score-card .text-slate-400 {
+  color: var(--muted) !important;
+}
+.imported-score-card .bg-\[\#101624\],
+.imported-score-card .bg-\[\#0d1322\] {
+  background: #fffef9 !important;
+  border-color: var(--line) !important;
+}
+.imported-score-card .text-slate-100,
+.imported-score-card .text-slate-200,
+.imported-score-card .text-slate-300 {
+  color: var(--ink) !important;
+}
+.imported-score-card .text-\[\#e8be6a\],
+.imported-score-card .text-emerald-300 {
+  color: #1f4536 !important;
+}
+.imported-score-card .bg-emerald-500\/15 {
+  background: #e0eadb !important;
+}
 .editing :is(label, span, summary, .text-slate-100) {
   color: var(--ink);
 }

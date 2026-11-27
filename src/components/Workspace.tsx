@@ -23,6 +23,7 @@ export default function Workspace({
     if (
       page === 'editor' &&
       !source.lyCode &&
+      !source.importedScore &&
       !source.loading &&
       source.selectedPresetId === 'short_etude'
     ) {

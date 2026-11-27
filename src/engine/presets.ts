@@ -4,6 +4,7 @@ export interface ScorePreset {
   subtitle: string;
   composer: string;
   url: string;
+  scoreType?: string;
 }
 
 export const scorePresets: ScorePreset[] = [
@@ -203,5 +204,78 @@ export const scorePresets: ScorePreset[] = [
     subtitle: '59 小节 · 静谧沉思',
     composer: 'Satie',
     url: '/presets/satie/satie_gymnopedie_3.ly',
+  },
+
+  {
+    id: 'say_goodbye',
+    name: '说了再见',
+    composer: '周杰伦',
+    subtitle: '钢琴伴奏 · MusicXML',
+    scoreType: 'MusicXML',
+    url: '/presets/mandopop/周杰伦 - 说了再见.musicxml',
+  },
+  {
+    id: 'red_dust_inn',
+    name: '红尘客栈',
+    composer: '周杰伦',
+    subtitle: '钢琴改编 · MusicXML',
+    scoreType: 'MusicXML',
+    url: '/presets/mandopop/周杰伦 - 红尘客栈.musicxml',
+  },
+  {
+    id: 'sunny_day',
+    name: '晴天',
+    composer: '周杰伦',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/晴天.mid',
+  },
+  {
+    id: 'nocturne',
+    name: '夜曲',
+    composer: '周杰伦',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/夜曲.mid',
+  },
+  {
+    id: 'east_wind',
+    name: '东风破',
+    composer: '周杰伦',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/东风破.mid',
+  },
+  {
+    id: 'a_thousand_years',
+    name: '一千年以后',
+    composer: '林俊杰',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/一千年以后.mid',
+  },
+  {
+    id: 'practice_love',
+    name: '修炼爱情',
+    composer: '林俊杰',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/修炼爱情.mid',
+  },
+  {
+    id: 'cao_cao',
+    name: '曹操',
+    composer: '林俊杰',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/曹操.mid',
+  },
+  {
+    id: 'back_to_back',
+    name: '背对背拥抱',
+    composer: '林俊杰',
+    subtitle: '钢琴改编 · MIDI',
+    scoreType: 'MIDI',
+    url: '/presets/mandopop/背对背拥抱.mid',
   },
 ];

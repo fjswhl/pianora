@@ -15,7 +15,7 @@ with sync_playwright() as playwright:
     browser = playwright.chromium.launch(channel=os.getenv("PIANORA_BROWSER", "chromium"))
     page = browser.new_page(viewport={"width": 1440, "height": 900}, accept_downloads=True)
     page.goto(os.getenv("PIANORA_URL", "http://127.0.0.1:4173"))
-    expect(page.locator(".score-card")).to_have_count(26)
+    expect(page.locator(".score-card")).to_have_count(35)
     page.wait_for_load_state("networkidle")
     resources = page.evaluate("performance.getEntriesByType('resource').map(r => ({path: new URL(r.name).pathname, bytes: r.decodedBodySize}))")
     scripts = [r for r in resources if r["path"].endswith(".js") and r["path"].startswith("/assets/")]
@@ -34,7 +34,7 @@ with sync_playwright() as playwright:
     requests = []
     page.on("request", lambda r: requests.append((r.method, urlsplit(r.url).path)))
     page.goto(library_url)
-    expect(page.locator(".score-card")).to_have_count(26)
+    expect(page.locator(".score-card")).to_have_count(35)
     expect(page.get_by_role("heading", name="精选曲谱")).to_be_visible()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     page.screenshot(path=output / "mobile.png")

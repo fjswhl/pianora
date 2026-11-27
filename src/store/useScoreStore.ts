@@ -100,6 +100,19 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
           response.headers.get('content-type')?.includes('text/html')
         )
           throw new Error();
+        if (isDirectScoreFile(preset.url)) {
+          const fileName = preset.url.split('/').pop()!;
+          const file = new File([await response.blob()], fileName);
+          const parsed = await parseDirectScoreFile(file);
+          if (request === revision) {
+            set({
+              importedScore: { ...parsed, title: preset.name, composer: preset.composer },
+              lyCode: '',
+              loading: false,
+            });
+          }
+          return;
+        }
         source = await response.text();
         sources.set(id, source);
       }

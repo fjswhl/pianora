@@ -14,7 +14,7 @@ with sync_playwright() as p:
         page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=dpr)
         page.goto(os.getenv("PIANORA_URL", "http://localhost:5173"))
         cards = page.locator(".score-card")
-        expect(cards).to_have_count(26)
+        expect(cards).to_have_count(35)
         for width in [390, 360, 844, 384]:
             page.set_viewport_size({"width": width, "height": 844})
             heights = cards.evaluate_all("""async cards => {

@@ -204,6 +204,8 @@ export const editions: Record<string, EditionMeta> = {
 
 const COMPOSER_FILTERS = [
   { id: 'all', label: '全部' },
+  { id: '周杰伦', label: '周杰伦' },
+  { id: '林俊杰', label: '林俊杰' },
   { id: 'Bach', label: '巴赫' },
   { id: 'Mozart', label: '莫扎特' },
   { id: 'Beethoven', label: '贝多芬' },
@@ -270,7 +272,7 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
             const e = editions[p.id] ?? {
               name: p.name,
               title: p.name,
-              credit: p.subtitle,
+              credit: p.composer,
               bars: 0,
               art: 'etude' as const,
             };
@@ -292,16 +294,22 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
                     <ArrowUpRight size={17} />
                   </div>
                   <p>
-                    {e.name} · {e.credit}
+                    {p.scoreType ? e.credit : e.name + ' · ' + e.credit}
                   </p>
                   <footer>
-                    <Music2 size={13} /> 钢琴独奏 <span>{e.bars} 小节</span>
+                    <Music2 size={13} /> {p.scoreType ? p.subtitle : '钢琴独奏'}
+                    {e.bars > 0 && <span>{e.bars} 小节</span>}
                   </footer>
                 </div>
               </button>
             );
           })}
         </div>
+        {(composer === 'all' || composer === '林俊杰') && (
+          <p><a href="/presets/mandopop/林俊杰 - 江南（前奏）.pdf" target="_blank" rel="noreferrer">
+            林俊杰《江南》前奏 · Sheen 改编 · 查看 4 小节 PDF ↗
+          </a></p>
+        )}
       </section>
     </>
   );

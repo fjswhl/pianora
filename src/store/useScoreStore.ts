@@ -11,6 +11,7 @@ const sources = new Map<string, string>();
 
 interface ScoreState {
   lyCode: string;
+  originalFile: File | null;
   selectedPresetId: string;
   importedScore: ImportedScoreData | null;
   loading: boolean;
@@ -24,6 +25,7 @@ interface ScoreState {
 
 export const useScoreStore = create<ScoreState>((set, get) => ({
   lyCode: '',
+  originalFile: null,
   selectedPresetId: 'short_etude',
   importedScore: null,
   loading: false,
@@ -34,6 +36,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
     revision++;
     set({
       lyCode: code,
+      originalFile: null,
       selectedPresetId: 'custom',
       importedScore: null,
       loading: false,
@@ -42,7 +45,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
   },
 
   clearImportedScore() {
-    set({ importedScore: null, error: '' });
+    set({ originalFile: null, importedScore: null, error: '' });
     if (!get().lyCode) {
       void get().selectPreset('short_etude');
     }
@@ -56,6 +59,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
         const parsed = await parseDirectScoreFile(file);
         if (request === revision) {
           set({
+            originalFile: file,
             importedScore: parsed,
             selectedPresetId: 'imported',
             loading: false,
@@ -67,6 +71,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
       const text = await file.text();
       if (request === revision) {
         set({
+          originalFile: file,
           lyCode: text,
           importedScore: null,
           selectedPresetId: 'custom',
@@ -90,7 +95,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
     const preset = scorePresets.find((p) => p.id === id);
     if (!preset) return;
     const request = ++revision;
-    set({ selectedPresetId: id, importedScore: null, loading: true, error: '' });
+    set({ selectedPresetId: id, originalFile: null, importedScore: null, loading: true, error: '' });
     try {
       let source = sources.get(id);
       if (source === undefined) {

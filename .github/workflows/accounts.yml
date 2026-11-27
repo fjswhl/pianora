@@ -1,0 +1,55 @@
+name: Account regression
+on:
+  workflow_call:
+  pull_request:
+    paths:
+      - 'worker/**'
+      - 'migrations/**'
+      - 'src/**'
+      - 'package*.json'
+      - 'scripts/*account*'
+      - 'wrangler.jsonc'
+      - '.github/workflows/accounts.yml'
+permissions:
+  contents: read
+jobs:
+  accounts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci && npm run typecheck && npm run build
+      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - name: Prepare isolated local mail and database
+        run: |
+          umask 077
+          test_dir=$(mktemp -d)
+          echo "PIANORA_TEST_DIR=$test_dir" >> "$GITHUB_ENV"
+          echo "PIANORA_TEST_SCRIPT=$GITHUB_WORKSPACE/scripts/verify-accounts.py" >> "$GITHUB_ENV"
+          node -e "process.stdout.write('BETTER_AUTH_SECRET='+require('node:crypto').randomBytes(48).toString('base64url'))" > "$test_dir/test.env"
+      - name: Prepare an existing session on the prior dependency versions
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_COMMIT: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --depth 1 origin "$BASE_COMMIT"
+          if git cat-file -e "$BASE_COMMIT:scripts/ci-accounts.sh" && ! git diff --quiet "$BASE_COMMIT" HEAD -- package-lock.json migrations worker/auth.ts; then
+            git worktree add --detach "$PIANORA_TEST_DIR/base" "$BASE_COMMIT"
+            cd "$PIANORA_TEST_DIR/base"
+            npm ci && npm run build
+            PIANORA_CAPTURE_SESSION="$PIANORA_TEST_DIR/session.json" bash scripts/ci-accounts.sh
+            echo "PIANORA_PREVIOUS_SESSION=$PIANORA_TEST_DIR/session.json" >> "$GITHUB_ENV"
+          fi
+      - name: Verify sign-in, session, saving and private access
+        run: bash scripts/ci-accounts.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: account-regression
+          path: artifacts/accounts.json

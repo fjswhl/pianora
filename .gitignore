@@ -22,3 +22,6 @@ public/models/*.onnx
 # Generated content-addressed downloads
 public/packs/
 public/packs-*/
+
+wrangler.accounts.generated.json
+.dev.vars*

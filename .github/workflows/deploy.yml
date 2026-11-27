@@ -14,7 +14,10 @@ permissions:
   contents: read
 
 jobs:
+  accounts:
+    uses: ./.github/workflows/accounts.yml
   deploy:
+    needs: accounts
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -25,7 +28,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -58,9 +61,12 @@ jobs:
 
       # Needs repo secrets: CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID
       - name: Deploy Worker + static assets
-        uses: cloudflare/wrangler-action@v3
-        with:
-          # v4 understands wrangler.jsonc (v3 does not)
-          wranglerVersion: '4'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/deploy-accounts.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PIANORA_D1_ID: ${{ vars.PIANORA_D1_ID }}
+          PIANORA_AUTH_FROM: ${{ vars.PIANORA_AUTH_FROM }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}

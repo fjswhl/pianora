@@ -1,0 +1,10 @@
+{
+  "simulatedOtp": true,
+  "saveAfterLogin": true,
+  "sessionAfterRefresh": true,
+  "reopenSource": true,
+  "crossAccountRead": 404,
+  "signedOutRead": 401,
+  "foreignOriginWrite": 403,
+  "generatedTakeTested": true
+}

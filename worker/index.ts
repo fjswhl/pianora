@@ -1,4 +1,7 @@
-interface Env {
+import { accountApi } from './accounts';
+import type { AccountEnv } from './auth';
+
+interface Env extends AccountEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
   BIG_FILES: R2Bucket;
 }
@@ -86,6 +89,7 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ): Promise<Response> {
+    if (new URL(request.url).pathname.startsWith('/api/')) return accountApi(request, env);
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method Not Allowed', { status: 405 });
     }

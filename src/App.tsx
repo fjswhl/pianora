@@ -12,6 +12,8 @@ import {
 import { Library } from './components/Library';
 import { useScoreStore } from './store/useScoreStore';
 
+const AccountLibrary = lazy(() => import('./components/AccountLibrary'));
+
 const Workspace = lazy(() => import('./components/Workspace'));
 
 const pages = {
@@ -38,6 +40,16 @@ function currentPage(): Page {
 }
 
 export function App() {
+  const [providers, setProviders] = useState({ email: false, google: false });
+  const [account, setAccount] = useState<'library' | 'editor' | 'studio' | null>(null);
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('account') === 'complete') {
+      window.close();
+    }
+    const abort = new AbortController();
+    fetch('/api/account/options', { signal: abort.signal }).then(r => r.json()).then(setProviders).catch(() => {});
+    return () => abort.abort();
+  }, []);
   const [page, setPage] = useState<Page>(currentPage);
   useEffect(() => {
     let disposed = false;
@@ -91,7 +103,14 @@ export function App() {
         <header className="crumb">
           <BookOpen size={16} /> 工作空间 <ChevronRight size={13} />{' '}
           <strong>{pages[page].title}</strong>
+          {(providers.email || providers.google) && <div className="account-actions">
+            {page !== 'library' && <button disabled={pipelineBusy} onClick={()=>setAccount(page)}>保存到曲库</button>}
+            <button onClick={()=>setAccount('library')}>我的曲库</button>
+          </div>}
         </header>
+        {account && <Suspense fallback={<p role="status">正在打开曲库…</p>}>
+          <AccountLibrary intent={account} providers={providers} close={()=>setAccount(null)} />
+        </Suspense>}
         <main className="content">
           {page === 'library' && (
             <div className="page-title">

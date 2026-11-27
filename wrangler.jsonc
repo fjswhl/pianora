@@ -3,13 +3,14 @@
   "name": "pianora",
   "main": "worker/index.ts",
   "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat"],
   "routes": [{ "pattern": "opuslin.uk", "custom_domain": true }],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     // Large binaries are served from R2 through the Worker (with Range support)
-    "run_worker_first": ["/soundfonts/*", "/models/*", "/ort/*"]
+    "run_worker_first": ["/api/*", "/soundfonts/*", "/models/*", "/ort/*"]
   },
   "r2_buckets": [
     {

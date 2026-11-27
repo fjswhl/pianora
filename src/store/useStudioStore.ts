@@ -113,6 +113,7 @@ interface StudioState {
 
   // Score & Pipeline params
   performanceTitle: string;
+  performanceSource: File | null;
   cfmSteps: number;
   stepFactor: number;
   seed: number;
@@ -246,6 +247,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     isPlaying: false,
     exportingWav: false,
 
+    performanceSource: null,
     performanceTitle: '',
     cfmSteps: 10,
     stepFactor: 0.75,
@@ -576,6 +578,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const totalBars = firstOut.perfState.scoreData.totalBars;
 
         set({
+          performanceSource: score.originalFile ?? new File([lyCode], score.selectedPresetId + ".ly"),
           performanceTitle:
             imported?.title ||
             lyCode.match(/^\s*title\s*=\s*"([^"\n]+)"/m)?.[1] ||

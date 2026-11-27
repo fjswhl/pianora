@@ -1,0 +1,25 @@
+name: Check account infrastructure
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspect access or provision the private D1 database and R2 bucket
+        type: choice
+        default: inspect
+        options: [inspect, prepare]
+permissions:
+  contents: read
+jobs:
+  check:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/provision-accounts.mjs "--$MODE"
+        env:
+          MODE: ${{ inputs.mode }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

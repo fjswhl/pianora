@@ -143,6 +143,104 @@ function findClosestTokenId(val: number, table: number[], startIdx = 9): number 
   return Math.abs(val - table[left]) <= Math.abs(val - table[right]) ? left : right;
 }
 
+/**
+ * Correct the mean pulse over a few written bars. Within each span the model's
+ * relative intervals, including signed offsets between chord tones, stay intact.
+ * Work on generated cells only: a locked prefix or a touch-only edit already
+ * contains the timing the musician heard.
+ */
+function calibrateTempo(
+  state: PerfState, meta: TokenizerMeta, start: number, end: number,
+  tempoChanges: number[], mask?: Uint8Array,
+  targetSpeed: (i: number) => number = () => 1,
+) {
+  const { scoreData, allValues, allTokens } = state;
+  const { scoreSimpleNotes: notes, noteBars } = scoreData;
+  const intervalScales = new Float64Array(end - start).fill(1);
+  const tables = ['TimeShift', 'TimeDuration', 'TimeDurationSustain'].map(key => meta.token_values_norm[key]);
+  const writable = (i: number, dim: number) => !mask || Boolean(mask[i * 4 + dim]);
+  function write(i: number, dim: number, value: number) {
+    const cell = (i + 1) * 8 + 4 + dim;
+    allValues[cell] = value;
+    allTokens[cell] = findClosestTokenId(value, tables[dim - 1]);
+  }
+  function scoreGap(i: number) {
+    return (notes[i].s - (notes[i - 1]?.s ?? 0)) / targetSpeed(Math.max(0, i - 1));
+  }
+  function scaleFor(raw: number, written: number) {
+    if (raw <= 0 || written <= 0) return 1;
+    const bias = Math.log(raw / written);
+    // Leave small variations alone. Beyond 5%, ease toward a maximum
+    // sustained deviation of about 10%, without pinning every phrase to it.
+    const excess = Math.abs(bias) - 0.05;
+    if (excess <= 0) return 1;
+    // An extreme error (e.g. 4x slower) carries little evidence of an
+    // intended tempo choice. Bring that pulse closer to the written mark.
+    const retained = (0.05 + 0.05 * Math.tanh(excess / 0.05)) / (1 + 2 * excess * excess);
+    return Math.exp(Math.sign(bias) * retained - bias);
+  }
+  function fit(first: number, stop: number) {
+    if (first === stop) return;
+    let raw = 0, written = 0;
+    for (let i = first; i < stop; i++) {
+      raw += allValues[(i + 1) * 8 + 5];
+      written += scoreGap(i);
+    }
+    const scale = scaleFor(raw, written);
+    for (let i = first; i < stop; i++) {
+      const off = (i + 1) * 8;
+      // A collapsed model span has no pulse to preserve. Use its written gaps.
+      const gap = written > 0 && raw <= 0 ? scoreGap(i) : allValues[off + 5] * scale;
+      write(i, 1, gap);
+      intervalScales[i - start] = scale;
+    }
+  }
+
+  let first = start;
+  let change = 0;
+  // Each shift ends at note i; the interval reaching a tempo mark still
+  // belongs to the preceding section. Score seconds already integrate all BPMs.
+  for (let i = start; i < end; i++) {
+    const gap = scoreGap(i);
+    if (!writable(i, 1) || i === 0 || gap >= 2) {
+      fit(first, i);
+      if (writable(i, 1)) {
+        if (i === 0) write(i, 1, notes[i].s);
+        else fit(i, i + 1);
+      }
+      first = i + 1;
+    }
+    if (first > i) continue;
+    while (change < tempoChanges.length && tempoChanges[change] <= (notes[i - 1]?.s ?? 0) + 0.00005) change++;
+    const changed = change < tempoChanges.length && tempoChanges[change] <= notes[i].s + 0.00005;
+    if (changed || noteBars[i] - noteBars[Math.max(0, first - 1)] >= 3) {
+      fit(first, i + 1);
+      first = i + 1;
+    }
+  }
+  fit(first, end);
+
+  // Releases follow the outgoing pulse. All tones struck together use the
+  // same duration scale, including the opening chord and tempo boundaries.
+  let nextAttack = end;
+  for (let i = end - 1; i >= start; i--) {
+    if (i + 1 < end && notes[i + 1].s > notes[i].s) nextAttack = i + 1;
+    if (!writable(i, 1)) continue;
+    let scale = intervalScales[(nextAttack < end ? nextAttack : i) - start];
+    const off = (i + 1) * 8;
+    if (end === notes.length && notes[i].s === notes[end - 1].s) {
+      // No later strike can anchor a final held note (or a one-chord score).
+      // Preserve articulation, intervening only for gross release errors.
+      const dry = allValues[off + 6] * scale;
+      const written = notes[i].d / targetSpeed(i);
+      if (dry > 0) scale *= Math.max(0.6 * written, Math.min(1.5 * written, dry)) / dry;
+    }
+    for (const dim of [2, 3]) {
+      if (writable(i, dim)) write(i, dim, allValues[off + 4 + dim] * scale);
+    }
+  }
+}
+
 /** Build Flow Matching time schedule matching SyMuPe (cfm_step_factor = 0.75) */
 function buildTimeSteps(steps: number, stepFactor = 0.75): number[] {
   if (stepFactor >= 0.9999) {
@@ -1003,6 +1101,11 @@ export class BrowserPianoFlow {
     }
 
     const perfState: PerfState = { allTokens, allValues, scoreData: tokData };
+    if (firstMasked >= 0 && lastMasked >= firstMasked) {
+      calibrateTempo(perfState, this.meta!, firstMasked, lastMasked + 1,
+        scoreMidi.header.tempos.map(t => scoreMidi.header.ticksToSeconds(t.ticks)), opts.maskMatrix,
+        conductor ? i => 1 + (conductor.tempoScale[i] - 1) * conductor.strength[i] : undefined);
+    }
     const decoded = decodePerfState(perfState);
     return {
       scoreNotes: tokData.scoreSimpleNotes,
@@ -1043,6 +1146,7 @@ export class LiveConductorSession {
   public cfmSteps: number;
   private rng: () => number;
   private noteStartTimes: number[] = [];
+  private tempoChanges: number[];
   private busy = false;
   public lastChunkMs = 0;
 
@@ -1053,6 +1157,7 @@ export class LiveConductorSession {
     opts: { seed?: number; cfmSteps?: number; tempoScale?: number; velOffset?: number },
   ) {
     this.pf = pf;
+    this.tempoChanges = scoreMidi.header.tempos.map(t => scoreMidi.header.ticksToSeconds(t.ticks));
     this.scoreData = tokenizeScoreMidi(scoreMidi, meta);
     this.tempoScale = opts.tempoScale ?? 1.0;
     this.velOffset = opts.velOffset ?? 0;
@@ -1152,6 +1257,7 @@ export class LiveConductorSession {
           : null,
       });
 
+      calibrateTempo(this, this.pf.meta!, startNote, endNote, this.tempoChanges, undefined, () => this.tempoScale);
       const outNotes: SimpleNote[] = [];
       let curSec = this.noteStartTimes.length ? this.noteStartTimes[this.noteStartTimes.length - 1] : 0;
 

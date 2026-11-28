@@ -57,6 +57,23 @@ const DYNAMICS_VEL: Record<string, number> = {
   fff: 0.98,
 };
 
+// MusicXML sound tempo counts quarter notes; a printed metronome counts
+// whichever (possibly dotted) note value is engraved next to the number.
+function directionTempo(direction: Element): number {
+  const sound = parseFloat(direction.querySelector('sound[tempo]')?.getAttribute('tempo') ?? '');
+  if (Number.isFinite(sound) && sound > 0) return sound;
+  const metro = direction.querySelector('metronome');
+  const perMinute = parseFloat(metro?.querySelector('per-minute')?.textContent ?? '');
+  const unit = metro?.querySelector('beat-unit')?.textContent?.trim() || 'quarter';
+  const quarters: Record<string, number> = {
+    maxima: 32, long: 16, breve: 8, whole: 4, half: 2, quarter: 1, eighth: 0.5,
+    '16th': 0.25, '32nd': 0.125, '64th': 1/16, '128th': 1/32, '256th': 1/64,
+    '512th': 1/128, '1024th': 1/256,
+  };
+  const dots = metro?.querySelectorAll('beat-unit-dot').length ?? 0;
+  return perMinute * quarters[unit] * (2 - 2 ** -dots);
+}
+
 function cleanBaseName(fileName: string): string {
   return fileName.replace(/\.(mid|midi|musicxml|xml|mxl)$/i, '').replace(/[_-]+/g, ' ').trim() || t("导入乐谱");
 }
@@ -354,10 +371,8 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
             writtenChords.set(tick, { tick, chord: readWrittenChord(child) });
         } else if (tag === 'direction') {
           if (pIdx === 0) {
-            const soundTempo = child.querySelector('sound[tempo]')?.getAttribute('tempo');
-            const metroPerMin = child.querySelector('metronome > per-minute')?.textContent;
-            const bpm = parseFloat(soundTempo || metroPerMin || '');
-            if (Number.isFinite(bpm) && bpm >= 20 && bpm <= 300) {
+            const bpm = directionTempo(child);
+            if (Number.isFinite(bpm) && bpm > 0) {
               if (!tempos.length || tempos[tempos.length - 1].ticks !== cursorTick) {
                 tempos.push({ ticks: cursorTick, bpm });
               }

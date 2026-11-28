@@ -39,7 +39,9 @@ npx wrangler d1 migrations apply CATALOG --remote
 npx wrangler d1 execute CATALOG --remote --file /tmp/catalog-verified.sql
 ```
 
-规划会打印批次曲目数、唯一对象数、原始和压缩字节。上传先检查已有对象，只写缺失对象，读回并核对 SHA-256 后才生成 SQL。仅在上传命令成功后使用它本次生成的 SQL。同一批次可重跑，重复曲目通过 ID 更新，未改动的行跳过写入。导入后等目录缓存刷新即可浏览，前端无需重新部署。GitHub Actions 的 **Verify and upload catalog seed** 也可上传仓库种子，生成经远端校验的 SQL artifact。
+规划会打印批次曲目数、唯一对象数、原始和压缩字节。上传先检查已有对象，只写缺失对象，读回并核对 SHA-256 后才生成 SQL。仅在上传命令成功后使用它本次生成的 SQL。同一批次可重跑，重复曲目通过 ID 更新，未改动的行跳过写入。导入后等目录缓存刷新即可浏览，前端无需重新部署。GitHub Actions 的 **Verify and upload catalog objects** 支持选择种子或已收录的开放曲集，生成经远端校验的 SQL artifact。
+
+首批新增的 [Mutopia 钢琴曲目](collections/mutopia-piano.json) 含 14 首公有领域排版，每首记录作品页、版本来源、制谱者和文件哈希。选取 `mutopia-piano` 可从固定上游版本重新下载原件。也可以在本地运行 `python3 scripts/fetch-mutopia.py /tmp/mutopia`，然后向导入工具传入 `--manifest catalog/collections/mutopia-piano.json --files /tmp/mutopia`。上线后用 `python3 scripts/verify-mutopia.py` 复验编辑器选曲和播放，加 `--dev-origin http://127.0.0.1:5173` 可在本地 Vite 的浏览器引擎中逐首复验 MIDI 与 SVG 排版。
 
 ## 免费容量规划
 

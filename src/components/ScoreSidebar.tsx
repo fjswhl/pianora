@@ -115,6 +115,13 @@ export function ScoreSidebar({ onGenerated, publishableKey }: { onGenerated: () 
           </option>
         ))}
       </select>
+      {current?.id === selectedPresetId && current.sourceUrl && <p className="mt-2 text-xs text-slate-300">
+        {current.collection} · <a className="underline" href={current.sourceUrl} target="_blank" rel="noreferrer">{t('版本来源')}</a>
+        {current.transcriber && ' · ' + current.transcriber}
+        {current.license && <> · {current.licenseUrl
+          ? <a className="underline" href={current.licenseUrl} target="_blank" rel="noreferrer">{current.license}</a>
+          : current.license}</>}
+      </p>}
       {(presets.next !== null || presets.error) && <button disabled={presets.loading} onClick={presets.more}>
         {presets.error ? t("重试") : t("更多曲谱")}
       </button>}

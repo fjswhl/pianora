@@ -9,11 +9,12 @@ interface ScoreRow {
   number: number;
   id: string;
   composer: string;
+  collection: string;
   file: string;
   metadata: string;
   object_name: string;
 }
-const selectScore = `SELECT s.number,s.id,s.composer,s.file,s.metadata,f.object_name
+const selectScore = `SELECT s.number,s.id,s.composer,s.collection,s.file,s.metadata,f.object_name
   FROM catalog_scores s JOIN catalog_files f ON f.path=s.file`;
 const filesRoute = '/api/catalog/files/';
 const shortCache = 'public, max-age=60, s-maxage=300';
@@ -27,6 +28,7 @@ function score(row: ScoreRow) {
     number: row.number,
     id: row.id,
     composer: row.composer,
+    collection: row.collection,
     file: row.file,
     url: filesRoute + row.object_name,
   };
@@ -102,6 +104,21 @@ async function readCatalog(url: URL, env: CatalogEnv) {
     ).first<number>('pieces');
     return json({ items: results.slice(0, 100), next, total });
   }
+  if (path === '/api/catalog/collections') {
+    const composer = url.searchParams.get('composer');
+    const after = url.searchParams.get('after') ?? '';
+    if (!composer || composer.length > 160 || after.length > 240)
+      return invalid();
+    const { results } = await env.CATALOG.prepare(
+      'SELECT collection,pieces FROM catalog_collections WHERE composer=? AND collection>? ORDER BY collection LIMIT 101',
+    )
+      .bind(composer, after)
+      .all<{ collection: string; pieces: number }>();
+    return json({
+      items: results.slice(0, 100),
+      next: results.length > 100 ? results[99].collection : null,
+    });
+  }
   if (path === '/api/catalog/scores') {
     const after = pageNumber(
       url.searchParams.get('after'),
@@ -116,14 +133,25 @@ async function readCatalog(url: URL, env: CatalogEnv) {
       (composer !== null && (!composer || composer.length > 160))
     )
       return invalid();
-    const query = composer
+    const collection = url.searchParams.get('collection');
+    if (
+      collection !== null &&
+      (!composer || !collection || collection.length > 240)
+    )
+      return invalid();
+    const query = collection
       ? env.CATALOG.prepare(
           selectScore +
-            ' WHERE s.composer=? AND s.number>? ORDER BY s.number LIMIT ?',
-        ).bind(composer, after, limit + 1)
-      : env.CATALOG.prepare(
-          selectScore + ' WHERE s.number>? ORDER BY s.number LIMIT ?',
-        ).bind(after, limit + 1);
+            ' WHERE s.composer=? AND s.collection=? AND s.number>? ORDER BY s.number LIMIT ?',
+        ).bind(composer, collection, after, limit + 1)
+      : composer
+        ? env.CATALOG.prepare(
+            selectScore +
+              ' WHERE s.composer=? AND s.number>? ORDER BY s.number LIMIT ?',
+          ).bind(composer, after, limit + 1)
+        : env.CATALOG.prepare(
+            selectScore + ' WHERE s.number>? ORDER BY s.number LIMIT ?',
+          ).bind(after, limit + 1);
     const { results } = await query.all<ScoreRow>();
     return json({
       items: results.slice(0, limit).map(score),
@@ -149,10 +177,12 @@ export async function catalogApi(
   const url = new URL(request.url);
   const allowed =
     url.pathname === '/api/catalog/scores'
-      ? ['composer', 'after', 'limit']
-      : url.pathname === '/api/catalog/composers'
-        ? ['after']
-        : [];
+      ? ['composer', 'collection', 'after', 'limit']
+      : url.pathname === '/api/catalog/collections'
+        ? ['composer', 'after']
+        : url.pathname === '/api/catalog/composers'
+          ? ['after']
+          : [];
   for (const key of [...url.searchParams.keys()])
     if (!allowed.includes(key)) url.searchParams.delete(key);
   url.searchParams.sort();

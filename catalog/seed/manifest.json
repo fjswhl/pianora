@@ -14,7 +14,8 @@
       "bars": 4,
       "nameEn": "Four-bar starter étude",
       "displayNameEn": "Moonlight Miniature",
-      "subtitleEn": "Three written arpeggios"
+      "subtitleEn": "Three written arpeggios",
+      "collection": "原创钢琴小品"
     },
     {
       "id": "clair_de_lune",
@@ -30,7 +31,8 @@
       "bars": 72,
       "nameEn": "Debussy · Clair de lune",
       "displayNameEn": "Moonlight",
-      "subtitleEn": "72 bars · Seven written arpeggios"
+      "subtitleEn": "72 bars · Seven written arpeggios",
+      "collection": "贝加马斯克组曲 · L. 75"
     },
     {
       "id": "rosee_dargent",
@@ -47,7 +49,8 @@
       "nameEn": "Silver Dew · Impressionist nocturne",
       "displayNameEn": "Silver Dew",
       "subtitleEn": "48 bars · Pianora original",
-      "creditEn": "Pianora original"
+      "creditEn": "Pianora original",
+      "collection": "原创钢琴小品"
     },
     {
       "id": "bach_goldberg_aria",
@@ -63,7 +66,8 @@
       "bars": 32,
       "nameEn": "Bach · Goldberg Variations: Aria, BWV 988",
       "displayNameEn": "Goldberg Variations · Aria",
-      "subtitleEn": "32 bars · Baroque aria"
+      "subtitleEn": "32 bars · Baroque aria",
+      "collection": "哥德堡变奏曲 · BWV 988"
     },
     {
       "id": "bach_invention_01",
@@ -79,7 +83,8 @@
       "bars": 22,
       "nameEn": "Bach · Invention No. 1 in C major, BWV 772",
       "displayNameEn": "Two-Part Invention No. 1 in C major",
-      "subtitleEn": "22 bars · Introduction to counterpoint"
+      "subtitleEn": "22 bars · Introduction to counterpoint",
+      "collection": "二部创意曲 · BWV 772–786"
     },
     {
       "id": "bach_wtc1_prelude1",
@@ -95,7 +100,8 @@
       "bars": 35,
       "nameEn": "Bach · Prelude in C major, BWV 846",
       "displayNameEn": "Well-Tempered Clavier I · Prelude in C",
-      "subtitleEn": "35 bars · Broken chords"
+      "subtitleEn": "35 bars · Broken chords",
+      "collection": "平均律钢琴曲集 I"
     },
     {
       "id": "mozart_fantasia_k397",
@@ -111,7 +117,8 @@
       "bars": 91,
       "nameEn": "Mozart · Fantasia in D minor, K. 397",
       "displayNameEn": "Fantasia in D minor, K. 397",
-      "subtitleEn": "91 bars · Dramatic fantasia"
+      "subtitleEn": "91 bars · Dramatic fantasia",
+      "collection": "幻想曲 · K. 397"
     },
     {
       "id": "mozart_sonata_k331_tema",
@@ -127,7 +134,8 @@
       "bars": 36,
       "nameEn": "Mozart · Sonata in A major, K. 331: Theme",
       "displayNameEn": "Sonata in A major, K. 331 · Theme",
-      "subtitleEn": "36 bars · Graceful andante"
+      "subtitleEn": "36 bars · Graceful andante",
+      "collection": "钢琴奏鸣曲 · K. 331"
     },
     {
       "id": "mozart_sonata_k545_1",
@@ -143,7 +151,8 @@
       "bars": 73,
       "nameEn": "Mozart · Sonata in C major, K. 545: I",
       "displayNameEn": "Sonata in C major, K. 545 · I",
-      "subtitleEn": "73 bars · Allegro"
+      "subtitleEn": "73 bars · Allegro",
+      "collection": "钢琴奏鸣曲 · K. 545"
     },
     {
       "id": "mozart_sonata_k545_2",
@@ -159,7 +168,8 @@
       "bars": 74,
       "nameEn": "Mozart · Sonata in C major, K. 545: II",
       "displayNameEn": "Sonata in C major, K. 545 · II",
-      "subtitleEn": "74 bars · Lyrical andante"
+      "subtitleEn": "74 bars · Lyrical andante",
+      "collection": "钢琴奏鸣曲 · K. 545"
     },
     {
       "id": "beethoven_fur_elise",
@@ -175,7 +185,8 @@
       "bars": 105,
       "nameEn": "Beethoven · Für Elise, WoO 59",
       "displayNameEn": "Für Elise, WoO 59",
-      "subtitleEn": "105 bars · Romantic bagatelle"
+      "subtitleEn": "105 bars · Romantic bagatelle",
+      "collection": "钢琴小品 · WoO 59"
     },
     {
       "id": "beethoven_pathetique_1",
@@ -191,7 +202,8 @@
       "bars": 312,
       "nameEn": "Beethoven · Pathétique Sonata, Op. 13: I",
       "displayNameEn": "Pathétique Sonata, Op. 13 · I",
-      "subtitleEn": "312 bars · Grave – Allegro"
+      "subtitleEn": "312 bars · Grave – Allegro",
+      "collection": "悲怆奏鸣曲 · Op. 13"
     },
     {
       "id": "beethoven_pathetique_2",
@@ -207,7 +219,8 @@
       "bars": 73,
       "nameEn": "Beethoven · Pathétique Sonata, Op. 13: II",
       "displayNameEn": "Pathétique Sonata, Op. 13 · II",
-      "subtitleEn": "73 bars · Adagio cantabile"
+      "subtitleEn": "73 bars · Adagio cantabile",
+      "collection": "悲怆奏鸣曲 · Op. 13"
     },
     {
       "id": "beethoven_pathetique_3",
@@ -223,7 +236,8 @@
       "bars": 210,
       "nameEn": "Beethoven · Pathétique Sonata, Op. 13: III",
       "displayNameEn": "Pathétique Sonata, Op. 13 · III",
-      "subtitleEn": "210 bars · Rondo allegro"
+      "subtitleEn": "210 bars · Rondo allegro",
+      "collection": "悲怆奏鸣曲 · Op. 13"
     },
     {
       "id": "beethoven_tempest_1",
@@ -239,7 +253,8 @@
       "bars": 232,
       "nameEn": "Beethoven · Tempest Sonata, Op. 31 No. 2: I",
       "displayNameEn": "Tempest Sonata, Op. 31 No. 2 · I",
-      "subtitleEn": "232 bars · Dramatic sonata"
+      "subtitleEn": "232 bars · Dramatic sonata",
+      "collection": "暴风雨奏鸣曲 · Op. 31 No. 2"
     },
     {
       "id": "schumann_op15_no1",
@@ -255,7 +270,8 @@
       "bars": 22,
       "nameEn": "Schumann · Scenes from Childhood, Op. 15 No. 1",
       "displayNameEn": "Scenes from Childhood · Of Foreign Lands and Peoples",
-      "subtitleEn": "22 bars · Lyrical miniature"
+      "subtitleEn": "22 bars · Lyrical miniature",
+      "collection": "童年情景 · Op. 15"
     },
     {
       "id": "schumann_traumerei",
@@ -271,7 +287,8 @@
       "bars": 24,
       "nameEn": "Schumann · Träumerei, Op. 15 No. 7",
       "displayNameEn": "Scenes from Childhood · Dreaming",
-      "subtitleEn": "24 bars · Romantic miniature"
+      "subtitleEn": "24 bars · Romantic miniature",
+      "collection": "童年情景 · Op. 15"
     },
     {
       "id": "liszt_consolation_1",
@@ -287,7 +304,8 @@
       "bars": 25,
       "nameEn": "Liszt · Consolation No. 1, S. 172",
       "displayNameEn": "Consolation No. 1",
-      "subtitleEn": "25 bars · Andante in E major"
+      "subtitleEn": "25 bars · Andante in E major",
+      "collection": "安慰曲 · S. 172"
     },
     {
       "id": "liszt_consolation_3",
@@ -303,7 +321,8 @@
       "bars": 61,
       "nameEn": "Liszt · Consolation No. 3 in D-flat major, S. 172",
       "displayNameEn": "Consolation No. 3 in D-flat major",
-      "subtitleEn": "61 bars · Lyrical nocturne"
+      "subtitleEn": "61 bars · Lyrical nocturne",
+      "collection": "安慰曲 · S. 172"
     },
     {
       "id": "liszt_consolation_4",
@@ -319,7 +338,8 @@
       "bars": 34,
       "nameEn": "Liszt · Consolation No. 4 in D-flat major, S. 172",
       "displayNameEn": "Consolation No. 4",
-      "subtitleEn": "34 bars · Chorale-like meditation"
+      "subtitleEn": "34 bars · Chorale-like meditation",
+      "collection": "安慰曲 · S. 172"
     },
     {
       "id": "debussy_arabesque_1",
@@ -335,7 +355,8 @@
       "bars": 106,
       "nameEn": "Debussy · Arabesque No. 1",
       "displayNameEn": "Arabesque No. 1",
-      "subtitleEn": "106 bars · Flowing impressionism"
+      "subtitleEn": "106 bars · Flowing impressionism",
+      "collection": "两首阿拉伯风格曲"
     },
     {
       "id": "debussy_arabesque_2",
@@ -351,7 +372,8 @@
       "bars": 110,
       "nameEn": "Debussy · Arabesque No. 2",
       "displayNameEn": "Arabesque No. 2",
-      "subtitleEn": "110 bars · Playful scherzo"
+      "subtitleEn": "110 bars · Playful scherzo",
+      "collection": "两首阿拉伯风格曲"
     },
     {
       "id": "satie_gnossienne_1",
@@ -367,7 +389,8 @@
       "bars": 82,
       "nameEn": "Satie · Gnossienne No. 1",
       "displayNameEn": "Gnossienne No. 1",
-      "subtitleEn": "82 bars · Modal miniature"
+      "subtitleEn": "82 bars · Modal miniature",
+      "collection": "玄秘曲"
     },
     {
       "id": "satie_gymnopedie_1",
@@ -383,7 +406,8 @@
       "bars": 47,
       "nameEn": "Satie · Gymnopédie No. 1",
       "displayNameEn": "Gymnopédie No. 1",
-      "subtitleEn": "47 bars · Melancholy dance"
+      "subtitleEn": "47 bars · Melancholy dance",
+      "collection": "裸体歌舞"
     },
     {
       "id": "satie_gymnopedie_2",
@@ -399,7 +423,8 @@
       "bars": 65,
       "nameEn": "Satie · Gymnopédie No. 2",
       "displayNameEn": "Gymnopédie No. 2",
-      "subtitleEn": "65 bars · Quiet lament"
+      "subtitleEn": "65 bars · Quiet lament",
+      "collection": "裸体歌舞"
     },
     {
       "id": "satie_gymnopedie_3",
@@ -415,7 +440,8 @@
       "bars": 59,
       "nameEn": "Satie · Gymnopédie No. 3",
       "displayNameEn": "Gymnopédie No. 3",
-      "subtitleEn": "59 bars · Reflective miniature"
+      "subtitleEn": "59 bars · Reflective miniature",
+      "collection": "裸体歌舞"
     },
     {
       "id": "say_goodbye",
@@ -426,7 +452,8 @@
       "scoreType": "MusicXML",
       "nameEn": "Saying Goodbye",
       "subtitleEn": "Piano accompaniment · MusicXML",
-      "composerEn": "Jay Chou"
+      "composerEn": "Jay Chou",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "red_dust_inn",
@@ -437,7 +464,8 @@
       "scoreType": "MusicXML",
       "nameEn": "Red Dust Inn",
       "subtitleEn": "Piano arrangement · MusicXML",
-      "composerEn": "Jay Chou"
+      "composerEn": "Jay Chou",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "sunny_day",
@@ -448,7 +476,8 @@
       "scoreType": "MIDI",
       "nameEn": "Sunny Day",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "Jay Chou"
+      "composerEn": "Jay Chou",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "nocturne",
@@ -459,7 +488,8 @@
       "scoreType": "MIDI",
       "nameEn": "Nocturne",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "Jay Chou"
+      "composerEn": "Jay Chou",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "east_wind",
@@ -470,7 +500,8 @@
       "scoreType": "MIDI",
       "nameEn": "East Wind Breaks",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "Jay Chou"
+      "composerEn": "Jay Chou",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "a_thousand_years",
@@ -481,7 +512,8 @@
       "scoreType": "MIDI",
       "nameEn": "A Thousand Years Later",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "JJ Lin"
+      "composerEn": "JJ Lin",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "practice_love",
@@ -492,7 +524,8 @@
       "scoreType": "MIDI",
       "nameEn": "Practice Love",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "JJ Lin"
+      "composerEn": "JJ Lin",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "cao_cao",
@@ -503,7 +536,8 @@
       "scoreType": "MIDI",
       "nameEn": "Cao Cao",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "JJ Lin"
+      "composerEn": "JJ Lin",
+      "collection": "流行钢琴改编"
     },
     {
       "id": "back_to_back",
@@ -514,7 +548,8 @@
       "scoreType": "MIDI",
       "nameEn": "Back to Back",
       "subtitleEn": "Piano arrangement · MIDI",
-      "composerEn": "JJ Lin"
+      "composerEn": "JJ Lin",
+      "collection": "流行钢琴改编"
     }
   ],
   "attachments": [

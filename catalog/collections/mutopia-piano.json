@@ -17,7 +17,8 @@
       "transcriber": "Magnus Lewis-Smith",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/ChopinFF/O28/Chop-28-4/Chop-28-4.ly",
-      "sha256": "d4fca574bc3c3ad810ee643d42b7299e1c97b3b8b3fa379c3d7f77edb02f6192"
+      "sha256": "d4fca574bc3c3ad810ee643d42b7299e1c97b3b8b3fa379c3d7f77edb02f6192",
+      "collection": "前奏曲 · Op. 28"
     },
     {
       "id": "chopin_op28_20",
@@ -36,7 +37,8 @@
       "transcriber": "Magnus Lewis-Smith",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/ChopinFF/O28/Chop-28-20/Chop-28-20.ly",
-      "sha256": "cf50fb34abbb643df194d39fdf1831c8ab2d7ab7c8af983236f7739e989dee8f"
+      "sha256": "cf50fb34abbb643df194d39fdf1831c8ab2d7ab7c8af983236f7739e989dee8f",
+      "collection": "前奏曲 · Op. 28"
     },
     {
       "id": "chopin_op66",
@@ -55,7 +57,8 @@
       "transcriber": "Guy D. Lederfein",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/ChopinFF/O66/chopin_fantaisie-impromptu/chopin_fantaisie-impromptu.ly",
-      "sha256": "f1c7074d91ad89e2af12f7da89b582073a874f7321cb76ff5252153067065eae"
+      "sha256": "f1c7074d91ad89e2af12f7da89b582073a874f7321cb76ff5252153067065eae",
+      "collection": "幻想即兴曲 · Op. 66"
     },
     {
       "id": "brahms_op118_2",
@@ -74,7 +77,8 @@
       "transcriber": "Aron Fay",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BrahmsJ/O118/intermezzo/intermezzo.ly",
-      "sha256": "5bd64924ba0c1a72018144bbd9245ebef7d6892acb163fb282c3a25bd0f21623"
+      "sha256": "5bd64924ba0c1a72018144bbd9245ebef7d6892acb163fb282c3a25bd0f21623",
+      "collection": "六首钢琴小品 · Op. 118"
     },
     {
       "id": "brahms_op39_10",
@@ -93,7 +97,8 @@
       "transcriber": "John Mamoun",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BrahmsJ/O39/waltz-op39-10/waltz-op39-10.ly",
-      "sha256": "4c5185979521c4fc3f9a237db583f17f16e317e46b31110074a5e7f6e6ba3144"
+      "sha256": "4c5185979521c4fc3f9a237db583f17f16e317e46b31110074a5e7f6e6ba3144",
+      "collection": "圆舞曲 · Op. 39"
     },
     {
       "id": "brahms_op39_15",
@@ -112,7 +117,8 @@
       "transcriber": "Brian D. Rude",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BrahmsJ/O39/waltz-op39-15/waltz-op39-15.ly",
-      "sha256": "64cef49cf056947e8d4f900535dbc28a4a841653ff1e2a936534e928e2209a65"
+      "sha256": "64cef49cf056947e8d4f900535dbc28a4a841653ff1e2a936534e928e2209a65",
+      "collection": "圆舞曲 · Op. 39"
     },
     {
       "id": "tchaikovsky_op39_1",
@@ -131,7 +137,8 @@
       "transcriber": "Rem Zolotykh",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/TchaikovskyPI/O39/01MorningPrayer/01MorningPrayer.ly",
-      "sha256": "928e8f72045b5e23ebf0b52973d847572702a21b00e122e6ee578f441c046bfb"
+      "sha256": "928e8f72045b5e23ebf0b52973d847572702a21b00e122e6ee578f441c046bfb",
+      "collection": "儿童曲集 · Op. 39"
     },
     {
       "id": "tchaikovsky_op39_5",
@@ -150,7 +157,8 @@
       "transcriber": "Anonymous",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/TchaikovskyPI/O39/05MarchOfTheWoodenSoldiers/05MarchOfTheWoodenSoldiers.ly",
-      "sha256": "ef760e0dbd11fefcadbd3f1d3415fe4d1a443ce7f43af3805fd84e3c7739654e"
+      "sha256": "ef760e0dbd11fefcadbd3f1d3415fe4d1a443ce7f43af3805fd84e3c7739654e",
+      "collection": "儿童曲集 · Op. 39"
     },
     {
       "id": "tchaikovsky_op39_16",
@@ -169,7 +177,8 @@
       "transcriber": "David McNamara",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/TchaikovskyPI/O39/16OldFrenchSong/16OldFrenchSong.ly",
-      "sha256": "b65b68630d04552ff7d6f56d0282a219feba407f1038ad544eb4f7d716876628"
+      "sha256": "b65b68630d04552ff7d6f56d0282a219feba407f1038ad544eb4f7d716876628",
+      "collection": "儿童曲集 · Op. 39"
     },
     {
       "id": "burgmuller_op100_2",
@@ -188,7 +197,8 @@
       "transcriber": "Bas Wassink",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BurgmullerJFF/O100/25EF-02/25EF-02.ly",
-      "sha256": "9ee203a6c2059700b10d45a7a1fd7a122803793af9a2e328d634bee538819a94"
+      "sha256": "9ee203a6c2059700b10d45a7a1fd7a122803793af9a2e328d634bee538819a94",
+      "collection": "25 首简易进阶练习曲 · Op. 100"
     },
     {
       "id": "burgmuller_op100_3",
@@ -207,7 +217,8 @@
       "transcriber": "Bas Wassink",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BurgmullerJFF/O100/25EF-03/25EF-03.ly",
-      "sha256": "be3b90be0fcfe7d92e34ef189cb633f7007e38ea8d5f290e4c3e5a988f097c81"
+      "sha256": "be3b90be0fcfe7d92e34ef189cb633f7007e38ea8d5f290e4c3e5a988f097c81",
+      "collection": "25 首简易进阶练习曲 · Op. 100"
     },
     {
       "id": "burgmuller_op100_5",
@@ -226,7 +237,8 @@
       "transcriber": "Bas Wassink",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BurgmullerJFF/O100/25EF-05/25EF-05.ly",
-      "sha256": "f19c5f5986cfc75d56263a4cab98eac7d3927c10bce75917766e49351280286a"
+      "sha256": "f19c5f5986cfc75d56263a4cab98eac7d3927c10bce75917766e49351280286a",
+      "collection": "25 首简易进阶练习曲 · Op. 100"
     },
     {
       "id": "burgmuller_op100_6",
@@ -245,7 +257,8 @@
       "transcriber": "Bas Wassink",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BurgmullerJFF/O100/25EF-06/25EF-06.ly",
-      "sha256": "e3f05f6bd21543333f1843d1f024f721bba34f63699de71e09def1d0d6f5ad61"
+      "sha256": "e3f05f6bd21543333f1843d1f024f721bba34f63699de71e09def1d0d6f5ad61",
+      "collection": "25 首简易进阶练习曲 · Op. 100"
     },
     {
       "id": "burgmuller_op100_10",
@@ -264,7 +277,8 @@
       "transcriber": "Bas Wassink",
       "license": "Public Domain",
       "upstream": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BurgmullerJFF/O100/25EF-10/25EF-10.ly",
-      "sha256": "facd4daa13d8b44afb23aa69c21149d4249f2befa99cb83b449b8254a66327f9"
+      "sha256": "facd4daa13d8b44afb23aa69c21149d4249f2befa99cb83b449b8254a66327f9",
+      "collection": "25 首简易进阶练习曲 · Op. 100"
     }
   ]
 }

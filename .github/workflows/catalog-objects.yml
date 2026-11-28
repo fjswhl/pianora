@@ -5,7 +5,7 @@ on:
       collection:
         description: Score collection
         type: choice
-        options: [seed, mutopia-piano]
+        options: [seed, mutopia-piano, keyboard-editions, mutopia-keyboard, classical-mxl]
         default: seed
 permissions:
   contents: read
@@ -17,9 +17,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Restore pinned Mutopia sources
-        if: inputs.collection == 'mutopia-piano'
-        run: python3 scripts/fetch-mutopia.py "$RUNNER_TEMP/mutopia"
+      - name: Restore and verify the publisher's editions
+        if: inputs.collection != 'seed'
+        env:
+          COLLECTION: ${{ inputs.collection }}
+        run: python3 scripts/restore-collection.py "catalog/collections/$COLLECTION.json" "$RUNNER_TEMP/scores"
       - name: Upload missing files and verify stored checksums
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -27,8 +29,8 @@ jobs:
           COLLECTION: ${{ inputs.collection }}
         run: |
           args=()
-          if [[ "$COLLECTION" == mutopia-piano ]]; then
-            args=(--manifest catalog/collections/mutopia-piano.json --files "$RUNNER_TEMP/mutopia")
+          if [[ "$COLLECTION" != seed ]]; then
+            args=(--manifest "catalog/collections/$COLLECTION.json" --files "$RUNNER_TEMP/scores")
           fi
           node scripts/import-catalog.mjs --remote "${args[@]}" --sql-out catalog.sql
       - uses: actions/upload-artifact@v4

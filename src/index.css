@@ -255,6 +255,24 @@ body {
 .shelf {
   margin-top: 35px;
 }
+.catalog-select {
+  display: inline-flex;
+  flex-direction: column;
+  margin: 0 1rem 1rem 0;
+  max-width: 100%;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.catalog-select select {
+  min-height: 44px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 0.65rem;
+  color: var(--ink);
+  background: #fffef8;
+}
 .composer-tabs {
   display: flex;
   flex-wrap: wrap;

@@ -10,6 +10,7 @@ import {
 import {
   useScores,
   useComposers,
+  useCollections,
   composerName,
   label,
 } from '../engine/presets';
@@ -70,12 +71,48 @@ const COMPOSER_FILTERS = [
       return t('萨蒂');
     },
   },
+  {
+    id: 'Scarlatti',
+    get label() {
+      return t('斯卡拉蒂');
+    },
+  },
+  {
+    id: 'Chopin',
+    get label() {
+      return t('肖邦');
+    },
+  },
+  {
+    id: 'Brahms',
+    get label() {
+      return t('勃拉姆斯');
+    },
+  },
+  {
+    id: 'Tchaikovsky',
+    get label() {
+      return t('柴可夫斯基');
+    },
+  },
+  {
+    id: 'Burgmüller',
+    get label() {
+      return t('布格缪勒');
+    },
+  },
   { id: 'Pianora', label: 'Pianora' },
 ];
 
 export function Library({ openScore }: { openScore: (id: string) => void }) {
   const [composer, setComposer] = useState('');
-  const scores = useScores(composer);
+  const [collection, setCollection] = useState('');
+  const collections = useCollections(composer);
+  const scores = useScores(composer, collection);
+  function chooseComposer(value: string) {
+    setCollection('');
+    setComposer(value);
+  }
   const composers = useComposers();
   const counts = new Map(composers.items.map((c) => [c.composer, c.pieces]));
   const filters = [
@@ -86,7 +123,9 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
       .map((c) => ({ id: c.composer, label: c.composer })),
   ];
   const countFor = (id: string) => (id ? counts.get(id) : composers.total);
-  const count = countFor(composer);
+  const count = collection
+    ? collections.items.find((c) => c.collection === collection)?.pieces
+    : countFor(composer);
 
   return (
     <>
@@ -117,28 +156,68 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
                 : t('{0} 部作品', count)}
           </span>
         </header>
-        <div
-          className="composer-tabs"
-          role="tablist"
-          aria-label={t('按作曲家筛选')}
-        >
-          {filters.map((f) => {
-            const count = countFor(f.id);
-            return (
-              <button
-                key={f.id}
-                role="tab"
-                aria-selected={composer === f.id}
-                className={
-                  composer === f.id ? 'composer-tab active' : 'composer-tab'
-                }
-                onClick={() => setComposer(f.id)}
-              >
-                {f.label} <span>{count}</span>
-              </button>
-            );
-          })}
-        </div>
+        {filters.length > 24 ? (
+          <label className="catalog-select">
+            {t('作曲家')}
+            <select
+              aria-label={t('作曲家')}
+              id="catalogComposer"
+              value={composer}
+              onChange={(e) => chooseComposer(e.target.value)}
+            >
+              {filters.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.label} ({countFor(f.id)})
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <div
+            className="composer-tabs"
+            role="tablist"
+            aria-label={t('按作曲家筛选')}
+          >
+            {filters.map((f) => {
+              const count = countFor(f.id);
+              return (
+                <button
+                  key={f.id}
+                  role="tab"
+                  aria-selected={composer === f.id}
+                  className={
+                    composer === f.id ? 'composer-tab active' : 'composer-tab'
+                  }
+                  onClick={() => chooseComposer(f.id)}
+                >
+                  {f.label} <span>{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {composer && (
+          <label className="catalog-select">
+            {t('作品集')}
+            <select
+              aria-label={t('作品集')}
+              value={collection}
+              onChange={(e) => setCollection(e.target.value)}
+            >
+              <option value="">{t('全部作品集')}</option>
+              {collections.items.map((c) => (
+                <option key={c.collection} value={c.collection}>
+                  {c.collection} ({c.pieces})
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {(collections.next || collections.error) && (
+          <button disabled={collections.loading} onClick={collections.more}>
+            {collections.error ? t('重试') : t('更多作品集')}
+          </button>
+        )}
         {(composers.next || composers.error) && (
           <button disabled={composers.loading} onClick={composers.more}>
             {composers.error ? t('重试') : t('更多作曲家')}

@@ -44,6 +44,8 @@ for (const score of scores) {
     composer.length > 160 ||
     typeof metadata.name !== 'string' ||
     !metadata.name.trim() ||
+    (metadata.collection !== undefined && (typeof metadata.collection !== 'string' ||
+      !metadata.collection.trim() || metadata.collection.length > 240)) ||
     [
       'subtitle',
       'title',
@@ -131,13 +133,19 @@ if (opts.local) {
     CLOUDFLARE_ACCOUNT_ID +
     '/r2/buckets/pianora-assets/objects/';
 }
-async function remote(key, method, body) {
+async function remote(key, method, body, attempt = 0) {
   const result = await fetch(endpoint + key, {
     method,
     body,
     redirect: 'error',
     headers: { Authorization: 'Bearer ' + process.env.CLOUDFLARE_API_TOKEN },
   });
+  if ((result.status === 429 || result.status >= 500) && attempt < 8) {
+    const seconds = Math.max(Number(result.headers.get('retry-after')) || 0, Math.min(90, 2 ** attempt));
+    await result.body?.cancel();
+    await new Promise(resolve => setTimeout(resolve, (seconds + Math.random()) * 1000));
+    return remote(key, method, body, attempt + 1);
+  }
   if (method === 'GET' && result.status === 404) return null;
   if (!result.ok) throw Error(method + ' ' + key + ' HTTP ' + result.status);
   return Buffer.from(await result.arrayBuffer());

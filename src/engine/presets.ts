@@ -20,6 +20,11 @@ export interface ScorePreset {
   composer: string;
   url: string;
   scoreType?: string;
+  collection?: string;
+  sourceUrl?: string;
+  transcriber?: string;
+  license?: string;
+  licenseUrl?: string;
 }
 export function label(
   p: ScorePreset,
@@ -59,7 +64,7 @@ interface Page<T> {
   next: string | number | null;
   total?: number;
 }
-function usePages<T>(path: string, onItem?: (item: T) => void) {
+function usePages<T>(path: string | null, onItem?: (item: T) => void) {
   const [page, setPage] = useState<Page<T>>({ items: [], next: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -67,6 +72,12 @@ function usePages<T>(path: string, onItem?: (item: T) => void) {
   const load = useCallback(
     async (cursor: Page<T>['next']) => {
       active.current?.abort();
+      if (!path) {
+        setPage({ items: [], next: null });
+        setLoading(false);
+        setError(false);
+        return;
+      }
       const controller = new AbortController();
       active.current = controller;
       setLoading(true);
@@ -97,11 +108,20 @@ function usePages<T>(path: string, onItem?: (item: T) => void) {
   }, [load]);
   return { ...page, error, loading, more: () => load(page.next) };
 }
-export const useScores = (composer = '') =>
-  usePages<ScorePreset>(
-    '/api/catalog/scores' +
-      (composer ? '?composer=' + encodeURIComponent(composer) : ''),
+export const useScores = (composer = '', collection = '') => {
+  const query = new URLSearchParams();
+  if (composer) query.set('composer', composer);
+  if (composer && collection) query.set('collection', collection);
+  return usePages<ScorePreset>(
+    '/api/catalog/scores' + (query.size ? '?' + query : ''),
     remember,
+  );
+};
+export const useCollections = (composer: string) =>
+  usePages<{ collection: string; pieces: number }>(
+    composer
+      ? '/api/catalog/collections?composer=' + encodeURIComponent(composer)
+      : null,
   );
 export const useComposers = () =>
   usePages<{ composer: string; pieces: number }>('/api/catalog/composers');

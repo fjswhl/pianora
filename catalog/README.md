@@ -67,6 +67,12 @@ python3 scripts/audit-lilypond.py /tmp/pianora-scores catalog/collections/keyboa
 python3 scripts/verify-collections.py https://opuslin.uk --minimum 1011 --play --output artifacts/collections-production.json
 ```
 
+## 古典音乐会曲目
+
+[本批清单](collections/concert-repertoire.json)收录 25 位作曲家的 72 份压缩 MusicXML，按 42 个作品集分类。贝多芬第一、第四、第五和第七交响曲收齐全部乐章的钢琴改编，福雷《多莉组曲》收齐六首四手联弹。肖邦第一叙事曲补齐了馆内的四首叙事曲。选段、简易版和钢琴改编在曲库中标明。每份谱保留原发布页、发布者、版本许可和可校验的文件哈希。[PDMX 发行档案](https://zenodo.org/records/15571083)
+
+选用发布流程中的 `concert-repertoire` 可从归档恢复。使用 `scripts/audit-catalog-files.py` 的 `--engrave` 参数可逐首验证浏览器导入与五线谱排版。发布后用 `scripts/verify-collections.py` 的 `--manifest catalog/collections/concert-repertoire.json --play` 参数可复验线上文件、分类、生成和播放。
+
 ## 免费容量规划
 
 本次 35 首与 5 份附件在 R2 合计 303,516 字节，生产 D1 首次导入后为 73,728 字节，此批记录了 215 行写入。容量规划以未来曲集的实测平均大小为准，尤其要单独计算扫描 PDF、附件和历史版本。

@@ -41,6 +41,10 @@ const chineseComposerNames: Record<string, string> = {
   Verdi: '威尔第', Grieg: '格里格', Ravel: '拉威尔', Mendelssohn: '门德尔松', Haydn: '海顿',
   'Rimsky-Korsakov': '里姆斯基-科萨科夫', Alkan: '阿尔康', Rameau: '拉莫', Kuhlau: '库劳',
   Field: '菲尔德', 'J. C. F. Fischer': '约翰·卡斯帕·费迪南德·费舍尔', Albéniz: '阿尔贝尼兹',
+  Bizet: '比才', Borodin: '鲍罗丁', Dvořák: '德沃夏克', Elgar: '埃尔加', Fauré: '福雷',
+  Glinka: '格林卡', 'Johann Strauss II': '小约翰·施特劳斯', Joplin: '斯科特·乔普林',
+  Mascagni: '马斯卡尼', Mussorgsky: '穆索尔斯基', Offenbach: '奥芬巴赫', Puccini: '普契尼',
+  Rossini: '罗西尼', Smetana: '斯美塔那', Vivaldi: '维瓦尔第', Wagner: '瓦格纳',
   'C. P. E. Bach': '卡尔·菲利普·埃马努埃尔·巴赫', Pachelbel: '帕赫贝尔',
 };
 export function composerName(composer: string) {

@@ -7,6 +7,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument('manifest',type=Path)
 parser.add_argument('directory',type=Path)
 parser.add_argument('--dev-origin',default='http://localhost:5173')
+parser.add_argument('--engrave',action='store_true',help='Also render every MusicXML score with the studio engraver')
 parser.add_argument('--output',required=True,type=Path)
 args=parser.parse_args()
 report={}
@@ -18,15 +19,21 @@ with sync_playwright() as pw:
         data=(args.directory/score['file']).read_bytes()
         digest=hashlib.sha256(data).hexdigest()
         assert digest==score['sha256'],score['id']
-        result=page.evaluate('''async ([name,bytes])=>{
+        result=page.evaluate('''async ([name,bytes,engrave])=>{
           const {parseDirectScoreFile}=await import('/src/engine/scoreImport.ts');
           const buffer=Uint8Array.from(atob(bytes),c=>c.charCodeAt(0));
           const p=await parseDirectScoreFile(new File([buffer],name));
           const notes=p.midi.tracks.flatMap(t=>t.notes).sort((a,b)=>a.ticks-b.ticks || a.midi-b.midi);
           const hash=await crypto.subtle.digest('SHA-256',Uint8Array.from(notes,n=>n.midi));
-          return {notes:p.noteCount,seconds:p.durationSec,format:p.kind,
+          let pages;
+          if(engrave) {
+            const {renderMusicXmlToSvgPages}=await import('/src/engine/musicXmlSheet.ts');
+            pages=(await renderMusicXmlToSvgPages(p.musicXmlText)).length;
+            if(!pages) throw Error('Empty score: '+name);
+          }
+          return {pages,notes:p.noteCount,seconds:p.durationSec,format:p.kind,
                pitchHash:Array.from(new Uint8Array(hash),x=>x.toString(16).padStart(2,'0')).join('')};
-        }''',[score['file'].split('/')[-1],base64.b64encode(data).decode()])
+        }''',[score['file'].split('/')[-1],base64.b64encode(data).decode(),args.engrave])
         assert result['notes']>0 and result['seconds']>0,score['id']
         report[score['id']]={**result,'sha256':digest}
 args.output.parent.mkdir(parents=True,exist_ok=True)

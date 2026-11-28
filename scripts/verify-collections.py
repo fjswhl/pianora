@@ -2,7 +2,7 @@
 import argparse, hashlib, json, os, re
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 from playwright.sync_api import sync_playwright, expect
 
 parser = argparse.ArgumentParser()
@@ -10,6 +10,7 @@ parser.add_argument('url')
 parser.add_argument('--minimum', type=int, default=1000)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--play', action='store_true', help='Generate, engrave and play the last opened score')
+parser.add_argument('--manifest',type=Path,help='Verify every published file and open samples from this batch')
 args = parser.parse_args()
 with sync_playwright() as pw:
     browser = pw.chromium.launch(channel=os.getenv('PIANORA_BROWSER','chrome'))
@@ -56,11 +57,23 @@ with sync_playwright() as pw:
     expect(page.locator('#presetSelect')).to_have_value('beethoven_pathetique_1')
     opened = []
     if args.minimum >= 1000:
-        for composer, translated, collection, sample in [
+        samples = [
             ('Scarlatti','斯卡拉蒂','键盘奏鸣曲 · K. 001–010','scarlatti_k1'),
             ('Czerny','车尔尼','初步教程 · Op. 599','pdmx_6080531'),
             ('Czerny','车尔尼','50 首旋律练习曲 · Op. 840','mutopia_2146'),
-        ]:
+        ]
+        if args.manifest:
+            editions = json.loads(args.manifest.read_text())['scores']
+            published = {score['id']:score for score in scores}
+            for edition in editions:
+                score = published[edition['id']]
+                for field in ('name','composer','collection','file','sha256','license','sourceUrl'):
+                    assert score[field] == edition[field], (edition['id'],field)
+                response = page.request.get(urljoin(base,score['url']))
+                assert response.ok and hashlib.sha256(response.body()).hexdigest() == edition['sha256'], edition['id']
+            samples = [(s['composer'],s['composer'],s['collection'],s['id'])
+                       for s in (editions[0], editions[len(editions)//2], editions[-1])]
+        for composer, translated, collection, sample in samples:
             page.goto(base)
             select_composer(composer, translated)
             menu.select_option(collection)
@@ -93,4 +106,5 @@ with sync_playwright() as pw:
         'classicalScores':len(classical),'classicalFormats':dict(formats),
         'classicalComposers':len({s['composer'] for s in classical}),
         'classicalCollections':len({(s['composer'],s['collection']) for s in classical}),
+        'verifiedManifest':args.manifest.name if args.manifest else None,
         'composers':composers,'openedScores':opened,'played':opened[-1] if args.play else None,'verifiedNestedNavigation':True},ensure_ascii=False,indent=2)+'\n')

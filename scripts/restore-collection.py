@@ -47,7 +47,7 @@ def source_edition(group):
         archive = directory / 'edition.tar.gz'
         fetch(url, archive)
         with tarfile.open(archive) as tar:
-            members = [m for m in tar if m.isfile() and m.name.endswith(('.ly', '.ily'))]
+            members = [m for m in tar if m.isfile()]
             tar.extractall(directory, members=members, filter='data')
         folders = [p for p in directory.iterdir() if p.is_dir()]
         if len(folders) != 1:

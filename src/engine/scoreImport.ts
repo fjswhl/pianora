@@ -1,3 +1,4 @@
+import { LocalizedError, t } from '../i18n';
 /**
  * Pure-browser multi-format score importer for Pianora:
  *  - Standard MIDI (.mid / .midi)
@@ -50,7 +51,7 @@ const DYNAMICS_VEL: Record<string, number> = {
 };
 
 function cleanBaseName(fileName: string): string {
-  return fileName.replace(/\.(mid|midi|musicxml|xml|mxl)$/i, '').replace(/[_-]+/g, ' ').trim() || '导入乐谱';
+  return fileName.replace(/\.(mid|midi|musicxml|xml|mxl)$/i, '').replace(/[_-]+/g, ' ').trim() || t("导入乐谱");
 }
 
 function summarizeMidi(midi: Midi): {
@@ -128,7 +129,7 @@ export async function parseMidiScoreFile(file: File): Promise<ImportedScoreData>
   }
 
   if (totalAdded === 0) {
-    throw new Error('该 MIDI 文件中没有找到可用的钢琴音符（可能仅包含打击乐轨道或为空文件）。');
+    throw new LocalizedError("该 MIDI 文件中没有找到可用的钢琴音符（可能仅包含打击乐轨道或为空文件）。");
   }
 
   const stats = summarizeMidi(clean);
@@ -138,7 +139,7 @@ export async function parseMidiScoreFile(file: File): Promise<ImportedScoreData>
     midiFile: file,
     fileName: file.name,
     title,
-    composer: 'MIDI 导入',
+    get composer() { return t("MIDI 导入"); },
     midi: clean,
     rawAnnotations: [],
     ...stats,
@@ -164,7 +165,7 @@ async function extractZipEntries(ab: ArrayBuffer): Promise<Map<string, Uint8Arra
     }
   }
   if (eocdOffset === -1) {
-    throw new Error('无效的 .mxl 压缩文件（未找到 ZIP 目录尾）。');
+    throw new LocalizedError("无效的 .mxl 压缩文件（未找到 ZIP 目录尾）。");
   }
 
   const cdEntries = view.getUint16(eocdOffset + 10, true);
@@ -228,7 +229,7 @@ async function readMusicXmlText(file: File): Promise<string> {
     }
   }
   if (!targetPath) {
-    throw new Error('压缩包 .mxl 中未找到有效的 MusicXML 乐谱文件。');
+    throw new LocalizedError("压缩包 .mxl 中未找到有效的 MusicXML 乐谱文件。");
   }
   return decoder.decode(entries.get(targetPath)!);
 }
@@ -240,7 +241,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
   const xmlText = await readMusicXmlText(file);
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
   if (doc.querySelector('parsererror')) {
-    throw new Error('MusicXML 文件解析失败，请检查 XML 格式是否完整。');
+    throw new LocalizedError("MusicXML 文件解析失败，请检查 XML 格式是否完整。");
   }
 
   const workTitle =
@@ -248,7 +249,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     doc.querySelector('movement-title')?.textContent?.trim() ||
     cleanBaseName(file.name);
   const composer =
-    doc.querySelector('identification > creator[type="composer"]')?.textContent?.trim() || 'MusicXML 导入';
+    doc.querySelector('identification > creator[type="composer"]')?.textContent?.trim();
 
   const midi = new Midi();
   const PPQ = midi.header.ppq; // 480
@@ -259,7 +260,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
 
   const parts = Array.from(doc.querySelectorAll('score-partwise > part'));
   if (!parts.length) {
-    throw new Error('仅支持标准 score-partwise 格式的 MusicXML 文件（未找到 <part> 节点）。');
+    throw new LocalizedError("仅支持标准 score-partwise 格式的 MusicXML 文件（未找到 <part> 节点）。");
   }
 
   let totalNotes = 0;
@@ -421,7 +422,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
   }
 
   if (totalNotes === 0) {
-    throw new Error('该 MusicXML 文件中未解析到任何音符。');
+    throw new LocalizedError("该 MusicXML 文件中未解析到任何音符。");
   }
 
   if (tempos.length) {
@@ -441,7 +442,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     kind: 'musicxml',
     fileName: file.name,
     title: workTitle,
-    composer,
+    get composer() { return composer || t("MusicXML 导入"); },
     midi,
     rawAnnotations,
     musicXmlText: xmlText,
@@ -461,5 +462,5 @@ export async function parseDirectScoreFile(file: File): Promise<ImportedScoreDat
   if (/\.(musicxml|xml|mxl)$/i.test(file.name)) {
     return parseMusicXmlFile(file);
   }
-  throw new Error('不支持的文件格式，请导入 .ly、.mid / .midi、.musicxml / .mxl 乐谱文件。');
+  throw new LocalizedError("不支持的文件格式，请导入 .ly、.mid / .midi、.musicxml / .mxl 乐谱文件。");
 }

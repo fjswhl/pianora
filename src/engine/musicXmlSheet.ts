@@ -1,3 +1,4 @@
+import { LocalizedError } from '../i18n';
 /**
  * Lazy-loaded MusicXML sheet music engraver powered by OpenSheetMusicDisplay (OSMD).
  *
@@ -93,7 +94,7 @@ export async function renderMusicXmlToSvgPages(xmlText: string): Promise<string[
     const unitPx = OSMD_UNIT_IN_PIXELS * (osmd.Zoom || 1);
     const svgElements = Array.from(host.querySelectorAll('svg'));
     if (!svgElements.length) {
-      throw new Error('MusicXML 五线谱渲染未生成任何页面。');
+      throw new LocalizedError("MusicXML 五线谱渲染未生成任何页面。");
     }
 
     const svgStrings: string[] = [];

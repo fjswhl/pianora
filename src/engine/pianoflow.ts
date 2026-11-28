@@ -1,3 +1,4 @@
+import { LocalizedError, message, type DisplayText } from '../i18n';
 /**
  * Pure-TypeScript SyMuPe/PianoFlow-base inference engine running 100% in the browser
  * via onnxruntime-web (WebGPU with automatic WASM fallback).
@@ -640,14 +641,14 @@ export class BrowserPianoFlow {
   public meta: TokenizerMeta | null = null;
   public provider = 'unloaded';
 
-  async load(onProgress?: (msg: string, pct?: number) => void, signal?: AbortSignal): Promise<void> {
+  async load(onProgress?: (msg: DisplayText, pct?: number) => void, signal?: AbortSignal): Promise<void> {
     if (this.session && this.meta) return;
     const modelStart = performance.now();
     const [ort, tokenizer, modelBytes, wasm] = await Promise.all([
       import('onnxruntime-web'),
       pianoFlowRelease.tokenizer(),
       downloadBytes(releaseUrl(pianoFlowRelease.model), (loaded, total, parts) => {
-        onProgress?.(assetLoadMessage('PianoFlow 模型', loaded, total, parts), 12 + Math.round(loaded / total * 70));
+        onProgress?.(assetLoadMessage(message("PianoFlow 模型"), loaded, total, parts), 12 + Math.round(loaded / total * 70));
       }, signal).then(bytes => {
         performance.measure('pianora:model-bytes', { start: modelStart });
         return bytes;
@@ -664,26 +665,26 @@ export class BrowserPianoFlow {
     const hasWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator;
     if (hasWebGPU) {
       try {
-        onProgress?.('初始化 WebGPU 推理引擎...', 88);
+        onProgress?.(message("初始化 WebGPU 推理引擎..."), 88);
         this.session = await ort.InferenceSession.create(modelBytes, {
           executionProviders: ['webgpu'],
         });
         ort.env.wasm.wasmBinary = undefined;
         this.provider = 'WebGPU';
-        onProgress?.('PianoFlow-base (WebGPU) 就绪！', 100);
+        onProgress?.(message("PianoFlow-base (WebGPU) 就绪！"), 100);
         return;
       } catch (e) {
         console.warn('[PianoFlow] WebGPU init failed, falling back to WASM:', e);
       }
     }
 
-    onProgress?.('初始化 WebAssembly (WASM) 推理引擎...', 90);
+    onProgress?.(message("初始化 WebAssembly (WASM) 推理引擎..."), 90);
     this.session = await ort.InferenceSession.create(modelBytes, {
       executionProviders: ['wasm'],
     });
     ort.env.wasm.wasmBinary = undefined;
     this.provider = 'WASM';
-    onProgress?.('PianoFlow-base (WASM) 就绪！', 100);
+    onProgress?.(message("PianoFlow-base (WASM) 就绪！"), 100);
   }
 
   /**
@@ -1023,7 +1024,7 @@ export class BrowserPianoFlow {
     scoreMidi: Midi,
     opts: { seed?: number; cfmSteps?: number; tempoScale?: number; velOffset?: number } = {},
   ): LiveConductorSession {
-    if (!this.meta) throw new Error('PianoFlow 模型尚未加载');
+    if (!this.meta) throw new LocalizedError("PianoFlow 模型尚未加载");
     return new LiveConductorSession(this, scoreMidi, this.meta, opts);
   }
 }

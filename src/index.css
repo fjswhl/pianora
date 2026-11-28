@@ -521,6 +521,7 @@ body {
   }
   .page-title {
     margin-bottom: 19px;
+    flex-wrap: wrap;
   }
   .page-title p {
     font-size: 12px;
@@ -991,3 +992,18 @@ body {
 .account-dialog li { border-top: 1px solid var(--line); padding-top: 12px; overflow-wrap: anywhere; }
 .account-dialog [role=alert] { color: #9a372e; }
 .account-identity { font-size: 13px; margin: 10px 0; overflow-wrap: anywhere; }
+
+.locale-select {
+  margin-left: auto;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  padding: 5px 8px;
+}
+.crumb .account-actions { margin-left: 0; }
+@media (max-width: 760px) {
+  .locale-select { min-height: 40px; }
+  .rail { flex-wrap: wrap; }
+  .crumb { display: flex; height: auto; min-height: 44px; padding: 4px 16px; flex-wrap: wrap; gap: 6px; }
+}

@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { followTimeline, readFollowScore, type FollowScore } from '../engine/followScore';
 import { pianoPlayer } from '../engine/instances';
@@ -51,10 +52,10 @@ function ScoreWindow({ score, images }: { score: FollowScore; images: string[] }
     return () => cancelAnimationFrame(frame);
   }, [timeline]);
   const active = timeline[Math.min(index, timeline.length - 1)]?.bar;
-  if (!active) return <p>这份乐谱没有可跟随的小节。</p>;
+  if (!active) return <p>{t("这份乐谱没有可跟随的小节。")}</p>;
   const start = Math.max(0, Math.min(active.row - 1, score.rows.length - 3));
   return <>
-    <p className="follow-measure">第 <b>{active.number}</b> 小节</p>
+    <p className="follow-measure">{t("第 {0} 小节", active.number)}</p>
     <div className="follow-systems">
       {score.rows.slice(start, start + 3).map((row, i) => {
         const page = score.pages[row.page];
@@ -62,7 +63,7 @@ function ScoreWindow({ score, images }: { score: FollowScore; images: string[] }
         const height = row.bottom - row.top;
         const width = row.right - row.left + 4;
         return <svg className="follow-system" key={start + i} role="img"
-          aria-label={`第 ${start + i + 1} 行钢琴谱`} data-row={start + i + 1}
+          aria-label={t("第 {0} 行钢琴谱", start + i + 1)} data-row={start + i + 1}
           viewBox={`${row.left - 3} ${row.top - 0.7} ${width} ${height + 1.4}`}>
           <image href={images[row.page]} x={page.box[0]} y={page.box[1]}
             width={page.box[2]} height={page.box[3]} />
@@ -101,9 +102,9 @@ export function FollowScorePanel() {
     };
   }, [load, attempt]);
   if (!load) return null;
-  return <div className="follow-score" role="group" aria-label="随奏谱">
+  return <div className="follow-score" role="group" aria-label={t("随奏谱")}>
     {loaded?.load === load ? <ScoreWindow {...loaded} /> : failed
-      ? <p role="alert">随奏谱加载失败。 <button onClick={() => retry(n => n + 1)}>重试</button></p>
-      : <p role="status">正在准备随奏谱…</p>}
+      ? <p role="alert">{t("随奏谱加载失败。")} <button onClick={() => retry(n => n + 1)}>{t("重试")}</button></p>
+      : <p role="status">{t("正在准备随奏谱…")}</p>}
   </div>;
 }

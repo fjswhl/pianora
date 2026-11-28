@@ -1,3 +1,4 @@
+import { t, display } from '../i18n';
 import { Music2, Cpu, Volume2, Layers } from 'lucide-react';
 import { useStudioStore } from '../store/useStudioStore';
 
@@ -20,26 +21,26 @@ export function TopBar() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[16px] font-bold tracking-tight text-slate-50">
-                Pianora <span className="font-normal text-[#e8be6a]">琴境</span>
+                Pianora <span className="font-normal text-[#e8be6a]">{t("琴境")}</span>
               </h1>
               <span className="rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-300">
-                100% 纯前端 · 零后端
+                {t("100% 纯前端 · 零后端")}
               </span>
             </div>
             <p className="text-[11px] text-slate-400">
-              LilyPond WASM · Scheme 装饰音提取 · Flow Matching WebGPU · 7 大交互指挥 · 琴弦共鸣 &amp; 音乐厅卷积
+              {t("LilyPond WASM · Scheme 装饰音提取 · Flow Matching WebGPU · 7 大交互指挥 · 琴弦共鸣 & 音乐厅卷积")}
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <StatusPill icon={<Layers className="h-3.5 w-3.5" />} ready={wasmReady} busy={!wasmReady} label={wasmStatus} />
-          <StatusPill icon={<Cpu className="h-3.5 w-3.5" />} ready={ortReady} busy={!ortReady} label={ortStatus} />
+          <StatusPill icon={<Layers className="h-3.5 w-3.5" />} ready={wasmReady} busy={!wasmReady} label={display(wasmStatus)} />
+          <StatusPill icon={<Cpu className="h-3.5 w-3.5" />} ready={ortReady} busy={!ortReady} label={display(ortStatus)} />
           <StatusPill
             icon={<Volume2 className="h-3.5 w-3.5" />}
             ready={pianoReady}
             busy={pianoLoading}
-            label={pianoStatus}
+            label={display(pianoStatus)}
           />
         </div>
       </div>

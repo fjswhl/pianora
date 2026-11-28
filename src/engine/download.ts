@@ -1,12 +1,13 @@
+import { LocalizedError, message, type DisplayText } from '../i18n';
 import { packedAsset, unpackAsset, type AssetProgress, type PartProgress } from './assetPacks';
 
-export function assetLoadMessage(name: string, loaded: number, total: number, parts?: PartProgress) {
-  if (!parts) return `加载 ${name} · ${(loaded / 1e6).toFixed(1)} / ${(total / 1e6).toFixed(1)} MB`;
+export function assetLoadMessage(name: DisplayText, loaded: number, total: number, parts?: PartProgress) {
+  if (!parts) return message("加载 {0} · {1} / {2} MB", name, (loaded / 1e6).toFixed(1), (total / 1e6).toFixed(1));
   if (parts.fetched === 0)
-    return `从本地缓存还原 ${name} · ${parts.cached} / ${parts.total} 块`;
+    return message("从本地缓存还原 {0} · {1} / {2} 块", name, parts.cached, parts.total);
   if (parts.cached === 0)
-    return `获取 ${name} · ${parts.fetched} / ${parts.total} 块`;
-  return `加载 ${name} · ${parts.cached + parts.fetched} / ${parts.total} 块（本地缓存 ${parts.cached} 块，获取 ${parts.fetched} 块）`;
+    return message("获取 {0} · {1} / {2} 块", name, parts.fetched, parts.total);
+  return message("加载 {0} · {1} / {2} 块（本地缓存 {3} 块，获取 {4} 块）", name, parts.cached + parts.fetched, parts.total, parts.cached, parts.fetched);
 }
 
 // Content-Length describes the wire representation. With transparent compression
@@ -23,9 +24,7 @@ export async function downloadBytes(
   }
   const response = await fetch(url, { signal });
   if (!response.ok)
-    throw new Error(
-      `加载资源失败 (${response.status}): ${new URL(url, location.href).pathname}`,
-    );
+    throw new LocalizedError("加载资源失败 ({0}): {1}", response.status, new URL(url, location.href).pathname);
   const size = Number(response.headers.get('content-length'));
   if (
     !response.body ||
@@ -56,6 +55,6 @@ export async function downloadBytes(
   } finally {
     reader.releaseLock();
   }
-  if (offset !== size) throw new Error('资源下载不完整，请重试。');
+  if (offset !== size) throw new LocalizedError("资源下载不完整，请重试。");
   return bytes;
 }

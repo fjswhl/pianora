@@ -1,3 +1,4 @@
+import { t, display } from '../i18n';
 import { useEffect, useRef } from 'react';
 import {
   Play,
@@ -69,20 +70,20 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
       <div className="transport-strip">
         <button id="playBtn" disabled={!hasScore} onClick={togglePlay}>
           {isPlaying ? <Pause /> : <Play />}
-          {isPlaying ? '暂停' : '播放'}
+          {isPlaying ? t("暂停") : t("播放")}
         </button>
         <button
           id="stopBtn"
           disabled={!hasScore}
           onClick={stopPlayback}
-          aria-label="停止"
-          title="停止"
+          aria-label={t("停止")}
+          title={t("停止")}
         >
           <Square />
         </button>
         <input
           ref={seekRef}
-          aria-label="播放位置"
+          aria-label={t("播放位置")}
           id="seekSlider"
           type="range"
           min={0}
@@ -99,13 +100,13 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
       <aside className="studio-mixer">
         <header>
           <SlidersHorizontal size={18} />
-          <h2>声音设置</h2>
+          <h2>{t("声音设置")}</h2>
         </header>
         <div className="mixer-field">
-          <label htmlFor="timbreSelect">钢琴音色</label>
+          <label htmlFor="timbreSelect">{t("钢琴音色")}</label>
           <select
             id="timbreSelect"
-            title={timbreDesc}
+            title={display(timbreDesc)}
             value={activeTimbreId}
             onChange={(e) => void switchTimbre(e.target.value)}
           >
@@ -123,7 +124,7 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
           <small>{pianoStatus}</small>
           <label className="sf-import">
             <FolderOpen size={14} />
-            导入本地音色
+            {t("导入本地音色")}
             <input
               type="file"
               accept=".sf2,.sf3,.dls"
@@ -133,7 +134,7 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
           </label>
         </div>
         <div className="mixer-field">
-          <label htmlFor="hallSelect">演奏空间</label>
+          <label htmlFor="hallSelect">{t("演奏空间")}</label>
           <select
             id="hallSelect"
             value={activeHallId}
@@ -147,7 +148,7 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
           </select>
         </div>
         <label className="level-control">
-          厅堂混响 <output>{Math.round(reverbWet * 100)}%</output>
+          {t("厅堂混响")} <output>{Math.round(reverbWet * 100)}%</output>
           <input
             id="reverbSlider"
             type="range"
@@ -159,7 +160,7 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
           />
         </label>
         <label className="level-control">
-          琴弦共鸣 <output>{Math.round(resonanceAmount * 100)}%</output>
+          {t("琴弦共鸣")} <output>{Math.round(resonanceAmount * 100)}%</output>
           <input
             id="resSlider"
             type="range"
@@ -180,7 +181,7 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
             onClick={() => void exportWav()}
           >
             <AudioWaveform />
-            {exportingWav ? '渲染中…' : '导出 WAV'}
+            {exportingWav ? t("渲染中…") : t("导出 WAV")}
           </button>
         </footer>
       </aside>

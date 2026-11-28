@@ -1,3 +1,4 @@
+import { t, display } from '../i18n';
 import { useState } from 'react';
 import { AudioLines, BookOpen, SlidersHorizontal } from 'lucide-react';
 import { PipelineHeader, GenerationRecord } from './PipelineHeader';
@@ -9,9 +10,9 @@ import { SheetMusicPanel } from './SheetMusicPanel';
 import { fmtTime, useStudioStore } from '../store/useStudioStore';
 
 const views = [
-  { id: 'listen', label: '试听与导出', icon: AudioLines },
-  { id: 'shape', label: '调整演绎', icon: SlidersHorizontal },
-  { id: 'sheet', label: '查看谱面', icon: BookOpen },
+  { id: 'listen', get label() { return t("试听与导出"); }, icon: AudioLines },
+  { id: 'shape', get label() { return t("调整演绎"); }, icon: SlidersHorizontal },
+  { id: 'sheet', get label() { return t("查看谱面"); }, icon: BookOpen },
 ] as const;
 
 export function StudioPanel() {
@@ -30,17 +31,17 @@ export function StudioPanel() {
     <section className="studio-session">
       <header className="session-title">
         <div>
-          <span>演奏室</span>
-          <h1>{title}</h1>
+          <span>{t("演奏室")}</span>
+          <h1>{display(title)}</h1>
           <p>
-            钢琴独奏 <i /> {bars} 小节 <i /> 原谱 {fmtTime(duration)}
+            {t("钢琴独奏")} <i /> {bars} {t("小节")} <i /> {t("原谱")} {fmtTime(duration)}
           </p>
         </div>
         <div className="session-print" aria-hidden="true">
           <div className="session-disc" />
         </div>
       </header>
-      <div className="studio-views" aria-label="演奏工具">
+      <div className="studio-views" aria-label={t("演奏工具")}>
         {views.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -55,19 +56,19 @@ export function StudioPanel() {
           </button>
         ))}
       </div>
-      {busy && <p role="status">{progress}</p>}
-      {error && <p role="alert">{error}</p>}
+      {busy && <p role="status">{display(progress)}</p>}
+      {error && <p role="alert">{display(error)}</p>}
       <div className="console">
         {view === 'listen' && (
           <section className="listening-desk">
             <div className="roll-card">
               <PipelineHeader />
               {midiNotation && requestedScore !== score
-                ? <button onClick={() => setRequestedScore(score)}>显示 MIDI 随奏谱</button>
+                ? <button onClick={() => setRequestedScore(score)}>{t("显示 MIDI 随奏谱")}</button>
                 : <FollowScorePanel />}
               <PianoRollCanvas />
             </div>
-            <TransportBar pianoStatus={pianoStatus} />
+            <TransportBar pianoStatus={display(pianoStatus)} />
             <GenerationRecord />
           </section>
         )}

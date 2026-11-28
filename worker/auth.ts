@@ -1,3 +1,4 @@
+import { formatMessage, type Locale } from '../src/i18n/catalog';
 import { betterAuth } from 'better-auth';
 import { emailOTP } from 'better-auth/plugins/email-otp';
 
@@ -20,7 +21,7 @@ export function providers(env: AccountEnv) {
   };
 }
 
-export function authFor(env: AccountEnv) {
+export function authFor(env: AccountEnv, locale: Locale) {
   const enabled = providers(env);
   return betterAuth({
     appName: 'Pianora', baseURL: env.BETTER_AUTH_URL!, secret: env.BETTER_AUTH_SECRET!,
@@ -36,8 +37,8 @@ export function authFor(env: AccountEnv) {
       async sendVerificationOTP({ email, otp, type }) {
         if (type !== 'sign-in') throw new Error('Unsupported verification request');
         await env.EMAIL!.send({
-          from: env.AUTH_FROM!, to: email, subject: 'Pianora 登录验证码',
-          text: `你的 Pianora 登录验证码是 ${otp}，5 分钟内有效。如果你没有请求登录，可以忽略这封邮件。`,
+          from: env.AUTH_FROM!, to: email, subject: formatMessage(locale, 'Pianora 登录验证码'),
+          text: formatMessage(locale, '你的 Pianora 登录验证码是 {0}，5 分钟内有效。如果你没有请求登录，可以忽略这封邮件。', otp),
         });
       },
     })] : [],

@@ -162,3 +162,11 @@ For local development, run `node scripts/account-config.mjs --local`, set a rand
 For production, run the **Check account infrastructure** workflow in prepare mode using a token with D1 and R2 edit permissions. Enable **Email Sending** for `opuslin.uk` and verify its DNS records. Set the GitHub repository variables `PIANORA_D1_ID` and `PIANORA_AUTH_FROM` (for example `login@opuslin.uk`), and set a stable, randomly generated `BETTER_AUTH_SECRET` in repository Secrets. Public recipients require a sending plan that supports them. Optional Google OAuth uses repository Secrets `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, with the authorized redirect URI `https://opuslin.uk/api/auth/callback/google`. Re-run the deploy workflow after configuration. The deployment applies D1 migrations before publishing the Worker. Keep the private R2 bucket free of public domains and r2.dev access.
 
 The account regression workflow exercises simulated email, sign-in, session persistence, private saves, reopening a score, logout and cross-user denial. Dependency PRs also check a session created by the previous version against the upgraded Worker and database. Dependabot checks Better Auth updates weekly. To run the browser regression manually, set `PIANORA_LOCAL_MAIL_LOG` to the local Wrangler log and run `scripts/verify-accounts.py` with Python Playwright. Set `PIANORA_TEST_GENERATION=1` with the binary asset packs installed to include saving and replaying a generated take.
+
+### 界面语言与翻译
+
+在页面顶部选择「中文」或「English」即可切换语言。首次使用默认中文，浏览器通过 `pianora.locale` 保存选择。切换语言时可以继续编辑或试听当前乐谱。
+
+中文原文用作消息键，英文译文集中在 `src/i18n/en.json`。组件用 `t(key, ...values)` 渲染文案，含变量的句子用 `{0}`、`{1}` 占位。需要留在状态中的异步提示用 `message` 创建，在展示时调用 `display`。账户 API 通过 `Accept-Language` 接收界面语言，验证码邮件与页面使用同一翻译目录。
+
+启动带有本地演奏资源的 `npm run preview` 后，运行 `python scripts/verify-i18n.py`（需要 Python Playwright 和 Chromium）。脚本会生成 `artifacts/i18n.json` 和两张界面截图；设置 `PIANORA_LOCAL_MAIL_LOG` 可同时验证本地 Wrangler 模拟邮件的双语登录流程。

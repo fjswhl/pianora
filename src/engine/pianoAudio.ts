@@ -1,3 +1,4 @@
+import { LocalizedError, t, message, type DisplayText } from '../i18n';
 import type { WorkletSynthesizer } from 'spessasynth_lib';
 import { releaseUrl, soundfonts } from './assetRelease';
 import { assetLoadMessage, downloadBytes } from './download';
@@ -25,26 +26,26 @@ export interface HallIrSpec {
 export const HALL_IR_PRESETS: HallIrSpec[] = [
   {
     id: 'musikverein',
-    name: '🏛️ 维也纳金色大厅 (Musikverein)',
-    shortName: '维也纳金色大厅',
+    get name() { return t("🏛️ 维也纳金色大厅 (Musikverein)"); },
+    get shortName() { return t("维也纳金色大厅"); },
     url: '/irs/musikverein_hall.wav',
   },
   {
     id: 'french_salon',
-    name: '🕯️ 18 世纪法式沙龙 (德彪西推荐)',
-    shortName: '法式沙龙',
+    get name() { return t("🕯️ 18 世纪法式沙龙 (德彪西推荐)"); },
+    get shortName() { return t("法式沙龙"); },
     url: '/irs/french_salon.wav',
   },
   {
     id: 'la_scala',
-    name: '🎭 米兰斯卡拉歌剧院 (La Scala)',
-    shortName: '斯卡拉歌剧院',
+    get name() { return t("🎭 米兰斯卡拉歌剧院 (La Scala)"); },
+    get shortName() { return t("斯卡拉歌剧院"); },
     url: '/irs/la_scala_opera.wav',
   },
   {
     id: 'st_nicolaes',
-    name: '⛪ 圣尼古拉大教堂 (深邃长混响)',
-    shortName: '圣尼古拉大教堂',
+    get name() { return t("⛪ 圣尼古拉大教堂 (深邃长混响)"); },
+    get shortName() { return t("圣尼古拉大教堂"); },
     url: '/irs/st_nicolaes_church.wav',
   },
 ];
@@ -52,34 +53,34 @@ export const HALL_IR_PRESETS: HallIrSpec[] = [
 export const PIANO_PRESETS: PianoPresetSpec[] = [
   {
     id: 'salamander_c5_multi',
-    name: '🎹 雅马哈 C5 三角（Salamander · 5 力度层快开版）',
-    shortName: 'Yamaha C5 (5层)',
-    desc: 'AKG C414 实录 5 力度层 (v2/v6/v10/v13/v16) + AudioWorklet 琴弦交感共鸣 + 真实音乐厅卷积混响',
+    get name() { return t("🎹 雅马哈 C5 三角（Salamander · 5 力度层快开版）"); },
+    get shortName() { return t("Yamaha C5 (5层)"); },
+    get desc() { return t("AKG C414 实录 5 力度层 (v2/v6/v10/v13/v16) + AudioWorklet 琴弦交感共鸣 + 真实音乐厅卷积混响"); },
     engine: 'salamander_multi',
   },
   {
     id: 'abbey_steinway_d',
-    name: '🏛️ Abbey Road 施坦威 Model D（38 MB · SF2）',
+    get name() { return t("🏛️ Abbey Road 施坦威 Model D（38 MB · SF2）"); },
     shortName: 'Abbey Steinway D',
-    desc: 'Abbey Steinway Model D 38 MB 专业 SF2 + 琴弦交感共鸣 + 真实音乐厅卷积',
+    get desc() { return t("Abbey Steinway Model D 38 MB 专业 SF2 + 琴弦交感共鸣 + 真实音乐厅卷积"); },
     engine: 'sf2',
     sf2Url: releaseUrl(soundfonts.abbey),
     sizeLabel: '38 MB',
   },
   {
     id: 'nice_steinway_v38',
-    name: '🎼 Nice Steinway v3.8 音乐会施坦威（205 MB · 多力度 SF2）',
+    get name() { return t("🎼 Nice Steinway v3.8 音乐会施坦威（205 MB · 多力度 SF2）"); },
     shortName: 'Nice Steinway v3.8',
-    desc: '205 MB 多力度立体声音乐会施坦威 + 琴弦交感共鸣 + 真实音乐厅卷积',
+    get desc() { return t("205 MB 多力度立体声音乐会施坦威 + 琴弦交感共鸣 + 真实音乐厅卷积"); },
     engine: 'sf2',
     sf2Url: releaseUrl(soundfonts.nice),
     sizeLabel: '205 MB',
   },
   {
     id: 'fazioli_f308',
-    name: '✨ Dore Mark Fazioli F308 法奇奥里大三角（299 MB · 顶流 SF2）',
-    shortName: 'Fazioli F308 大三角',
-    desc: '意大利 3.08 米 Fazioli F308 旗舰大三角（299 MB 多力度 SF2）+ 琴弦交感共鸣 + 真实音乐厅卷积',
+    get name() { return t("✨ Dore Mark Fazioli F308 法奇奥里大三角（299 MB · 顶流 SF2）"); },
+    get shortName() { return t("Fazioli F308 大三角"); },
+    get desc() { return t("意大利 3.08 米 Fazioli F308 旗舰大三角（299 MB 多力度 SF2）+ 琴弦交感共鸣 + 真实音乐厅卷积"); },
     engine: 'sf2',
     sf2Url: releaseUrl(soundfonts.fazioli),
     sizeLabel: '299 MB',
@@ -141,7 +142,7 @@ async function downloadSf2(
   onProgress?: AssetProgress,
 ): Promise<ArrayBuffer> {
   const url = spec.sf2Url;
-  if (!url) throw new Error(`音色 ${spec.shortName} 缺少音源地址`);
+  if (!url) throw new LocalizedError("音色 {0} 缺少音源地址", spec.shortName);
 
   return (await downloadBytes(url, onProgress)).buffer;
 }
@@ -292,7 +293,7 @@ export class StudioGrandPianoPlayer {
     if (cached) return cached;
     const spec = HALL_IR_PRESETS.find((h) => h.id === hallId) ?? HALL_IR_PRESETS[0];
     const resp = await fetch(spec.url);
-    if (!resp.ok) throw new Error(`无法加载音乐厅脉冲响应 ${spec.url}`);
+    if (!resp.ok) throw new LocalizedError("无法加载音乐厅脉冲响应 {0}", spec.url);
     const ab = await resp.arrayBuffer();
     this.irRawCache.set(spec.id, ab);
     return ab;
@@ -326,7 +327,7 @@ export class StudioGrandPianoPlayer {
   // =========================================================================
   // Engine A: Multi-Velocity Yamaha C5 Salamander (5 velocity layers x 30 notes)
   // =========================================================================
-  private async ensureSalamanderMulti(onStatus?: (loading: boolean, text: string) => void): Promise<void> {
+  private async ensureSalamanderMulti(onStatus?: (loading: boolean, text: DisplayText) => void): Promise<void> {
     if (this.salReady) return;
     if (this.salLoadPromise) {
       await this.salLoadPromise;
@@ -353,17 +354,17 @@ export class StudioGrandPianoPlayer {
       const worker = async () => {
         while (cursor < tasks.length) {
           const idx = cursor++;
-          const t = tasks[idx];
-          const resp = await fetch(t.url);
-          if (!resp.ok) throw new Error(`采样下载失败: ${t.url}`);
+          const task = tasks[idx];
+          const resp = await fetch(task.url);
+          if (!resp.ok) throw new LocalizedError("采样下载失败: {0}", task.url);
           const raw = await resp.arrayBuffer();
-          this.salRawCache.set(t.key, raw);
+          this.salRawCache.set(task.key, raw);
           const decoded = await ctx.decodeAudioData(raw.slice(0));
-          this.salBuffers.set(t.key, decoded);
+          this.salBuffers.set(task.key, decoded);
           done++;
           if (done % 6 === 0 || done === total) {
             const pct = Math.round((done / total) * 100);
-            onStatus?.(true, `加载 5 力度层 Yamaha C5: ${done}/${total} (${pct}%)`);
+            onStatus?.(true, message("加载 5 力度层 Yamaha C5: {0}/{1} ({2}%)", done, total, pct));
           }
         }
       };
@@ -512,10 +513,10 @@ export class StudioGrandPianoPlayer {
   private async activateSf2Buffer(
     id: string,
     buf: ArrayBuffer,
-    label: string,
-    onStatus?: (loading: boolean, text: string) => void,
+    label: DisplayText,
+    onStatus?: (loading: boolean, text: DisplayText) => void,
   ): Promise<void> {
-    onStatus?.(true, `初始化 AudioWorklet 并装载 ${label}...`);
+    onStatus?.(true, message("初始化 AudioWorklet 并装载 {0}...", label));
     const synth = await this.ensureSf2Worklet();
     await synth.soundBankManager.addSoundBank(buf.slice(0), 'main', 0);
     synth.programChange(0, 0);
@@ -527,12 +528,12 @@ export class StudioGrandPianoPlayer {
     this.activeEngine = 'sf2';
     this.activePresetId = id;
     this.ready = true;
-    onStatus?.(false, `${label} 就绪`);
+    onStatus?.(false, message("{0} 就绪", label));
   }
 
   async loadPreset(
     presetId: string,
-    onStatus?: (loading: boolean, text: string) => void,
+    onStatus?: (loading: boolean, text: DisplayText) => void,
   ): Promise<PianoPresetSpec> {
     const spec = PIANO_PRESETS.find((p) => p.id === presetId) ?? DEFAULT_TIMBRE;
     this.activePresetId = spec.id;
@@ -542,15 +543,15 @@ export class StudioGrandPianoPlayer {
       this.activeEngine = 'salamander_multi';
       if (this.salReady) {
         this.ready = true;
-        onStatus?.(false, `${spec.shortName} 就绪`);
+        onStatus?.(false, message("{0} 就绪", () => spec.shortName));
         return spec;
       }
       this.ready = false;
-      onStatus?.(true, `加载 5 力度层 ${spec.shortName}...`);
+      onStatus?.(true, message("加载 5 力度层 {0}...", () => spec.shortName));
       await this.ensureSalamanderMulti(onStatus);
       if (this.activePresetId === spec.id) {
         this.ready = true;
-        onStatus?.(false, `${spec.shortName} 就绪`);
+        onStatus?.(false, message("{0} 就绪", () => spec.shortName));
       }
       return spec;
     }
@@ -559,21 +560,21 @@ export class StudioGrandPianoPlayer {
     this.ready = false;
     const cached = this.sf2Cache.get(spec.id);
     if (cached) {
-      await this.activateSf2Buffer(spec.id, cached, spec.shortName, onStatus);
+      await this.activateSf2Buffer(spec.id, cached, () => spec.shortName, onStatus);
       return spec;
     }
 
-    onStatus?.(true, `加载 ${spec.shortName} (${spec.sizeLabel || 'SF2'})...`);
+    onStatus?.(true, message("加载 {0} ({1})...", () => spec.shortName, spec.sizeLabel || 'SF2'));
     let lastReport = 0;
     const ab = await downloadSf2(spec, (loaded, total, parts) => {
       const now = performance.now();
       if (now - lastReport < 120 && loaded < total) return;
       lastReport = now;
-      onStatus?.(true, assetLoadMessage(spec.shortName, loaded, total, parts));
+      onStatus?.(true, assetLoadMessage(() => spec.shortName, loaded, total, parts));
     });
 
     if (this.activePresetId === spec.id) {
-      await this.activateSf2Buffer(spec.id, ab, spec.shortName, onStatus);
+      await this.activateSf2Buffer(spec.id, ab, () => spec.shortName, onStatus);
     } else {
       this.cacheSf2Buffer(spec.id, ab);
     }
@@ -582,12 +583,12 @@ export class StudioGrandPianoPlayer {
 
   async loadCustomSf2File(
     file: File,
-    onStatus?: (loading: boolean, text: string) => void,
+    onStatus?: (loading: boolean, text: DisplayText) => void,
   ): Promise<string> {
     this.releaseAll();
     this.ready = false;
     const shortName = file.name.replace(/\.(sf2|sf3|dls)$/i, '').slice(0, 24);
-    onStatus?.(true, `读取本地音色 ${shortName}...`);
+    onStatus?.(true, message("读取本地音色 {0}...", shortName));
     const ab = await file.arrayBuffer();
     const customId = `custom_${file.name}`;
     await this.activateSf2Buffer(customId, ab, shortName, onStatus);

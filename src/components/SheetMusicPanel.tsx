@@ -1,3 +1,4 @@
+import { t, errorText, display, type DisplayText } from '../i18n';
 import { useEffect, useState } from 'react';
 import { FileMusic, Table2, ZoomIn, ZoomOut } from 'lucide-react';
 import { useStudioStore, fmtTime } from '../store/useStudioStore';
@@ -9,7 +10,7 @@ export function SheetMusicPanel() {
   const load = useStudioStore(s => s.loadSheetPages);
   const [svgPages, setPages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sheetError, setSheetError] = useState('');
+  const [sheetError, setSheetError] = useState<DisplayText>('');
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     if (!load) { setPages([]); setLoading(false); setSheetError(''); return; }
@@ -20,7 +21,7 @@ export function SheetMusicPanel() {
     load().then(pages => {
       if (active) setPages(pages);
     }).catch(error => {
-      if (active) setSheetError(String(error));
+      if (active) setSheetError(() => errorText(error));
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [tab, load, attempt]);
@@ -40,7 +41,7 @@ export function SheetMusicPanel() {
             }`}
           >
             <FileMusic className="h-3.5 w-3.5" />
-            五线谱
+            {t("五线谱")}
           </button>
           <button
             onClick={() => setTab('ann')}
@@ -49,7 +50,7 @@ export function SheetMusicPanel() {
             }`}
           >
             <Table2 className="h-3.5 w-3.5" />
-            琶音明细
+            {t("琶音明细")}
           </button>
         </div>
 
@@ -58,7 +59,7 @@ export function SheetMusicPanel() {
             <button
               onClick={() => setZoom((z) => Math.max(60, z - 15))}
               className="cursor-pointer rounded-md border border-[#cdd6c9] bg-[#f6f7ef] p-1 hover:border-slate-600"
-              title="缩小"
+              title={t("缩小")}
             >
               <ZoomOut className="h-3.5 w-3.5" />
             </button>
@@ -66,7 +67,7 @@ export function SheetMusicPanel() {
             <button
               onClick={() => setZoom((z) => Math.min(145, z + 15))}
               className="cursor-pointer rounded-md border border-[#cdd6c9] bg-[#f6f7ef] p-1 hover:border-slate-600"
-              title="放大"
+              title={t("放大")}
             >
               <ZoomIn className="h-3.5 w-3.5" />
             </button>
@@ -76,11 +77,11 @@ export function SheetMusicPanel() {
 
       {tab === 'sheet' ? (
         <div id="svgGallery" className="flex max-h-[560px] flex-col gap-3 overflow-y-auto pr-1">
-          {loading ? <p role="status">正在准备五线谱…</p> : sheetError ? (
-            <div role="alert">{sheetError} <button onClick={() => setAttempt(n => n + 1)}>重试排版</button></div>
+          {loading ? <p role="status">{t("正在准备五线谱…")}</p> : sheetError ? (
+            <div role="alert">{display(sheetError)} <button onClick={() => setAttempt(n => n + 1)}>{t("重试排版")}</button></div>
           ) : svgPages.length === 0 ? (
             <div className="py-12 text-center text-xs text-[#576354]">
-              当前演奏暂无可显示的谱面。
+              {t("当前演奏暂无可显示的谱面。")}
             </div>
           ) : (
             svgPages.map((svgHtml, i) => (
@@ -98,32 +99,32 @@ export function SheetMusicPanel() {
           <table className="w-full border-collapse text-left text-xs">
             <thead>
               <tr className="border-b border-[#cdd6c9] text-[#576354]">
-                <th className="px-3 py-2">小节</th>
-                <th className="px-3 py-2">时刻</th>
-                <th className="px-3 py-2">和弦音数</th>
-                <th className="px-3 py-2">AI 原版跨度</th>
-                <th className="px-3 py-2">还原后滚奏</th>
-                <th className="px-3 py-2">动作</th>
+                <th scope="col" className="px-3 py-2">{t("小节")}</th>
+                <th scope="col" className="px-3 py-2">{t("时刻")}</th>
+                <th scope="col" className="px-3 py-2">{t("和弦音数")}</th>
+                <th scope="col" className="px-3 py-2">{t("AI 原版跨度")}</th>
+                <th scope="col" className="px-3 py-2">{t("还原后滚奏")}</th>
+                <th scope="col" className="px-3 py-2">{t("动作")}</th>
               </tr>
             </thead>
             <tbody>
               {arpeggios.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-6 text-center text-[#576354]">
-                    {activeTake ? '该乐谱未包含 \\arpeggio 记号' : '尚未运行'}
+                    {activeTake ? t("该乐谱未包含 \\arpeggio 记号") : t("尚未运行")}
                   </td>
                 </tr>
               ) : (
                 arpeggios.map((a, idx) => (
                   <tr key={`${a.bar}-${idx}`} className="border-b border-[#cdd6c9]/70 text-stone-800">
-                    <td className="px-3 py-2 font-semibold">第 {a.bar} 小节</td>
+                    <td className="px-3 py-2 font-semibold">{t("第 {0} 小节", a.bar)}</td>
                     <td className="px-3 py-2 font-mono text-stone-700">
                       {fmtTime(a.time_sec)} ({a.time_sec}s)
                     </td>
-                    <td className="px-3 py-2">{a.note_count} 音</td>
+                    <td className="px-3 py-2">{a.note_count} {t("音")}</td>
                     <td className="px-3 py-2">{a.before_ms} ms</td>
                     <td className="px-3 py-2 font-bold text-[#42674f]">{a.after_ms} ms</td>
-                    <td className="px-3 py-2 text-[#576354]">{a.action}</td>
+                    <td className="px-3 py-2 text-[#576354]">{a.action === 'preserved (AI already rolled upward)' ? t('保留 AI 的上行琶音') : t('还原由低至高的琶音')}</td>
                   </tr>
                 ))
               )}

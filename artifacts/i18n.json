@@ -1,0 +1,16 @@
+{
+  "default": "zh-CN",
+  "persistedAfterReload": "en",
+  "mobileWidth": 390,
+  "importErrorTranslated": true,
+  "sheetRendered": true,
+  "filterPreserved": true,
+  "sourcePreserved": true,
+  "generatedTakeTranslated": true,
+  "liveStatusTranslated": true,
+  "pageErrors": [],
+  "simulatedEmailSignIn": [
+    "zh-CN",
+    "en"
+  ]
+}

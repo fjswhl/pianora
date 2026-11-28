@@ -1,3 +1,4 @@
+import { errorText, LocalizedError, t, message, type DisplayText } from '../i18n';
 import { create } from 'zustand';
 import { Midi } from '@tonejs/midi';
 import {
@@ -31,8 +32,8 @@ export type StageStatus = 'idle' | 'active' | 'done';
 
 export interface TakeRecord {
   id: string;
-  label: string;
-  subtitle: string;
+  label: DisplayText;
+  subtitle: DisplayText;
   seed: number;
   perfState: PerfState;
   rawNotes: SimpleNote[];
@@ -54,8 +55,8 @@ export function fmtTime(sec: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-function summarizeNotes(notes: SimpleNote[]): string {
-  if (!notes.length) return '0 音';
+function summarizeNotes(notes: SimpleNote[]): DisplayText {
+  if (!notes.length) return message("0 音");
   let sumV = 0;
   let minV = 127;
   let maxV = 0;
@@ -64,7 +65,7 @@ function summarizeNotes(notes: SimpleNote[]): string {
     if (n.v < minV) minV = n.v;
     if (n.v > maxV) maxV = n.v;
   }
-  return `均力 ${Math.round(sumV / notes.length)} (${minV}–${maxV})`;
+  return message("均力 {0} ({1}–{2})", Math.round(sumV / notes.length), minV, maxV);
 }
 
 function defaultCuesForBars(totalBars: number): ConductorCue[] {
@@ -94,16 +95,16 @@ export function getLiveSession(): LiveConductorSession | null {
 interface StudioState {
   // Engine status pills
   wasmReady: boolean;
-  wasmStatus: string;
+  wasmStatus: DisplayText;
   ortReady: boolean;
-  ortStatus: string;
+  ortStatus: DisplayText;
   pianoReady: boolean;
   pianoLoading: boolean;
-  pianoStatus: string;
+  pianoStatus: DisplayText;
 
   // Audio controls
   activeTimbreId: string;
-  timbreDesc: string;
+  timbreDesc: DisplayText;
   customTimbres: CustomTimbreItem[];
   activeHallId: string;
   reverbWet: number;
@@ -112,7 +113,7 @@ interface StudioState {
   exportingWav: boolean;
 
   // Score & Pipeline params
-  performanceTitle: string;
+  performanceTitle: DisplayText;
   performanceSource: File | null;
   cfmSteps: number;
   stepFactor: number;
@@ -122,10 +123,10 @@ interface StudioState {
 
   // Pipeline execution
   busy: boolean;
-  progressMsg: string;
+  progressMsg: DisplayText;
   progressPct: number;
-  errorMsg: string;
-  stages: Record<'st1' | 'st2' | 'st3' | 'st4' | 'st5', { status: StageStatus; stat: string }>;
+  errorMsg: DisplayText;
+  stages: Record<'st1' | 'st2' | 'st3' | 'st4' | 'st5', { status: StageStatus; stat: DisplayText }>;
 
   // Compiled score & Takes pool
   scoreMidi: Midi | null;
@@ -146,12 +147,12 @@ interface StudioState {
   liveActive: boolean;
   liveTempo: number;
   liveVel: number;
-  liveStatus: string;
+  liveStatus: DisplayText;
 
   // Mode 7 Master Style Relay
   refMasterMidi: Midi | null;
-  refMasterLabel: string;
-  m7Status: string;
+  refMasterLabel: DisplayText;
+  m7Status: DisplayText;
 
   // Actions
   setCfmSteps: (v: number) => void;
@@ -196,14 +197,14 @@ interface StudioState {
 
 
 export const useStudioStore = create<StudioState>((set, get) => {
-  const buildTake = (id: string, label: string, seed: number, perfState: PerfState): TakeRecord => {
+  const buildTake = (id: string, label: DisplayText, seed: number, perfState: PerfState): TakeRecord => {
     const st = get();
     const decoded = decodePerfState(perfState);
     const fixed = restoreArpeggios(st.scoreMidi!, decoded.perfSustainNotes, st.rawAnnotations, st.arpMs);
     return {
       id,
       label,
-      subtitle: `${fmtTime(fixed.duration)} · ${summarizeNotes(fixed.notes)}`,
+      subtitle: message("{0} · {1}", fmtTime(fixed.duration), summarizeNotes(fixed.notes)),
       seed,
       perfState,
       rawNotes: decoded.perfSustainNotes,
@@ -214,16 +215,16 @@ export const useStudioStore = create<StudioState>((set, get) => {
     };
   };
 
-  const runGuardedMode = async (title: string, fn: () => Promise<void>) => {
+  const runGuardedMode = async (title: DisplayText, fn: () => Promise<void>) => {
     const st = get();
     if (!st.scoreMidi || st.busy) return;
     if (st.liveActive) st.stopLiveConductor(false);
-    set({ busy: true, errorMsg: '', progressMsg: `${title}...`, progressPct: 12 });
+    set({ busy: true, errorMsg: '', progressMsg: message("{0}…", title), progressPct: 12 });
     try {
       await fn();
     } catch (err) {
       console.error(err);
-      set({ errorMsg: (err as Error).message || String(err) });
+      set({ errorMsg: errorText(err) });
     } finally {
       set({ busy: false });
     }
@@ -231,15 +232,15 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
   return {
     wasmReady: false,
-    wasmStatus: 'LilyPond WASM 待命',
+    wasmStatus: message("LilyPond WASM 待命"),
     ortReady: false,
-    ortStatus: 'PianoFlow ONNX 待加载',
+    ortStatus: message("PianoFlow ONNX 待加载"),
     pianoReady: false,
     pianoLoading: false,
-    pianoStatus: '钢琴音色待加载',
+    pianoStatus: message("钢琴音色待加载"),
 
     activeTimbreId: DEFAULT_TIMBRE_ID,
-    timbreDesc: DEFAULT_TIMBRE.desc,
+    timbreDesc: () => DEFAULT_TIMBRE.desc,
     customTimbres: [],
     activeHallId: HALL_IR_PRESETS[0].id,
     reverbWet: 0.28,
@@ -260,11 +261,11 @@ export const useStudioStore = create<StudioState>((set, get) => {
     progressPct: 0,
     errorMsg: '',
     stages: {
-      st1: { status: 'idle', stat: '待运行' },
-      st2: { status: 'idle', stat: '待运行' },
-      st3: { status: 'idle', stat: '待运行' },
-      st4: { status: 'idle', stat: '待运行' },
-      st5: { status: 'idle', stat: DEFAULT_TIMBRE.shortName },
+      st1: { status: 'idle', stat: message("待运行") },
+      st2: { status: 'idle', stat: message("待运行") },
+      st3: { status: 'idle', stat: message("待运行") },
+      st4: { status: 'idle', stat: message("待运行") },
+      st5: { status: 'idle', stat: () => DEFAULT_TIMBRE.shortName },
     },
 
     scoreMidi: null,
@@ -283,11 +284,11 @@ export const useStudioStore = create<StudioState>((set, get) => {
     liveActive: false,
     liveTempo: 1.0,
     liveVel: 0,
-    liveStatus: '就绪：点击「启动实时指挥演奏」后随时拖动速度与情绪滑块',
+    liveStatus: message("就绪：点击「启动实时指挥演奏」后随时拖动速度与情绪滑块"),
 
     refMasterMidi: null,
     refMasterLabel: '',
-    m7Status: '尚未选择参考演奏 MIDI（可直接点击上方内置大师引子试玩）',
+    m7Status: message("尚未选择参考演奏 MIDI（可直接点击上方内置大师引子试玩）"),
 
     setCfmSteps: (v) => set({ cfmSteps: v }),
     setStepFactor: (v) => set({ stepFactor: v }),
@@ -308,13 +309,13 @@ export const useStudioStore = create<StudioState>((set, get) => {
               restoredNotes: fixed.notes,
               restoredDuration: fixed.duration,
               arpeggios: fixed.arpeggios,
-              subtitle: `${fmtTime(fixed.duration)} · ${summarizeNotes(fixed.notes)}`,
+              subtitle: message("{0} · {1}", fmtTime(fixed.duration), summarizeNotes(fixed.notes)),
             }
           : item,
       );
       set({
         takes: updatedTakes,
-        stages: { ...st.stages, st4: { status: 'done', stat: `${(performance.now() - t0).toFixed(1)} ms 即时重调` } },
+        stages: { ...st.stages, st4: { status: 'done', stat: message("{0} ms 即时重调", (performance.now() - t0).toFixed(1)) } },
       });
       if (st.activeTrack === 'final_restored' && !st.liveActive) {
         const cur = pianoPlayer.getCurrentTime();
@@ -337,18 +338,18 @@ export const useStudioStore = create<StudioState>((set, get) => {
             pianoStatus: text,
             stages: {
               ...s.stages,
-              st5: { status: loading ? 'active' : 'done', stat: loading ? '加载音色中...' : specShort(presetId) },
+              st5: { status: loading ? 'active' : 'done', stat: loading ? message("加载音色中...") : () => specShort(presetId) },
             },
           }));
         });
-        set({ timbreDesc: spec.desc });
+        set({ timbreDesc: () => spec.desc });
         if (wasPlaying) {
           set({ isPlaying: true });
           void pianoPlayer.play(curT, () => set({ isPlaying: false }));
         }
       } catch (e) {
         console.error(e);
-        set({ pianoLoading: false, pianoReady: false, pianoStatus: '音色加载失败，请重试' });
+        set({ pianoLoading: false, pianoReady: false, pianoStatus: message("音色加载失败，请重试") });
       }
     },
 
@@ -364,24 +365,24 @@ export const useStudioStore = create<StudioState>((set, get) => {
             pianoStatus: text,
             stages: {
               ...s.stages,
-              st5: { status: loading ? 'active' : 'done', stat: loading ? '加载本地 SF2...' : file.name.slice(0, 18) },
+              st5: { status: loading ? 'active' : 'done', stat: loading ? message("加载本地 SF2...") : file.name.slice(0, 18) },
             },
           }));
         });
         const id = `custom_${file.name}`;
         set((s) => ({
           activeTimbreId: id,
-          timbreDesc: `本地导入 SoundFont2 (${file.name}, ${(file.size / 1e6).toFixed(1)} MB) · 琴弦共鸣 + 音乐厅卷积`,
+          timbreDesc: message("本地导入 SoundFont2 ({0}, {1} MB) · 琴弦共鸣 + 音乐厅卷积", file.name, (file.size / 1e6).toFixed(1)),
           customTimbres: s.customTimbres.some((c) => c.id === id)
             ? s.customTimbres
-            : [...s.customTimbres, { id, name: `${name} (本地 SF2)` }],
+            : [...s.customTimbres, { id, get name() { return t("{0} (本地 SF2)", name); } }],
         }));
         if (wasPlaying) {
           set({ isPlaying: true });
           void pianoPlayer.play(curT, () => set({ isPlaying: false }));
         }
       } catch (err) {
-        set({ errorMsg: `本地 SF2 加载失败: ${(err as Error).message}` });
+        set({ errorMsg: message("本地 SF2 加载失败: {0}", errorText(err)) });
       }
     },
 
@@ -390,7 +391,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       try {
         await pianoPlayer.loadHallIr(hallId);
       } catch (err) {
-        console.error('IR 加载失败:', err);
+        console.error(t("IR 加载失败:"), err);
       }
     },
 
@@ -458,14 +459,14 @@ export const useStudioStore = create<StudioState>((set, get) => {
         busy: true,
         isPlaying: false,
         errorMsg: '',
-        progressMsg: imported ? `准备解析 ${imported.kind.toUpperCase()} 乐谱并加载 AI 引擎...` : '准备编译乐谱...',
+        progressMsg: imported ? message("准备解析 {0} 乐谱并加载 AI 引擎...", imported.kind.toUpperCase()) : message("准备编译乐谱..."),
         progressPct: 4,
         stages: {
           ...st.stages,
-          st1: { status: 'active', stat: imported ? `${imported.kind.toUpperCase()} 直通解析` : 'WASM 编译中...' },
-          st2: { status: 'active', stat: imported ? '读取符号标记...' : 'Scheme 监听中...' },
-          st3: { status: 'active', stat: '等待 MIDI...' },
-          st4: { status: 'active', stat: '等待 AI...' },
+          st1: { status: 'active', stat: imported ? message("{0} 直通解析", imported.kind.toUpperCase()) : message("WASM 编译中...") },
+          st2: { status: 'active', stat: imported ? message("读取符号标记...") : message("Scheme 监听中...") },
+          st3: { status: 'active', stat: message("等待 MIDI...") },
+          st4: { status: 'active', stat: message("等待 AI...") },
         },
       });
 
@@ -473,13 +474,13 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const controller = new AbortController();
         let compileProgress = imported ? 100 : 0;
         let modelProgress = 0;
-        const report = (msg: string) => set({
+        const report = (msg: DisplayText) => set({
           progressMsg: msg,
           progressPct: 4 + compileProgress * 0.7 + modelProgress * 0.28,
         });
         let compiled: Awaited<ReturnType<typeof lilypondEngine.compile>> | {
           scoreMidi: Midi; rawAnnotations: RawArpeggioAnnotation[]; compileSec: number;
-          loadPages: (() => Promise<string[]>) | null; method: string;
+          loadPages: (() => Promise<string[]>) | null; method: DisplayText;
         };
         if (imported) {
           const method = imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI';
@@ -489,14 +490,14 @@ export const useStudioStore = create<StudioState>((set, get) => {
               const { default: MidiToMusicXML } = await import('../vendor/planetscore/MidiToMusicXML.js');
               xml = new MidiToMusicXML().convert(await imported.midiFile.arrayBuffer(), {
                 title: imported.title,
-                creator: imported.composer === 'MIDI 导入' ? '' : imported.composer,
+                creator: imported.composer === t("MIDI 导入") ? '' : imported.composer,
                 normalize: false, // Preserve leading rests for the playback cursor.
                 muteChannels: [9], // The piano playback path also excludes percussion.
                 autoSplit: true,
                 divisions: 12, // Represent both sixteenths and triplet eighths.
               });
             }
-            if (!xml) throw new Error('缺少可排版的乐谱数据');
+            if (!xml) throw new LocalizedError("缺少可排版的乐谱数据");
             return renderMusicXmlToSvgPages(xml);
           };
           let pending: Promise<string[]> | null = null;
@@ -509,11 +510,11 @@ export const useStudioStore = create<StudioState>((set, get) => {
           };
           compiled = { method, scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages };
           set(s => ({ stages: { ...s.stages,
-            st1: { status: 'done', stat: `${method} · ${imported.noteCount} 音` },
-            st2: { status: 'done', stat: `提取 ${imported.rawAnnotations.length} 条事件` },
+            st1: { status: 'done', stat: message("{0} · {1} 音", method, imported.noteCount) },
+            st2: { status: 'done', stat: message("提取 {0} 条事件", imported.rawAnnotations.length) },
           } }));
           await pianoFlowEngine.load(report, controller.signal);
-          set({ ortReady: true, ortStatus: `PianoFlow (${pianoFlowEngine.provider}) 就绪` });
+          set({ ortReady: true, ortStatus: message("PianoFlow ({0}) 就绪", pianoFlowEngine.provider) });
         } else {
           const compileStarted = performance.now();
           const compile = lilypondEngine.compile(lyCode, (msg, pct) => {
@@ -526,8 +527,8 @@ export const useStudioStore = create<StudioState>((set, get) => {
               wasmStatus: res.method,
               stages: {
                 ...s.stages,
-                st1: { status: 'done', stat: `${res.method} ${res.compileSec}s` },
-                st2: { status: 'done', stat: `提取 ${res.rawAnnotations.length} 条事件` },
+                st1: { status: 'done', stat: message("{0} {1}s", res.method, res.compileSec) },
+                st2: { status: 'done', stat: message("提取 {0} 条事件", res.rawAnnotations.length) },
               },
             }));
             return res;
@@ -537,7 +538,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
             modelProgress = pct ?? modelProgress;
             report(msg);
           }, controller.signal).then(() => {
-            set({ ortReady: true, ortStatus: `PianoFlow (${pianoFlowEngine.provider}) 就绪` });
+            set({ ortReady: true, ortStatus: message("PianoFlow ({0}) 就绪", pianoFlowEngine.provider) });
           });
           // Let both jobs settle before allowing a retry or another generation.
           const [scoreResult, modelResult] = await Promise.allSettled([compile, model]);
@@ -561,7 +562,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
             onProgress: (done, total) => {
               const pct = total ? Math.round(((b + done / total) / batchCount) * 100) : 100;
               set((s) => ({
-                progressMsg: `Stage 3/5: PianoFlow (${pianoFlowEngine.provider}) 第 ${b + 1}/${batchCount} 版 (Seed ${sd}) ${done}/${total}`,
+                progressMsg: message("Stage 3/5: PianoFlow ({0}) 第 {1}/{2} 版 (Seed {3}) {4}/{5}", pianoFlowEngine.provider, b + 1, batchCount, sd, done, total),
                 progressPct: 52 + pct * 0.43,
                 stages: { ...s.stages, st3: { status: 'active', stat: `${b + 1}/${batchCount} · ${pianoFlowEngine.provider}` } },
               }));
@@ -572,7 +573,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const dt3 = ((performance.now() - t3) / 1000).toFixed(2);
 
         // Stage 4: Symbolic Arpeggio Restoration
-        set({ progressMsg: 'Stage 4/5: 正在执行符号级琶音精准还原...', progressPct: 97 });
+        set({ progressMsg: message("Stage 4/5: 正在执行符号级琶音精准还原..."), progressPct: 97 });
         const t4 = performance.now();
         const firstOut = generated[0].out;
         const totalBars = firstOut.perfState.scoreData.totalBars;
@@ -580,9 +581,9 @@ export const useStudioStore = create<StudioState>((set, get) => {
         set({
           performanceSource: score.originalFile ?? new File([lyCode], score.selectedPresetId + ".ly"),
           performanceTitle:
-            imported?.title ||
+            imported ? () => imported.title :
             lyCode.match(/^\s*title\s*=\s*"([^"\n]+)"/m)?.[1] ||
-            '自定义乐谱',
+            message("自定义乐谱"),
           scoreMidi: compiled.scoreMidi,
           scoreNotes: firstOut.scoreNotes,
           scoreDuration: firstOut.scoreDuration,
@@ -594,7 +595,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         });
 
         const takes = generated.map((item, idx) =>
-          buildTake(`take_${Date.now()}_${idx}`, `#${idx + 1} 演奏 (Seed ${item.seed})`, item.seed, item.out.perfState),
+          buildTake(`take_${Date.now()}_${idx}`, message("#{0} 演奏 (Seed {1})", idx + 1, item.seed), item.seed, item.out.perfState),
         );
         const dt4 = (performance.now() - t4).toFixed(1);
 
@@ -604,10 +605,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
           activeTrack: 'final_restored',
           stages: {
             ...s.stages,
-            st3: { status: 'done', stat: `${dt3}s · ${batchCount} 版` },
-            st4: { status: 'done', stat: `${dt4} ms · ${takes[0].arpeggios.length} 处琶音` },
+            st3: { status: 'done', stat: message("{0}s · {1} 版", dt3, batchCount) },
+            st4: { status: 'done', stat: message("{0} ms · {1} 处琶音", dt4, takes[0].arpeggios.length) },
           },
-          progressMsg: `演奏已生成(${compiled.method} ${compiled.compileSec}s + ${dt3}s AI × ${batchCount}版 + ${dt4}ms 还原)`,
+          progressMsg: message("演奏已生成({0} {1}s + {2}s AI × {3}版 + {4}ms 还原)", compiled.method, compiled.compileSec, dt3, batchCount, dt4),
           progressPct: 100,
         }));
 
@@ -616,13 +617,13 @@ export const useStudioStore = create<StudioState>((set, get) => {
       } catch (err) {
         console.error(err);
         set((s) => ({
-          errorMsg: (err as Error).message || String(err),
+          errorMsg: errorText(err),
           stages: {
             ...s.stages,
-            st1: s.stages.st1.status === 'active' ? { status: 'idle', stat: '失败' } : s.stages.st1,
-            st2: s.stages.st2.status === 'active' ? { status: 'idle', stat: '中止' } : s.stages.st2,
-            st3: s.stages.st3.status === 'active' ? { status: 'idle', stat: '中止' } : s.stages.st3,
-            st4: s.stages.st4.status === 'active' ? { status: 'idle', stat: '中止' } : s.stages.st4,
+            st1: s.stages.st1.status === 'active' ? { status: 'idle', stat: message("失败") } : s.stages.st1,
+            st2: s.stages.st2.status === 'active' ? { status: 'idle', stat: message("中止") } : s.stages.st2,
+            st3: s.stages.st3.status === 'active' ? { status: 'idle', stat: message("中止") } : s.stages.st3,
+            st4: s.stages.st4.status === 'active' ? { status: 'idle', stat: message("中止") } : s.stages.st4,
           },
         }));
       } finally {
@@ -693,7 +694,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 10000);
       } catch (e) {
-        set({ errorMsg: `WAV 导出失败: ${(e as Error).message}` });
+        set({ errorMsg: message("WAV 导出失败: {0}", errorText(e)) });
       } finally {
         set({ exportingWav: false });
       }
@@ -703,7 +704,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     // 7 Advanced PianoFlow Modes
     // =========================================================================
     runMode1Batch: async (count, startSeed) => {
-      await runGuardedMode(`玩法 ① 批量盲盒抽卡 (${count} 版)`, async () => {
+      await runGuardedMode(message("玩法 ① 批量盲盒抽卡 ({0} 版)", count), async () => {
         const st = get();
         const t0 = performance.now();
         const added: TakeRecord[] = [];
@@ -715,15 +716,15 @@ export const useStudioStore = create<StudioState>((set, get) => {
             seed: sd,
             onProgress: (d, tot) => {
               const pct = Math.round(((i + (tot ? d / tot : 1)) / count) * 100);
-              set({ progressMsg: `批量抽卡：第 ${i + 1}/${count} 版 (Seed ${sd}) ${pct}%`, progressPct: pct });
+              set({ progressMsg: message("批量抽卡：第 {0}/{1} 版 (Seed {2}) {3}%", i + 1, count, sd, pct), progressPct: pct });
             },
           });
-          added.push(buildTake(`m1_${Date.now()}_${i}`, `抽卡 (Seed ${sd})`, sd, res.perfState));
+          added.push(buildTake(`m1_${Date.now()}_${i}`, message("抽卡 (Seed {0})", sd), sd, res.perfState));
         }
         const last = added[added.length - 1];
         set((s) => ({
           takes: [...s.takes, ...added],
-          progressMsg: `玩法 ① 完成！新增 ${count} 版进入版本池 (${((performance.now() - t0) / 1000).toFixed(2)}s)`,
+          progressMsg: message("玩法 ① 完成！新增 {0} 版进入版本池 ({1}s)", count, ((performance.now() - t0) / 1000).toFixed(2)),
           progressPct: 100,
         }));
         get().selectTake(last.id);
@@ -731,7 +732,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     },
 
     runMode2Continuation: async (lockBarsRaw, count, startSeed) => {
-      await runGuardedMode(`玩法 ② 锁前 ${lockBarsRaw} 小节续弹 (${count} 版)`, async () => {
+      await runGuardedMode(message("玩法 ② 锁前 {0} 小节续弹 ({1} 版)", lockBarsRaw, count), async () => {
         const st = get();
         const baseTake = st.takes.find((t) => t.id === st.activeTakeId) ?? st.takes[0];
         if (!baseTake) return;
@@ -746,7 +747,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           if (u) unlocked++;
           for (let j = 0; j < 4; j++) mask[i * 4 + j] = u;
         }
-        if (unlocked === 0) throw new Error('所有小节都已被锁死，请调小锁死小节数。');
+        if (unlocked === 0) throw new LocalizedError("所有小节都已被锁死，请调小锁死小节数。");
 
         const added: TakeRecord[] = [];
         for (let k = 0; k < count; k++) {
@@ -759,15 +760,15 @@ export const useStudioStore = create<StudioState>((set, get) => {
             maskMatrix: mask,
             onProgress: (d, tot) => {
               const pct = Math.round(((k + (tot ? d / tot : 1)) / count) * 100);
-              set({ progressMsg: `锁 1–${lockBars} 小节续弹：第 ${k + 1}/${count} 版 (${pct}%)`, progressPct: pct });
+              set({ progressMsg: message("锁 1–{0} 小节续弹：第 {1}/{2} 版 ({3}%)", lockBars, k + 1, count, pct), progressPct: pct });
             },
           });
-          added.push(buildTake(`m2_${Date.now()}_${k}`, `锁1–${lockBars}续弹 #${k + 1}`, sd, res.perfState));
+          added.push(buildTake(`m2_${Date.now()}_${k}`, message("锁1–{0}续弹 #{1}", lockBars, k + 1), sd, res.perfState));
         }
         const last = added[added.length - 1];
         set((s) => ({
           takes: [...s.takes, ...added],
-          progressMsg: `玩法 ② 完成！保留 1–${lockBars} 小节，重抽后面 ${count} 版 (${((performance.now() - t0) / 1000).toFixed(2)}s)`,
+          progressMsg: message("玩法 ② 完成！保留 1–{0} 小节，重抽后面 {1} 版 ({2}s)", lockBars, count, ((performance.now() - t0) / 1000).toFixed(2)),
           progressPct: 100,
         }));
         get().selectTake(last.id);
@@ -775,7 +776,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     },
 
     runMode3Inpainting: async (sBarRaw, eBarRaw, seed) => {
-      await runGuardedMode(`玩法 ③ 双向局部重弹 (第 ${sBarRaw}–${eBarRaw} 小节)`, async () => {
+      await runGuardedMode(message("玩法 ③ 双向局部重弹 (第 {0}–{1} 小节)", sBarRaw, eBarRaw), async () => {
         const st = get();
         const baseTake = st.takes.find((t) => t.id === st.activeTakeId) ?? st.takes[0];
         if (!baseTake) return;
@@ -791,7 +792,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           if (inside) cnt++;
           for (let j = 0; j < 4; j++) mask[i * 4 + j] = inside;
         }
-        if (cnt === 0) throw new Error(`第 ${sBar}–${eBar} 小节内未找到音符`);
+        if (cnt === 0) throw new LocalizedError("第 {0}–{1} 小节内未找到音符", sBar, eBar);
 
         const res = await pianoFlowEngine.performScore(st.scoreMidi!, {
           cfmSteps: st.cfmSteps,
@@ -799,12 +800,12 @@ export const useStudioStore = create<StudioState>((set, get) => {
           seed,
           baseState: clonePerfState(baseTake.perfState),
           maskMatrix: mask,
-          onProgress: (d, tot) => set({ progressMsg: `双向缝合第 ${sBar}–${eBar} 小节 (${d}/${tot})`, progressPct: (d / Math.max(1, tot)) * 100 }),
+          onProgress: (d, tot) => set({ progressMsg: message("双向缝合第 {0}–{1} 小节 ({2}/{3})", sBar, eBar, d, tot), progressPct: (d / Math.max(1, tot)) * 100 }),
         });
-        const tk = buildTake(`m3_${Date.now()}`, `重绘 ${sBar}–${eBar} 小节`, seed, res.perfState);
+        const tk = buildTake(`m3_${Date.now()}`, message("重绘 {0}–{1} 小节", sBar, eBar), seed, res.perfState);
         set((s) => ({
           takes: [...s.takes, tk],
-          progressMsg: `玩法 ③ 完成！已双向缝合第 ${sBar}–${eBar} 小节 (${cnt} 音，${((performance.now() - t0) / 1000).toFixed(2)}s)`,
+          progressMsg: message("玩法 ③ 完成！已双向缝合第 {0}–{1} 小节 ({2} 音，{3}s)", sBar, eBar, cnt, ((performance.now() - t0) / 1000).toFixed(2)),
           progressPct: 100,
         }));
         get().selectTake(tk.id);
@@ -813,11 +814,11 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
     runMode4Dimensions: async (dims, sBarRaw, eBarRaw, seed) => {
       if (dims.every((x) => !x)) {
-        set({ errorMsg: '请至少勾选 1 个要重算的演奏维度' });
+        set({ errorMsg: message("请至少勾选 1 个要重算的演奏维度") });
         return;
       }
-      const dimNames = ['力度', '呼吸', '触键', '踏板'].filter((_, i) => dims[i]).join('+');
-      await runGuardedMode(`玩法 ④ 拆维度精修 (${dimNames})`, async () => {
+      const dimNames = () => [t("力度"), t("呼吸"), t("触键"), t("踏板")].filter((_, i) => dims[i]).join('+');
+      await runGuardedMode(message("玩法 ④ 拆维度精修 ({0})", dimNames), async () => {
         const st = get();
         const baseTake = st.takes.find((t) => t.id === st.activeTakeId) ?? st.takes[0];
         if (!baseTake) return;
@@ -837,12 +838,12 @@ export const useStudioStore = create<StudioState>((set, get) => {
           seed,
           baseState: clonePerfState(baseTake.perfState),
           maskMatrix: mask,
-          onProgress: (d, tot) => set({ progressMsg: `拆维度重算 [${dimNames}] (${d}/${tot})`, progressPct: (d / Math.max(1, tot)) * 100 }),
+          onProgress: (d, tot) => set({ progressMsg: message("拆维度重算 [{0}] ({1}/{2})", dimNames, d, tot), progressPct: (d / Math.max(1, tot)) * 100 }),
         });
-        const tk = buildTake(`m4_${Date.now()}`, `仅修${dimNames}`, seed, res.perfState);
+        const tk = buildTake(`m4_${Date.now()}`, message("仅修{0}", dimNames), seed, res.perfState);
         set((s) => ({
           takes: [...s.takes, tk],
-          progressMsg: `玩法 ④ 完成！锁定其余维度，仅重算「${dimNames}」(${((performance.now() - t0) / 1000).toFixed(2)}s)`,
+          progressMsg: message("玩法 ④ 完成！锁定其余维度，仅重算「{0}」({1}s)", dimNames, ((performance.now() - t0) / 1000).toFixed(2)),
           progressPct: 100,
         }));
         get().selectTake(tk.id);
@@ -855,10 +856,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
     runMode5Conductor: async (seed) => {
       const cues = get().cues;
       if (!cues.length) {
-        set({ errorMsg: '请先添加至少 1 个指挥段落' });
+        set({ errorMsg: message("请先添加至少 1 个指挥段落") });
         return;
       }
-      await runGuardedMode(`玩法 ⑤ 分段指挥家 (${cues.length} 段引导)`, async () => {
+      await runGuardedMode(message("玩法 ⑤ 分段指挥家 ({0} 段引导)", cues.length), async () => {
         const st = get();
         const t0 = performance.now();
         const res = await pianoFlowEngine.performScore(st.scoreMidi!, {
@@ -866,12 +867,12 @@ export const useStudioStore = create<StudioState>((set, get) => {
           stepFactor: st.stepFactor,
           seed,
           cues,
-          onProgress: (d, tot) => set({ progressMsg: `分段指挥 Flow 引导 (${d}/${tot})`, progressPct: (d / Math.max(1, tot)) * 100 }),
+          onProgress: (d, tot) => set({ progressMsg: message("分段指挥 Flow 引导 ({0}/{1})", d, tot), progressPct: (d / Math.max(1, tot)) * 100 }),
         });
-        const tk = buildTake(`m5_${Date.now()}`, `指挥家 (${cues.length}段)`, seed, res.perfState);
+        const tk = buildTake(`m5_${Date.now()}`, message("指挥家 ({0}段)", cues.length), seed, res.perfState);
         set((s) => ({
           takes: [...s.takes, tk],
-          progressMsg: `玩法 ⑤ 完成！已按 ${cues.length} 段指挥曲线生成 (${((performance.now() - t0) / 1000).toFixed(2)}s)`,
+          progressMsg: message("玩法 ⑤ 完成！已按 {0} 段指挥曲线生成 ({1}s)", cues.length, ((performance.now() - t0) / 1000).toFixed(2)),
           progressPct: 100,
         }));
         get().selectTake(tk.id);
@@ -882,7 +883,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       const st = get();
       if (!st.scoreMidi || st.liveActive) return;
       if (!pianoPlayer.ready) {
-        set({ errorMsg: '钢琴音色正在加载中，请稍等 1 秒再启动实时指挥。' });
+        set({ errorMsg: message("钢琴音色正在加载中，请稍等 1 秒再启动实时指挥。") });
         return;
       }
       pianoPlayer.stop(true);
@@ -892,7 +893,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         tempoScale: st.liveTempo,
         velOffset: st.liveVel,
       });
-      set({ liveActive: true, isPlaying: true, liveStatus: '正在预热首段 0.8s 实时滑动缓冲...' });
+      set({ liveActive: true, isPlaying: true, liveStatus: message("正在预热首段 0.8s 实时滑动缓冲...") });
 
       while (get().liveActive && liveSessionRef && !liveSessionRef.finished && liveSessionRef.getBufferHeadTime() < 0.9) {
         await liveSessionRef.generateNextChunk(10);
@@ -906,7 +907,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const finalDur = liveSessionRef.committedNotes.reduce((mx, n) => Math.max(mx, n.s + n.d), 0);
         pianoPlayer.finishLiveStream(finalDur);
       }
-      set({ liveStatus: `实时指挥中！随时拖动滑块 · 单块推理 ${liveSessionRef.lastChunkMs} ms` });
+      set({ liveStatus: message("实时指挥中！随时拖动滑块 · 单块推理 {0} ms", liveSessionRef.lastChunkMs) });
 
       liveLoopTimer = window.setInterval(async () => {
         if (!get().liveActive || !liveSessionRef) return;
@@ -923,7 +924,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
               pianoPlayer.finishLiveStream(finalDur);
             }
             set({
-              liveStatus: `实时指挥中 · 缓冲至第 ${curBar}/${liveSessionRef.scoreData.totalBars} 小节 · 响应 ${liveSessionRef.lastChunkMs} ms`,
+              liveStatus: message("实时指挥中 · 缓冲至第 {0}/{1} 小节 · 响应 {2} ms", curBar, liveSessionRef.scoreData.totalBars, liveSessionRef.lastChunkMs),
             });
           }
         }
@@ -937,7 +938,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       liveSessionRef.velOffset = vel;
       const curT = pianoPlayer.getCurrentTime();
       liveSessionRef.dropFutureAfter(curT + 0.25);
-      set({ liveStatus: `已丢弃 0.25s 后缓存，实时重算新表情 (${tempo.toFixed(2)}x / ${vel >= 0 ? '+' : ''}${vel})...` });
+      set({ liveStatus: message("已丢弃 0.25s 后缓存，实时重算新表情 ({0}x / {1}{2})...", tempo.toFixed(2), vel >= 0 ? '+' : '', vel) });
       const added = await liveSessionRef.generateNextChunk(10);
       if (added.length && get().liveActive && liveSessionRef) {
         pianoPlayer.hotReplaceNotes(
@@ -945,7 +946,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           liveSessionRef.finished ? liveSessionRef.getBufferHeadTime() + 1.0 : 9999,
         );
         set({
-          liveStatus: `已响应手势 (${liveSessionRef.lastChunkMs} ms) · 当前 ${tempo.toFixed(2)}x / ${vel >= 0 ? '+' : ''}${vel}`,
+          liveStatus: message("已响应手势 ({0} ms) · 当前 {1}x / {2}{3}", liveSessionRef.lastChunkMs, tempo.toFixed(2), vel >= 0 ? '+' : '', vel),
         });
       }
     },
@@ -961,14 +962,14 @@ export const useStudioStore = create<StudioState>((set, get) => {
       set({ liveActive: false, isPlaying: false });
 
       if (saveTake && sess && get().scoreMidi && sess.generatedNoteCount >= sess.scoreData.noteCount) {
-        const tk = buildTake(`m6_${Date.now()}`, '实时指挥实录', 77, sess.toPerfState());
+        const tk = buildTake(`m6_${Date.now()}`, message("实时指挥实录"), 77, sess.toPerfState());
         set((s) => ({
           takes: [...s.takes, tk],
-          liveStatus: `实时指挥实录已保存到版本池！(共 ${sess.generatedNoteCount} 音)`,
+          liveStatus: message("实时指挥实录已保存到版本池！(共 {0} 音)", sess.generatedNoteCount),
         }));
         get().selectTake(tk.id);
       } else if (sess) {
-        set({ liveStatus: `已停止实时指挥（已实时演奏 ${sess.generatedNoteCount}/${sess.scoreData.noteCount} 音）` });
+        set({ liveStatus: message("已停止实时指挥（已实时演奏 {0}/{1} 音）", sess.generatedNoteCount, sess.scoreData.noteCount) });
       }
     },
 
@@ -981,10 +982,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
         set({
           refMasterMidi: midi,
           refMasterLabel: label,
-          m7Status: `已载入参考演奏「${file.name}」(${noteCnt} 音) — 点击「对齐并开始大师接力」`,
+          m7Status: message("已载入参考演奏「{0}」({1} 音) — 点击「对齐并开始大师接力」", file.name, noteCnt),
         });
       } catch (err) {
-        set({ errorMsg: `MIDI 读取失败: ${(err as Error).message}` });
+        set({ errorMsg: message("MIDI 读取失败: {0}", errorText(err)) });
       }
     },
 
@@ -995,14 +996,14 @@ export const useStudioStore = create<StudioState>((set, get) => {
       if (style === 'debussy_poetic') {
         set({
           refMasterMidi: demo,
-          refMasterLabel: '浪漫诗意大师',
-          m7Status: '已载入「浪漫诗意大师引子」（舒缓呼吸 + 歌唱性高声部 + 绵长踏板）— 点击右侧开始接力',
+          refMasterLabel: message("浪漫诗意大师"),
+          m7Status: message("已载入「浪漫诗意大师引子」（舒缓呼吸 + 歌唱性高声部 + 绵长踏板）— 点击右侧开始接力"),
         });
       } else {
         set({
           refMasterMidi: demo,
-          refMasterLabel: '戏剧炫技大师',
-          m7Status: '已载入「戏剧炫技大师引子」（紧凑推进 + 强对比触键）— 点击右侧开始接力',
+          refMasterLabel: message("戏剧炫技大师"),
+          m7Status: message("已载入「戏剧炫技大师引子」（紧凑推进 + 强对比触键）— 点击右侧开始接力"),
         });
       }
     },
@@ -1010,16 +1011,16 @@ export const useStudioStore = create<StudioState>((set, get) => {
     runMode7MasterRelay: async (prefixBarsRaw, seed) => {
       const { refMasterMidi, refMasterLabel } = get();
       if (!refMasterMidi) return;
-      await runGuardedMode(`玩法 ⑦ 大师风格接力 (${refMasterLabel})`, async () => {
+      await runGuardedMode(message("玩法 ⑦ 大师风格接力 ({0})", refMasterLabel), async () => {
         const st = get();
         const t0 = performance.now();
         if (!pianoFlowEngine.meta) await pianoFlowEngine.load();
         const prefixBars = Math.max(1, Math.min(st.totalBars - 1, prefixBarsRaw));
         const report = alignPerformanceMidiToScore(st.scoreMidi!, refMasterMidi, prefixBars, pianoFlowEngine.meta!);
         set({
-          m7Status: `DP 对齐完成：前 ${report.prefixBars} 小节匹配 ${report.alignedCount}/${report.prefixNoteCount} 音 (${Math.round(
+          m7Status: message("DP 对齐完成：前 {0} 小节匹配 {1}/{2} 音 ({3}%) · 均力 {4} / 相对速度 {5}x → PianoFlow 接力续弹中...", report.prefixBars, report.alignedCount, report.prefixNoteCount, Math.round(
             report.matchRate * 100,
-          )}%) · 均力 ${report.avgVel} / 相对速度 ${report.avgTempoRatio}x → PianoFlow 接力续弹中...`,
+          ), report.avgVel, report.avgTempoRatio),
         });
 
         const res = await pianoFlowEngine.performScore(st.scoreMidi!, {
@@ -1028,17 +1029,17 @@ export const useStudioStore = create<StudioState>((set, get) => {
           seed,
           baseState: report.baseState,
           maskMatrix: report.maskMatrix,
-          onProgress: (d, tot) => set({ progressMsg: `大师风格接力续弹 (${d}/${tot})`, progressPct: (d / Math.max(1, tot)) * 100 }),
+          onProgress: (d, tot) => set({ progressMsg: message("大师风格接力续弹 ({0}/{1})", d, tot), progressPct: (d / Math.max(1, tot)) * 100 }),
         });
 
-        const tk = buildTake(`m7_${Date.now()}`, `${refMasterLabel.slice(0, 6)}接力(前${prefixBars}小节)`, seed, res.perfState);
+        const tk = buildTake(`m7_${Date.now()}`, message("{0}接力(前{1}小节)", refMasterLabel, prefixBars), seed, res.perfState);
         const dt = ((performance.now() - t0) / 1000).toFixed(2);
         set((s) => ({
           takes: [...s.takes, tk],
-          m7Status: `接力完成 (${dt}s)！前 ${report.prefixBars} 小节锁死「${refMasterLabel}」(匹配 ${Math.round(
+          m7Status: message("接力完成 ({0}s)！前 {1} 小节锁死「{2}」(匹配 {3}%)，后续全曲已顺着大师风格续弹", dt, report.prefixBars, refMasterLabel, Math.round(
             report.matchRate * 100,
-          )}%)，后续全曲已顺着大师风格续弹`,
-          progressMsg: `玩法 ⑦ 大师风格接力完成！(${dt}s)`,
+          )),
+          progressMsg: message("玩法 ⑦ 大师风格接力完成！({0}s)", dt),
           progressPct: 100,
         }));
         get().selectTake(tk.id);

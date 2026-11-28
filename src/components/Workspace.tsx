@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { lazy, Suspense, useEffect } from 'react';
 import { ArrowRight, AudioLines } from 'lucide-react';
 import { useScoreStore } from '../store/useScoreStore';
@@ -52,7 +53,7 @@ export default function Workspace({
     return () => window.removeEventListener('keydown', play);
   }, [page]);
   return (
-    <Suspense fallback={<p role="status">正在打开演奏室…</p>}>
+    <Suspense fallback={<p role="status">{t("正在打开演奏室…")}</p>}>
       {(page === 'editor' || !takes.length) && (
         <div className="page-title">
           <div>
@@ -76,14 +77,14 @@ export default function Workspace({
         ) : (
           <section className="empty">
             <AudioLines size={38} />
-            <h2>{busy ? '正在生成演奏' : '演奏室等待第一份乐谱'}</h2>
+            <h2>{busy ? t("正在生成演奏") : t("演奏室等待第一份乐谱")}</h2>
             <p>
               {busy
-                ? '可以在编辑页查看生成进度。'
-                : '在编辑页生成演奏后，就能试听、调整音色和导出音频。'}
+                ? t("可以在编辑页查看生成进度。")
+                : t("在编辑页生成演奏后，就能试听、调整音色和导出音频。")}
             </p>
             <a href="#editor">
-              前往乐谱编辑 <ArrowRight size={16} />
+              {t("前往乐谱编辑")} <ArrowRight size={16} />
             </a>
           </section>
         ))}

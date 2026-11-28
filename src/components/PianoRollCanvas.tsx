@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
 import { pianoPlayer } from '../engine/instances';
@@ -72,7 +73,7 @@ export function PianoRollCanvas() {
           width={1060}
           height={220}
           role="img"
-          aria-label="实时钢琴卷帘与琴键：音符越宽、色调越暖，力度越强；下落速度随演奏节拍变化。"
+          aria-label={t("实时钢琴卷帘与琴键：音符越宽、色调越暖，力度越强；下落速度随演奏节拍变化。")}
           className="roll-canvas"
         />
       </div>
@@ -81,7 +82,7 @@ export function PianoRollCanvas() {
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs text-stone-600">
             <Sparkles className="h-3.5 w-3.5 text-emerald-800" />
-            <span>试听琶音片段</span>
+            <span>{t("试听琶音片段")}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {arpeggios.map((a, idx) => (
@@ -89,9 +90,8 @@ export function PianoRollCanvas() {
                 key={`${a.bar}-${idx}`}
                 onClick={() => playFrom(Math.max(0, a.time_sec - 1.5))}
                 className="cue-chip"
-                title={`琶音跨度 ${a.before_ms} → ${a.after_ms} ms`}
-              >
-                第 {a.bar} 小节 · {fmtTime(a.time_sec)}
+                title={t("琶音跨度 {0} → {1} ms", a.before_ms, a.after_ms)}
+              > {t("第 {0} 小节", a.bar)} · {fmtTime(a.time_sec)}
               </button>
             ))}
           </div>

@@ -1,3 +1,4 @@
+import { formatMessage } from '../src/i18n/catalog';
 import { authFor, providers, type AccountEnv } from './auth';
 
 const maxScoreSize = 12 * 1024 * 1024;
@@ -6,21 +7,22 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
   const headers = { 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' };
   const json = (data: unknown, status = 200) => Response.json(data, { status, headers });
   const path = new URL(request.url).pathname;
+  const locale = /^en(?:[-,;]|$)/i.test(request.headers.get('accept-language') ?? '') ? 'en' : 'zh-CN';
   const enabled = providers(env);
   if (request.method === 'GET' && path === '/api/account/options') return json(enabled);
-  if (!enabled.email && !enabled.google) return json({ error: '账户服务尚未启用' }, 503);
-  const auth = authFor(env);
+  if (!enabled.email && !enabled.google) return json({ error: formatMessage(locale, '账户服务尚未启用') }, 503);
+  const auth = authFor(env, locale);
   if (path.startsWith('/api/auth/')) {
     const res = await auth.handler(request);
     const copy = new Response(res.body, res);
     copy.headers.set('cache-control', 'private, no-store');
     return copy;
   }
-  if (!path.startsWith('/api/library')) return json({ error: '未找到接口' }, 404);
+  if (!path.startsWith('/api/library')) return json({ error: formatMessage(locale, '未找到接口') }, 404);
   if (request.method !== 'GET' && request.headers.get('origin') !== new URL(env.BETTER_AUTH_URL!).origin)
-    return json({ error: '请求来源无效' }, 403);
+    return json({ error: formatMessage(locale, '请求来源无效') }, 403);
   const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return json({ error: '请先登录' }, 401);
+  if (!session) return json({ error: formatMessage(locale, '请先登录') }, 401);
   const owner = session.user.id;
   const db = env.DB!, bucket = env.PRIVATE_SCORES!;
   if (path === '/api/library' && request.method === 'GET') {
@@ -31,14 +33,14 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
   }
   if (path === '/api/library' && request.method === 'POST') {
     const length = Number(request.headers.get('content-length'));
-    if (!length || length > maxScoreSize) return json({ error: '单次保存上限为 12 MB' }, 413);
+    if (!length || length > maxScoreSize) return json({ error: formatMessage(locale, '单次保存上限为 12 MB') }, 413);
     let form: FormData;
-    try { form = await request.formData(); } catch { return json({ error: '文件格式无效' }, 400); }
+    try { form = await request.formData(); } catch { return json({ error: formatMessage(locale, '文件格式无效') }, 400); }
     const source = form.get('source'), midi = form.get('performance'), title = form.get('title');
     if (!(source instanceof File) || !source.size || !/\.(ly|txt|mid|midi|musicxml|xml|mxl)$/i.test(source.name)
       || source.name.length > 255 || typeof title !== 'string' || !title.trim() || title.length > 200
       || (midi !== null && (!(midi instanceof File) || !midi.size)))
-      return json({ error: '乐谱文件或名称无效' }, 400);
+      return json({ error: formatMessage(locale, '乐谱文件或名称无效') }, 400);
     // A retry (including two tabs saving the same take) completes the same private entry.
     const digest = async (bytes: BufferSource) =>
       Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), n => n.toString(16).padStart(2, '0')).join('');
@@ -67,5 +69,5 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
       } });
     }
   }
-  return json({ error: '未找到作品' }, 404);
+  return json({ error: formatMessage(locale, '未找到作品') }, 404);
 }

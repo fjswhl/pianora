@@ -1,3 +1,4 @@
+import { display, message, type DisplayText } from '../i18n';
 import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
 import { injectSchemeHook, type RawArpeggioAnnotation } from './arpeggio';
@@ -11,7 +12,7 @@ interface ScoreData {
   rawAnnotations: RawArpeggioAnnotation[];
 }
 
-type Progress = (msg: string, pct?: number) => void;
+type Progress = (msg: DisplayText, pct?: number) => void;
 type Compiler = ReturnType<typeof createReusableCompiler>;
 
 export class BrowserLilyPondEngine {
@@ -37,7 +38,7 @@ export class BrowserLilyPondEngine {
         onProgress: ({ loadedBytes, totalBytes }) => {
           if (totalBytes)
             this.progress?.(
-              `加载 LilyPond：${Math.round((100 * loadedBytes) / totalBytes)}%`,
+              message("加载 LilyPond：{0}%", Math.round((100 * loadedBytes) / totalBytes)),
               5 + (15 * loadedBytes) / totalBytes,
             );
         },
@@ -86,9 +87,9 @@ export class BrowserLilyPondEngine {
 
   async compile(source: string, onProgress?: Progress) {
     const start = performance.now();
-    const result = (data: ScoreData, method: string) => {
+    const result = (data: ScoreData, method: DisplayText) => {
       const duration = performance.now() - start;
-      performance.measure('pianora:score-ready', { start, detail: { method } });
+      performance.measure('pianora:score-ready', { start, detail: { method: display(method) } });
       return {
         ...data,
         compileSec: Number((duration / 1000).toFixed(2)),
@@ -96,13 +97,13 @@ export class BrowserLilyPondEngine {
       };
     };
     if (this.last?.source === source)
-      return result(this.last.data, '复用上次结果');
+      return result(this.last.data, message("复用上次结果"));
 
-    onProgress?.('正在准备浏览器 LilyPond 编译器…', 5);
+    onProgress?.(message("正在准备浏览器 LilyPond 编译器…"), 5);
     this.progress = onProgress;
     try {
       await this.prepare();
-      onProgress?.('正在提取演奏 MIDI 和琶音标记…', 22);
+      onProgress?.(message("正在提取演奏 MIDI 和琶音标记…"), 22);
       const { midi, rawAnnotations } = await this.run(source, 'midi');
       const data = {
         scoreMidi: new Midi(midi),
@@ -110,7 +111,7 @@ export class BrowserLilyPondEngine {
         rawAnnotations,
       };
       this.last = { source, data };
-      return result(data, '浏览器编译');
+      return result(data, message("浏览器编译"));
     } finally {
       this.progress = undefined;
     }

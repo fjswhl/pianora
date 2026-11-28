@@ -1,3 +1,4 @@
+import { t, display } from '../i18n';
 import { useEffect, useState } from 'react';
 import {
   Dices,
@@ -16,13 +17,13 @@ import { useStudioStore } from '../store/useStudioStore';
 type ModeId = 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm7';
 
 const MODE_TABS: Array<{ id: ModeId; label: string; icon: React.ReactNode }> = [
-  { id: 'm1', label: '多版本演奏', icon: <Dices className="h-3.5 w-3.5" /> },
-  { id: 'm2', label: '保留开头', icon: <Scissors className="h-3.5 w-3.5" /> },
-  { id: 'm3', label: '重演选段', icon: <Bandage className="h-3.5 w-3.5" /> },
-  { id: 'm4', label: '触键微调', icon: <SlidersHorizontal className="h-3.5 w-3.5" /> },
-  { id: 'm5', label: '分段指挥', icon: <Wand2 className="h-3.5 w-3.5" /> },
-  { id: 'm6', label: '实时指挥', icon: <Radio className="h-3.5 w-3.5" /> },
-  { id: 'm7', label: '参考演奏', icon: <Crown className="h-3.5 w-3.5" /> },
+  { id: 'm1', get label() { return t("多版本演奏"); }, icon: <Dices className="h-3.5 w-3.5" /> },
+  { id: 'm2', get label() { return t("保留开头"); }, icon: <Scissors className="h-3.5 w-3.5" /> },
+  { id: 'm3', get label() { return t("重演选段"); }, icon: <Bandage className="h-3.5 w-3.5" /> },
+  { id: 'm4', get label() { return t("触键微调"); }, icon: <SlidersHorizontal className="h-3.5 w-3.5" /> },
+  { id: 'm5', get label() { return t("分段指挥"); }, icon: <Wand2 className="h-3.5 w-3.5" /> },
+  { id: 'm6', get label() { return t("实时指挥"); }, icon: <Radio className="h-3.5 w-3.5" /> },
+  { id: 'm7', get label() { return t("参考演奏"); }, icon: <Crown className="h-3.5 w-3.5" /> },
 ];
 
 export function WorkbenchPanel() {
@@ -83,20 +84,20 @@ export function WorkbenchPanel() {
   }, [totalBars]);
 
   const disabled = !hasScore || busy;
-  const tempoLabel = liveTempo < 0.9 ? '慢板' : liveTempo > 1.1 ? '急板' : '原速';
-  const velLabel = liveVel < -10 ? '柔和 pp' : liveVel > 10 ? '激昂 ff' : '自然';
+  const tempoLabel = liveTempo < 0.9 ? t("慢板") : liveTempo > 1.1 ? t("急板") : t("原速");
+  const velLabel = liveVel < -10 ? t("柔和 pp") : liveVel > 10 ? t("激昂 ff") : t("自然");
 
   return (
     <section className="rounded-2xl border border-[#cdd6c9]/90 bg-[#fffef9] p-4 ">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-stone-900">演奏调整</h2>
+        <h2 className="text-sm font-semibold text-stone-900">{t("演奏调整")}</h2>
         <span
           id="barCountBadge"
           className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
             hasScore ? 'bg-teal-600/15 text-teal-800' : 'bg-stone-200 text-[#576354]'
           }`}
         >
-          {hasScore ? `共 ${totalBars} 小节` : '请先生成演奏'}
+          {hasScore ? t("共 {0} 小节", totalBars) : t("请先生成演奏")}
         </span>
       </div>
 
@@ -124,11 +125,11 @@ export function WorkbenchPanel() {
         {activeMode === 'm1' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              使用不同种子生成多个演奏版本，在试听页切换比较。
+              {t("使用不同种子生成多个演奏版本，在试听页切换比较。")}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-stone-700">
-                版本数量
+                {t("版本数量")}
                 <select
                   id="m1Count"
                   value={m1Count}
@@ -137,13 +138,12 @@ export function WorkbenchPanel() {
                 >
                   {[2, 4, 6, 8].map((n) => (
                     <option key={n} value={n}>
-                      {n} 版
-                    </option>
+                      {n === 1 ? t("1 版") : t("{0} 版", n)} </option>
                   ))}
                 </select>
               </label>
               <label className="flex items-center gap-2 text-stone-700">
-                起始 Seed
+                {t("起始 Seed")}
                 <input
                   type="number"
                   value={m1Seed}
@@ -160,7 +160,7 @@ export function WorkbenchPanel() {
                 }}
                 className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                生成多个版本
+                {t("生成多个版本")}
               </button>
             </div>
           </div>
@@ -169,11 +169,11 @@ export function WorkbenchPanel() {
         {activeMode === 'm2' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              基于当前选中版本：将前 <b className="text-stone-800">X</b> 小节原封不动锁死为条件上下文，仅对后续段落重抽 1~4 种不同走向。
+              {t("保留当前版本的开头，为后续小节生成 1 至 4 种演绎。")}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-stone-700">
-                锁死前
+                {t("锁死前")}
                 <input
                   type="number"
                   min={1}
@@ -182,10 +182,10 @@ export function WorkbenchPanel() {
                   onChange={(e) => setM2LockBars(Number(e.target.value) || 1)}
                   className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
-                小节
+                {t("小节")}
               </label>
               <label className="flex items-center gap-2 text-stone-700">
-                续弹版数
+                {t("续弹版数")}
                 <select
                   id="m2Count"
                   value={m2Count}
@@ -194,13 +194,12 @@ export function WorkbenchPanel() {
                 >
                   {[1, 2, 4].map((n) => (
                     <option key={n} value={n}>
-                      {n} 版
-                    </option>
+                      {n === 1 ? t("1 版") : t("{0} 版", n)} </option>
                   ))}
                 </select>
               </label>
               <label className="flex items-center gap-2 text-stone-700">
-                新 Seed
+                {t("新 Seed")}
                 <input
                   type="number"
                   value={m2Seed}
@@ -217,7 +216,7 @@ export function WorkbenchPanel() {
                 }}
                 className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                锁死前段并续弹
+                {t("锁死前段并续弹")}
               </button>
             </div>
           </div>
@@ -226,11 +225,11 @@ export function WorkbenchPanel() {
         {activeMode === 'm3' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              像 PS 局部重绘：同时锁死开头与结尾，仅清空第 <b className="text-stone-800">A ~ B</b> 小节的表现力，由双向 Flow Matching 窗口丝滑缝合重弹。
+              {t("重演选定的小节。双向 Flow Matching 会与前后保留的段落自然衔接。")}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-stone-700">
-                挖空重弹：第
+                {t("挖空重弹：第")}
                 <input
                   type="number"
                   min={1}
@@ -239,7 +238,7 @@ export function WorkbenchPanel() {
                   onChange={(e) => setM3Start(Number(e.target.value) || 1)}
                   className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
-                至第
+                {t("至第")}
                 <input
                   type="number"
                   min={1}
@@ -248,10 +247,10 @@ export function WorkbenchPanel() {
                   onChange={(e) => setM3End(Number(e.target.value) || 1)}
                   className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
-                小节
+                {t("小节")}
               </label>
               <label className="flex items-center gap-2 text-stone-700">
-                新 Seed
+                {t("新 Seed")}
                 <input
                   type="number"
                   value={m3Seed}
@@ -268,7 +267,7 @@ export function WorkbenchPanel() {
                 }}
                 className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                局部双向缝合重弹
+                {t("局部双向缝合重弹")}
               </button>
             </div>
           </div>
@@ -277,14 +276,14 @@ export function WorkbenchPanel() {
         {activeMode === 'm4' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              锁死满意的演奏维度，仅重算勾选的维度（例如完全锁死原节奏呼吸，只重打磨强弱力度，或只重配踏板延音）。
+              {t("锁死满意的演奏维度，仅重算勾选的维度（例如完全锁死原节奏呼吸，只重打磨强弱力度，或只重配踏板延音）。")}
             </p>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: '锁快慢，只重弹轻重', v: [true, false, false, false] as [boolean, boolean, boolean, boolean] },
-                { label: '锁轻重，只重调呼吸', v: [false, true, false, false] as [boolean, boolean, boolean, boolean] },
-                { label: '只重踩踏板延音', v: [false, false, false, true] as [boolean, boolean, boolean, boolean] },
-                { label: '重修触键连断 + 踏板', v: [false, false, true, true] as [boolean, boolean, boolean, boolean] },
+                { label: t("锁快慢，只重弹轻重"), v: [true, false, false, false] as [boolean, boolean, boolean, boolean] },
+                { label: t("锁轻重，只重调呼吸"), v: [false, true, false, false] as [boolean, boolean, boolean, boolean] },
+                { label: t("只重踩踏板延音"), v: [false, false, false, true] as [boolean, boolean, boolean, boolean] },
+                { label: t("重修触键连断 + 踏板"), v: [false, false, true, true] as [boolean, boolean, boolean, boolean] },
               ].map((p) => (
                 <button
                   key={p.label}
@@ -296,7 +295,7 @@ export function WorkbenchPanel() {
               ))}
             </div>
             <div className="flex flex-wrap gap-2.5">
-              {(['轻重力度 (Velocity)', '快慢呼吸 (TimeShift)', '手指连断奏 (Duration)', '踏板延音 (Sustain)'] as const).map(
+              {([t("轻重力度 (Velocity)"), t("快慢呼吸 (TimeShift)"), t("手指连断奏 (Duration)"), t("踏板延音 (Sustain)")] as const).map(
                 (name, i) => (
                   <label
                     key={name}
@@ -319,7 +318,7 @@ export function WorkbenchPanel() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-stone-700">
-                作用小节：第
+                {t("作用小节：第")}
                 <input
                   type="number"
                   min={1}
@@ -337,10 +336,10 @@ export function WorkbenchPanel() {
                   onChange={(e) => setM4End(Number(e.target.value) || 1)}
                   className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
-                小节
+                {t("小节")}
               </label>
               <label className="flex items-center gap-2 text-stone-700">
-                新 Seed
+                {t("新 Seed")}
                 <input
                   type="number"
                   value={m4Seed}
@@ -357,7 +356,7 @@ export function WorkbenchPanel() {
                 }}
                 className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                仅重算勾选维度
+                {t("仅重算勾选维度")}
               </button>
             </div>
           </div>
@@ -366,7 +365,7 @@ export function WorkbenchPanel() {
         {activeMode === 'm5' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              像指挥家一样分段设定速度倍率与强弱方向，在 Flow Matching ODE 每一步施加端点引导，让 AI 自动补齐细腻呼吸与声部平衡。
+              {t("像指挥家一样分段设定速度倍率与强弱方向，在 Flow Matching ODE 每一步施加端点引导，让 AI 自动补齐细腻呼吸与声部平衡。")}
             </p>
             <div className="space-y-2">
               {cues.map((cue, idx) => (
@@ -375,7 +374,7 @@ export function WorkbenchPanel() {
                   className="flex flex-wrap items-center gap-2.5 rounded-lg border border-[#cdd6c9] bg-[#fffef9] px-3 py-2"
                 >
                   <span className="flex items-center gap-1.5 text-stone-700">
-                    第
+                    {t("第")}
                     <input
                       type="number"
                       min={1}
@@ -399,10 +398,10 @@ export function WorkbenchPanel() {
                       }}
                       className="w-14 rounded border border-[#bac7b8] bg-[#fffef9] px-1.5 py-0.5 text-stone-900"
                     />
-                    小节
+                    {t("小节")}
                   </span>
                   <span className="flex items-center gap-1 text-stone-700">
-                    速度
+                    {t("速度")}
                     <input
                       type="number"
                       min={0.6}
@@ -419,7 +418,7 @@ export function WorkbenchPanel() {
                     x
                   </span>
                   <span className="flex items-center gap-1 text-stone-700">
-                    力度
+                    {t("力度")}
                     <input
                       type="number"
                       min={-40}
@@ -435,7 +434,7 @@ export function WorkbenchPanel() {
                     />
                   </span>
                   <span className="flex items-center gap-1 text-stone-700">
-                    引导
+                    {t("引导")}
                     <input
                       type="number"
                       min={0.2}
@@ -453,7 +452,7 @@ export function WorkbenchPanel() {
                   <button
                     onClick={() => setCues(cues.filter((_, i) => i !== idx))}
                     className="ml-auto cursor-pointer rounded p-1 text-[#576354] hover:bg-rose-500/15 hover:text-rose-800"
-                    title="删除段落"
+                    title={t("删除段落")}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -473,13 +472,13 @@ export function WorkbenchPanel() {
                 className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1.5 text-stone-800 hover:border-[#42674f]"
               >
                 <Plus className="h-3.5 w-3.5" />
-                添加段落
+                {t("添加段落")}
               </button>
               <button
                 onClick={resetDefaultCues}
                 className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2.5 py-1.5 text-stone-800 hover:border-[#42674f]"
               >
-                填入推荐表情曲线
+                {t("填入推荐表情曲线")}
               </button>
               <label className="flex items-center gap-1.5 text-stone-700">
                 Seed
@@ -499,7 +498,7 @@ export function WorkbenchPanel() {
                 }}
                 className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                按指挥曲线生成
+                {t("按指挥曲线生成")}
               </button>
             </div>
           </div>
@@ -508,12 +507,12 @@ export function WorkbenchPanel() {
         {activeMode === 'm6' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              边听边拖滑块！0.25s 实时滑动时间窗引擎：拖动速度或强弱滑块瞬间丢弃未播缓存，约 60–150 ms 内 AI 钢琴家实时响应你的手势。
+              {t("边听边拖滑块！0.25s 实时滑动时间窗引擎：拖动速度或强弱滑块瞬间丢弃未播缓存，约 60–150 ms 内 AI 钢琴家实时响应你的手势。")}
             </p>
             <div className="grid grid-cols-1 gap-4 rounded-xl border border-sky-500/25 bg-teal-600/5 p-3 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 flex justify-between text-stone-700">
-                  <span>实时速度倍率</span>
+                  <span>{t("实时速度倍率")}</span>
                   <span className="font-semibold text-teal-800">
                     {liveTempo.toFixed(2)}x ({tempoLabel})
                   </span>
@@ -531,7 +530,7 @@ export function WorkbenchPanel() {
               </div>
               <div>
                 <label className="mb-1.5 flex justify-between text-stone-700">
-                  <span>实时强弱情绪</span>
+                  <span>{t("实时强弱情绪")}</span>
                   <span className="font-semibold text-[#42674f]">
                     {liveVel >= 0 ? `+${liveVel}` : liveVel} ({velLabel})
                   </span>
@@ -555,7 +554,7 @@ export function WorkbenchPanel() {
                 onClick={() => void startLiveConductor()}
                 className="cursor-pointer rounded-lg border border-teal-700/70 bg-teal-600/15 px-3.5 py-1.5 font-semibold text-teal-900 transition hover:bg-teal-600/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                启动实时指挥演奏
+                {t("启动实时指挥演奏")}
               </button>
               <button
                 id="m6StopBtn"
@@ -563,10 +562,10 @@ export function WorkbenchPanel() {
                 onClick={() => stopLiveConductor(true)}
                 className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 font-semibold text-stone-800 transition hover:border-[#42674f] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                停止并保存为版本
+                {t("停止并保存为版本")}
               </button>
               <span id="liveStatus" className="text-teal-800">
-                {liveStatus}
+                {display(liveStatus)}
               </span>
             </div>
           </div>
@@ -575,13 +574,12 @@ export function WorkbenchPanel() {
         {activeMode === 'm7' && (
           <div className="space-y-3">
             <p className="text-[#576354]">
-              导入任意真人钢琴家演奏的 <code>.mid</code>（或一键选用内置浪漫/戏剧大师引子），浏览器内运行动态规划逐音符对齐前{' '}
-              <b className="text-stone-800">K</b> 小节并锁死触键与呼吸，让 PianoFlow 顺着大师风格续弹全曲。
+              {t("导入演奏 MIDI 或选用内置引子。浏览器会逐音对齐开头的小节，保留触键与呼吸，让 PianoFlow 按相同风格续弹。")}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 text-stone-800 hover:border-[#42674f]">
                 <Upload className="h-3.5 w-3.5 text-[#42674f]" />
-                导入真人演奏 .mid
+                {t("导入真人演奏 .mid")}
                 <input
                   type="file"
                   accept=".mid,.midi"
@@ -599,7 +597,7 @@ export function WorkbenchPanel() {
                 onClick={() => loadBuiltinMasterDemo('debussy_poetic')}
                 className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 text-stone-800 hover:border-[#42674f] disabled:opacity-40"
               >
-                内置：浪漫诗意大师引子
+                {t("内置：浪漫诗意大师引子")}
               </button>
               <button
                 id="m7DemoDramaticBtn"
@@ -607,12 +605,12 @@ export function WorkbenchPanel() {
                 onClick={() => loadBuiltinMasterDemo('horowitz_dramatic')}
                 className="cursor-pointer rounded-lg border border-[#bac7b8] bg-[#fffef9] px-3 py-1.5 text-stone-800 hover:border-[#42674f] disabled:opacity-40"
               >
-                内置：戏剧炫技大师引子
+                {t("内置：戏剧炫技大师引子")}
               </button>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-stone-700">
-                锁死大师引子：前
+                {t("锁死大师引子：前")}
                 <input
                   type="number"
                   min={1}
@@ -621,10 +619,10 @@ export function WorkbenchPanel() {
                   onChange={(e) => setM7PrefixBars(Number(e.target.value) || 1)}
                   className="w-16 rounded-lg border border-[#bac7b8] bg-[#fffef9] px-2 py-1 text-stone-900"
                 />
-                小节
+                {t("小节")}
               </label>
               <label className="flex items-center gap-2 text-stone-700">
-                接力 Seed
+                {t("接力 Seed")}
                 <input
                   type="number"
                   value={m7Seed}
@@ -641,11 +639,11 @@ export function WorkbenchPanel() {
                 }}
                 className="cursor-pointer rounded-lg border border-[#42674f]/70 bg-emerald-700/15 px-3.5 py-1.5 font-semibold text-[#264e36] transition hover:bg-emerald-700/25 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                对齐并开始大师接力
+                {t("对齐并开始大师接力")}
               </button>
             </div>
             <div id="m7Status" className="text-teal-800">
-              {m7Status}
+              {display(m7Status)}
             </div>
           </div>
         )}

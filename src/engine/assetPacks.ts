@@ -1,3 +1,4 @@
+import { LocalizedError } from '../i18n';
 import sources from './assetSources.json';
 
 interface Pack {
@@ -40,10 +41,10 @@ function partUrl(path: string, digest: string) {
 }
 
 async function verified(response: Response, digest: string) {
-  if (!response.ok || response.status !== 200) throw new Error('下载分块失败');
+  if (!response.ok || response.status !== 200) throw new LocalizedError("下载分块失败");
   const bytes = new Uint8Array(await response.arrayBuffer());
   const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
-  if (!hash.every((v, i) => v === parseInt(digest.slice(i * 2, i * 2 + 2), 16))) throw new Error('资源分块校验失败');
+  if (!hash.every((v, i) => v === parseInt(digest.slice(i * 2, i * 2 + 2), 16))) throw new LocalizedError("资源分块校验失败");
   return bytes;
 }
 
@@ -109,7 +110,7 @@ export async function unpackAsset(
         const raw = new Uint8Array(await new Response(stream).arrayBuffer());
         const offset = index * pack.chunkSize;
         const length = Math.min(pack.chunkSize, pack.size - offset);
-        if (raw.length !== length) throw new Error('资源分块长度不匹配');
+        if (raw.length !== length) throw new LocalizedError("资源分块长度不匹配");
         if (pack.stride === 1) output.set(raw, offset);
         else {
           let src = 0;

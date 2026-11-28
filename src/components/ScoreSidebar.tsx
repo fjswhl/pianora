@@ -1,3 +1,4 @@
+import { t, display } from '../i18n';
 import { useEffect, useState } from 'react';
 import { lilypondEngine } from '../engine/instances';
 import { useScoreStore } from '../store/useScoreStore';
@@ -70,12 +71,12 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-100">
           {importedScore
-            ? `${importedScore.kind === 'musicxml' ? 'MusicXML' : 'MIDI'} 乐谱已导入`
-            : '乐谱源码 (.ly / .mid / MusicXML)'}
+            ? t("{0} 乐谱已导入", importedScore.kind === 'musicxml' ? 'MusicXML' : 'MIDI')
+            : t("乐谱源码 (.ly / .mid / MusicXML)")}
         </div>
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/80 bg-[#161f33] px-2.5 py-1.5 text-xs font-medium text-slate-200 transition hover:border-[#e8be6a]/70 hover:text-white">
           <FileUp className="h-3.5 w-3.5 text-[#e8be6a]" />
-          导入 .ly / .mid / .mxl
+          {t("导入 .ly / .mid / .mxl")}
           <input
             id="fileInput"
             type="file"
@@ -87,17 +88,17 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
       </div>
 
       <select
-        aria-label="选择曲谱"
+        aria-label={t("选择曲谱")}
         id="presetSelect"
         value={selectedPresetId}
         onChange={(e) => selectPreset(e.target.value)}
         className="w-full rounded-lg border border-slate-700/80 bg-[#0b101c] px-3 py-2 text-xs text-slate-100 outline-none transition focus:border-[#e8be6a]"
       >
         <option value="custom" hidden>
-          自定义 LilyPond 乐谱
+          {t("自定义 LilyPond 乐谱")}
         </option>
         <option value="imported" hidden>
-          {importedScore ? `已导入：${importedScore.title} (${importedScore.kind.toUpperCase()})` : '已导入本地乐谱'}
+          {importedScore ? t("已导入：{0} ({1})", importedScore.title, importedScore.kind.toUpperCase()) : t("已导入本地乐谱")}
         </option>
         {presets.map((p) => (
           <option key={p.id} value={p.id}>
@@ -106,8 +107,8 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         ))}
       </select>
 
-      {loading && <p role="status">正在读取并解析曲谱…</p>}
-      {error && <p role="alert">{error}</p>}
+      {loading && <p role="status">{t("正在读取并解析曲谱…")}</p>}
+      {error && <p role="alert">{display(error)}</p>}
 
       {importedScore ? (
         <div
@@ -118,39 +119,39 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
             <div className="mb-2 flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
                 <Music2 className="h-3.5 w-3.5" />
-                {importedScore.kind === 'musicxml' ? 'MusicXML 乐谱直通' : 'MIDI 乐谱直通'}
+                {importedScore.kind === 'musicxml' ? t("MusicXML 乐谱直通") : t("MIDI 乐谱直通")}
               </span>
               <button
                 type="button"
                 onClick={clearImportedScore}
                 className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-slate-700 px-2 py-1 text-[11px] text-slate-300 hover:border-[#e8be6a]"
               >
-                <RotateCcw className="h-3 w-3" /> 返回 LilyPond 源码
+                <RotateCcw className="h-3 w-3" /> {t("返回 LilyPond 源码")}
               </button>
             </div>
 
             <h3 className="text-base font-bold text-slate-100">{importedScore.title}</h3>
             <p className="mt-0.5 text-xs text-slate-400">
-              {importedScore.composer} · 文件：{importedScore.fileName}
+              {t("{0} · 文件：{1}", importedScore.composer, importedScore.fileName)}
             </p>
 
             <div className="mt-4 grid grid-cols-2 gap-2.5 text-xs sm:grid-cols-4">
               <div className="rounded-lg border border-slate-800 bg-[#101624] p-2.5">
-                <div className="text-[11px] text-slate-400">音符总数</div>
+                <div className="text-[11px] text-slate-400">{t("音符总数")}</div>
                 <div className="mt-0.5 font-mono text-sm font-bold text-[#e8be6a]">{importedScore.noteCount}</div>
               </div>
               <div className="rounded-lg border border-slate-800 bg-[#101624] p-2.5">
-                <div className="text-[11px] text-slate-400">小节数</div>
+                <div className="text-[11px] text-slate-400">{t("小节数")}</div>
                 <div className="mt-0.5 font-mono text-sm font-bold text-slate-100">{importedScore.barCount}</div>
               </div>
               <div className="rounded-lg border border-slate-800 bg-[#101624] p-2.5">
-                <div className="text-[11px] text-slate-400">速度 / 拍号</div>
+                <div className="text-[11px] text-slate-400">{t("速度 / 拍号")}</div>
                 <div className="mt-0.5 font-mono text-sm font-bold text-slate-100">
                   {importedScore.tempoBpm} BPM · {importedScore.timeSig}
                 </div>
               </div>
               <div className="rounded-lg border border-slate-800 bg-[#101624] p-2.5">
-                <div className="text-[11px] text-slate-400">原谱时长</div>
+                <div className="text-[11px] text-slate-400">{t("原谱时长")}</div>
                 <div className="mt-0.5 font-mono text-sm font-bold text-slate-100">
                   {fmtTime(importedScore.durationSec)}
                 </div>
@@ -159,21 +160,21 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
           </div>
 
           <p className="mt-4 rounded-lg border border-slate-800/90 bg-[#0d1322] px-3 py-2 text-[11.5px] leading-relaxed text-slate-400">
-            本地浏览器直接解析完成（零上传服务器）。点击下方「生成演奏」将直接进入{' '}
+            {t("本地浏览器直接解析完成（零上传服务器）。点击下方「生成演奏」将直接进入")}{' '}
             <b className="text-slate-200">
               {importedScore.kind === 'musicxml'
-                ? '高清五线谱 + 实时三行随奏谱 + PianoFlow WebGPU AI 演奏 + 音乐厅大三角渲染'
-                : 'MIDI 自动五线谱 + 实时三行随奏谱 + PianoFlow AI 演奏'}
+                ? t("高清五线谱 + 实时三行随奏谱 + PianoFlow WebGPU AI 演奏 + 音乐厅大三角渲染")
+                : t("MIDI 自动五线谱 + 实时三行随奏谱 + PianoFlow AI 演奏")}
             </b>
             {importedScore.rawAnnotations.length > 0
-              ? `，并已提取 ${importedScore.rawAnnotations.length} 处 MusicXML 琶音记号用于符号级还原。`
-              : '。'}
+              ? t("，并已提取 {0} 处 MusicXML 琶音记号用于符号级还原。", importedScore.rawAnnotations.length)
+              : t("。")}
           </p>
         </div>
       ) : (
         <textarea
           disabled={loading}
-          aria-label="LilyPond 乐谱源码"
+          aria-label={t("LilyPond 乐谱源码")}
           id="lyEditor"
           value={lyCode}
           onChange={(e) => setLyCode(e.target.value)}
@@ -183,11 +184,11 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
       )}
 
       <details className="advanced">
-        <summary>演奏生成参数</summary>
+        <summary>{t("演奏生成参数")}</summary>
         <div className="my-3.5 grid grid-cols-2 gap-3 rounded-xl border border-slate-800/80 bg-[#0c1220] p-3">
           <div>
             <label htmlFor="cfmSteps" className="mb-1 flex justify-between text-[11px] text-slate-400">
-              <span>Flow Matching 步数</span>
+              <span>{t("Flow Matching 步数")}</span>
               <span className="font-semibold text-[#e8be6a]">{cfmSteps}</span>
             </label>
             <input
@@ -204,7 +205,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
 
           <div>
             <label htmlFor="stepFactor" className="mb-1 flex justify-between text-[11px] text-slate-400">
-              <span>演绎自由度</span>
+              <span>{t("演绎自由度")}</span>
               <span className="font-semibold text-[#e8be6a]">{stepFactor.toFixed(2)}</span>
             </label>
             <input
@@ -221,7 +222,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
 
           <div>
             <label htmlFor="seed" className="mb-1 block text-[11px] text-slate-400">
-              随机种子
+              {t("随机种子")}
             </label>
             <input
               type="number"
@@ -234,7 +235,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
 
           <div>
             <label htmlFor="batchCount" className="mb-1 block text-[11px] text-slate-400">
-              生成版本数
+              {t("生成版本数")}
             </label>
             <select
               id="batchCount"
@@ -242,17 +243,17 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
               onChange={(e) => setBatchCount(Number(e.target.value))}
               className="w-full rounded-lg border border-slate-700/80 bg-[#090d16] px-2.5 py-1.5 text-xs text-slate-100 outline-none focus:border-[#e8be6a]"
             >
-              <option value={1}>1 版</option>
-              <option value={2}>2 版</option>
-              <option value={4}>4 版</option>
-              <option value={6}>6 版</option>
-              <option value={8}>8 版</option>
+              <option value={1}>{t("1 版")}</option>
+              <option value={2}>{t("2 版")}</option>
+              <option value={4}>{t("4 版")}</option>
+              <option value={6}>{t("6 版")}</option>
+              <option value={8}>{t("8 版")}</option>
             </select>
           </div>
 
           <div className="col-span-2 border-t border-slate-800/80 pt-2.5">
             <label htmlFor="arpMs" className="mb-1 flex justify-between text-[11px] text-slate-400">
-              <span>琶音滚奏时长</span>
+              <span>{t("琶音滚奏时长")}</span>
               <span className="font-semibold text-[#e8be6a]">{arpMs} ms</span>
             </label>
             <input
@@ -279,13 +280,13 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f1cc7d] to-[#d09638] px-4 py-3 text-sm font-bold text-[#090d16] shadow-lg shadow-amber-500/15 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {busy ? <Sparkles className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 fill-current" />}
-        {busy ? '正在生成演奏…' : '生成演奏'}
+        {busy ? t("正在生成演奏…") : t("生成演奏")}
       </button>
 
       {progressMsg && (
         <div className="mt-3 rounded-xl border border-slate-800 bg-[#0b101c] p-2.5">
           <div id="progressMsg" className="mb-1.5 text-[11.5px] text-sky-300">
-            {progressMsg}
+            {display(progressMsg)}
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
             <div
@@ -303,7 +304,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
           className="mt-3 flex items-start gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-200"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-400" />
-          <span className="whitespace-pre-wrap">{errorMsg}</span>
+          <span className="whitespace-pre-wrap">{display(errorMsg)}</span>
         </div>
       )}
     </aside>

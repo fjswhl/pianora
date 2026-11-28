@@ -1,5 +1,6 @@
+import { message, errorText, type DisplayText } from '../i18n';
 import { create } from 'zustand';
-import { scorePresets } from '../engine/presets';
+import { scorePresets, composerName } from '../engine/presets';
 import {
   isDirectScoreFile,
   parseDirectScoreFile,
@@ -15,7 +16,7 @@ interface ScoreState {
   selectedPresetId: string;
   importedScore: ImportedScoreData | null;
   loading: boolean;
-  error: string;
+  error: DisplayText;
   pipelineBusy: boolean;
   selectPreset: (id: string) => Promise<void>;
   setLyCode: (code: string) => void;
@@ -84,7 +85,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
       if (request === revision) {
         set({
           loading: false,
-          error: (err as Error).message || '无法读取乐谱文件，请确认格式为 .ly / .mid / .musicxml / .mxl',
+          error: errorText(err) || message("无法读取乐谱文件，请确认格式为 .ly / .mid / .musicxml / .mxl"),
         });
       }
       return false;
@@ -112,7 +113,11 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
           if (request === revision) {
             set({
               originalFile: file,
-              importedScore: { ...parsed, title: preset.name, composer: preset.composer },
+              importedScore: {
+                ...parsed,
+                get title() { return preset.name; },
+                get composer() { return composerName(preset.composer); },
+              },
               lyCode: '',
               loading: false,
             });
@@ -128,7 +133,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
         set({
           selectedPresetId: 'custom',
           loading: false,
-          error: '曲谱加载失败，请重新选择。',
+          error: message("曲谱加载失败，请重新选择。"),
         });
     }
   },

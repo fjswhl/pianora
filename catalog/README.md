@@ -77,7 +77,7 @@ python3 scripts/verify-collections.py https://opuslin.uk --minimum 1011 --play -
 
 `piano-classics` 收录 74 份原生 MusicXML 和 4 份 LilyPond，包括贝多芬《迪亚贝利变奏曲》全曲、巴赫《哥德堡变奏曲》第 2 和第 17 变奏、斯卡拉蒂奏鸣曲和勒穆瓦纳练习曲。每条记录保留对应版本的来源与许可。[PDMX 乐谱归档](https://zenodo.org/records/15571083)
 
-`nifc-piano` 收录肖邦研究所两套开放记谱中的 797 份钢琴谱。MusicXML 直接取自 Humdrum 记谱，保留原版链接、录谱人和 CC BY 4.0 署名。奏鸣曲乐章和组曲中可单独打开的小品各占一条。发布附件含逐份 SHA-256 清单和两个项目的署名文件。[肖邦第一版](https://github.com/pl-wnifc/humdrum-chopin-first-editions) · [波兰音乐遗产](https://github.com/pl-wnifc/humdrum-polish-scores) · [MusicXML 归档](https://github.com/fjswhl/pianora/releases/tag/catalog-nifc-piano-v1)
+`nifc-piano` 收录肖邦研究所两套开放记谱中的 797 份钢琴谱。MusicXML 直接取自 Humdrum 记谱，保留原版链接、录谱人和 CC BY 4.0 署名。奏鸣曲乐章和组曲中可单独打开的小品各占一条。发布附件含逐份 SHA-256 清单和两个项目的署名文件。[肖邦第一版](https://github.com/pl-wnifc/humdrum-chopin-first-editions) · [波兰音乐遗产](https://github.com/pl-wnifc/humdrum-polish-scores) · [MusicXML 归档](https://github.com/fjswhl/pianora/releases/tag/catalog-nifc-piano-v2)
 
 恢复此批谱面并逐份核验可运行 `python3 scripts/restore-collection.py catalog/collections/nifc-piano.json /tmp/pianora-scores`。从原始记谱重新转换时，把两个来源仓库检出到清单链接指定的提交，使用 Python 3.12、converter21 4.0.2 和 music21 10.5.2，运行 `python3 scripts/engrave-humdrum.py catalog/collections/nifc-piano.json --sources <来源仓库的父目录> --output-directory <输出目录>`。
 

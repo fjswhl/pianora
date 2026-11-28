@@ -25,11 +25,11 @@ def clerk(path, method="POST", body=None):
 
 email = "pianora-" + uuid.uuid4().hex + "+clerk_test@example.com"
 testing_token = clerk("testing_tokens", body={})["token"]
-user = clerk("users", body={"email_address":[email], "skip_password_requirement":True})
-music = '\\header {\n title = "Pianora Clerk E2E"\n}\n\\score { { c4 d e f } }'
+user = clerk("users", body={"email_address":[email], "first_name":"Aria", "last_name":"Lin", "skip_password_requirement":True})
+music = '\\header {\n title = "晨光练习曲"\n}\n\\score { { c4 d e f } }'
 def verify_performance(page, browser):
     import hashlib
-    page.locator("#fileInput").set_input_files(str(Path("artifacts/browser-models/inputs/classical.mid").resolve()))
+    page.locator("#fileInput").set_input_files({"name":"夜曲片段.mid", "mimeType":"audio/midi", "buffer":Path("artifacts/browser-models/inputs/classical.mid").read_bytes()})
     page.locator("#importedScoreCard").wait_for()
     page.locator("#performanceModel").select_option("pianist")
     page.locator("#renderBtn").click()
@@ -41,27 +41,29 @@ def verify_performance(page, browser):
     final_midi = download(page.locator("#dlMidiBtn"))
     page.get_by_role("button", name="原谱演奏", exact=True).click()
     assert download(page.locator("#dlMidiBtn")) != final_midi
-    page.get_by_role("button", name="保存最终演奏").click()
     uploads = []
     page.on("request", lambda request: uploads.append(request) if "/api/library" in request.url and request.method in ("POST","PUT") else None)
-    page.locator("dialog .account-primary").click()
-    expect(page.locator("dialog [role=status]")).to_contain_text("已保存", timeout=180000)
-    row = page.locator("dialog li").filter(has=page.get_by_role("button", name="公开分享演奏")).first
+    page.locator("main .studio-session").get_by_role("button", name="保存最终演奏").click()
+    expect(page.locator("main .save-action [role=status]")).to_contain_text("已保存", timeout=180000)
+    page.get_by_role("link", name="个人中心",exact=True).first.click()
+    row = page.locator(".collection-list > li").filter(has=page.get_by_role("button", name="打开演奏")).first
+    row.locator("summary").click()
     assert download(row.get_by_role("button", name="下载 MIDI")) == final_midi
     assert len(uploads) == 1
     payload = uploads[0].post_data_buffer
     assert b'name="performance"' in payload and b'name="source"' not in payload and b'audio_sha256' not in payload
-    page.get_by_role("button", name="关闭").click()
     page.goto(base + "/#library")
     page.reload()
-    page.get_by_role("button", name="我的曲库").click()
+    page.get_by_role("link", name="个人中心",exact=True).first.click()
     row.get_by_role("button", name="打开演奏").click()
     page.wait_for_url("**/#studio")
     expect(page.locator("dialog")).to_have_count(0)
     assert download(page.locator("#dlMidiBtn")) == final_midi
-    page.get_by_role("button", name="我的曲库").click()
+    page.get_by_role("link", name="个人中心",exact=True).first.click()
+    row = page.locator(".collection-list > li").filter(has=page.get_by_role("button",name="打开演奏")).first
+    row.locator("summary").click()
     row.get_by_role("button", name="公开分享演奏").click()
-    row = page.locator("dialog li").filter(has=page.get_by_role("link",name="打开分享页")).first
+    row = page.locator(".collection-list > li").filter(has=page.get_by_role("button",name="打开演奏")).first
     link = base + row.get_by_role("link",name="打开分享页").get_attribute("href")
     guest = browser.new_context(viewport={"width":390,"height":844})
     listener = guest.new_page()
@@ -72,10 +74,20 @@ def verify_performance(page, browser):
     assert download(listener.locator("#dlMidiBtn")) == final_midi
     assert guest.request.get(link + "/source").status == guest.request.get(link + "/audio").status == 404
     row.get_by_role("button",name="取消公开分享").click()
-    expect(page.locator("dialog [role=status]")).to_contain_text("已取消")
+    expect(page.locator(".profile-page [role=status]")).to_contain_text("已取消")
     assert guest.request.get(link).status == guest.request.get(link + "/performance").status == 404
     guest.close()
-    page.get_by_role("button",name="关闭").click()
+    page.reload()
+    expect(page.locator(".collection-list > li")).to_have_count(2)
+    anonymize = '.profile-identity p {font-size:0} .profile-identity p::after {content:"aria@example.com";font-size:14px}'
+    page.screenshot(path="artifacts/profile-desktop.png", full_page=True, style=anonymize)
+    page.set_viewport_size({"width":390,"height":844})
+    expect(page.locator(".collection-list > li")).to_have_count(2)
+    page.get_by_role("button",name="仅看演奏").click()
+    expect(page.locator(".collection-list > li")).to_have_count(1)
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    page.get_by_role("button",name="全部作品",exact=True).click()
+    page.screenshot(path="artifacts/profile-mobile.png", full_page=True, style=anonymize)
     return {"finalMidiMatchesExport":True,"singleMidiUpload":True,"privateStudio":True,"sharedStudio":True,"anonymousPlayback":True,"revokedLinkStatus":404}
 
 performance = None
@@ -93,23 +105,32 @@ try:
         page.route("**/*", testing_request)
         page.goto(base + "/#editor")
         page.locator("#lyEditor").fill(music)
-        page.get_by_role("button", name="保存到曲库").click()
+        expect(page.locator(".crumb button")).to_have_count(0)
+        page.locator("main .editing").get_by_role("button", name="保存到曲库").click()
         identifier = page.locator('dialog input[autocomplete*=email], dialog input[name=identifier]').first
         identifier.fill(email, timeout=45000)
         identifier.press("Enter")
-        page.locator('dialog input[autocomplete=one-time-code]').first.fill("424242", timeout=20000)
-        expect(page.locator("dialog [role=status]")).to_contain_text("已保存", timeout=20000)
-        page.get_by_role("button", name="关闭").click()
+        code = page.locator('dialog input[autocomplete=one-time-code]').first
+        code.fill("424242", timeout=20000)
+        saved = page.locator("main .save-action [role=status]")
+        needs_resend = page.get_by_text("You need to send a verification code before attempting to verify.")
+        expect(saved.or_(needs_resend)).to_be_visible(timeout=30000)
+        if needs_resend.is_visible():
+            resend = page.locator("dialog").get_by_role("button", name="重新发送验证码", exact=True)
+            resend.click(timeout=65000)
+            code.fill("")
+            code.fill("424242")
+        expect(page.locator("main .save-action [role=status]")).to_contain_text("已保存", timeout=20000)
         page.reload()
-        page.get_by_role("button", name="我的曲库").click()
-        expect(page.locator("dialog li").first).to_contain_text("Pianora Clerk E2E", timeout=20000)
+        page.get_by_role("link", name="个人中心",exact=True).first.click()
+        expect(page.locator(".collection-list > li").first).to_contain_text("晨光练习曲", timeout=20000)
         page.get_by_role("button", name="打开乐谱").click()
         expect(page.locator("#lyEditor")).to_have_value(music)
         if os.getenv("PIANORA_TEST_PERFORMANCE"):
             performance = verify_performance(page, browser)
-        page.get_by_role("button", name="我的曲库").click()
+        page.get_by_role("link", name="个人中心",exact=True).first.click()
         page.get_by_role("button", name="退出登录").click()
-        expect(page.locator("dialog")).to_have_count(0)
+        expect(page.locator(".profile-guest")).to_be_visible()
         browser.close()
 finally:
     clerk("users/" + user["id"], method="DELETE")

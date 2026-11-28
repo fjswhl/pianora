@@ -1,13 +1,14 @@
 import { message, errorText, display, type DisplayText, LocalizedError, t, getLocale } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { ArrowUpRight, BookOpen, Disc3, Download, FileMusic, LibraryBig, Link2, LockKeyhole, LogOut, MoreHorizontal, Unlink, X } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useScoreStore } from '../store/useScoreStore';
 
 import { ClerkFailed, ClerkProvider, SignIn, useAuth, useClerk, useUser } from '@clerk/react';
 import { zhCN } from '@clerk/localizations/zh-CN';
-interface Item { id: string; title: string; filename: string; has_performance: number; has_audio: number; take_label: string | null; share_id: string | null }
+interface Item { created_at: number; id: string; title: string; filename: string; has_performance: number; has_audio: number; take_label: string | null; share_id: string | null }
 interface Draft { title: string; source?: File; performance?: Uint8Array<ArrayBuffer>; takeLabel?: string }
-type Intent = 'library' | 'editor' | 'studio';
+type Intent = 'editor' | 'studio';
 
 type GetToken = () => Promise<string | null>;
 async function api(getToken: GetToken, path: string, body?: FormData | Blob, method = body ? 'POST' : 'GET') {
@@ -24,8 +25,7 @@ async function api(getToken: GetToken, path: string, body?: FormData | Blob, met
   return response;
 }
 
-async function currentDraft(intent: Intent): Promise<Draft | null> {
-  if (intent === 'library') return null;
+async function currentDraft(intent: Intent): Promise<Draft> {
   if (intent === 'editor') {
     const { originalFile, lyCode, selectedPresetId, loading } = useScoreStore.getState();
     if (loading || (!originalFile && !lyCode.trim())) throw new LocalizedError("请先打开乐谱。");
@@ -40,7 +40,7 @@ async function currentDraft(intent: Intent): Promise<Draft | null> {
     takeLabel: display(take.label) };
 }
 
-// A successful authentication stays in this dialog so the open score and take survive sign-in.
+// Keep Clerk's completion redirect inside the workspace so authentication preserves the selected take.
 const completed = '/?pianora-clerk=complete';
 function navigate(to: string) {
   const url = new URL(to, location.href);
@@ -48,84 +48,129 @@ function navigate(to: string) {
   location.assign(url.href);
 }
 
-export default function AccountLibrary({ intent, publishableKey, close }: {
-  intent: Intent; publishableKey: string; close: (target?: 'editor' | 'studio') => void;
-}) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const [draft, setDraft] = useState<Draft | null>(null);
-  const [ready, setReady] = useState(false);
-  const [error, setError] = useState<DisplayText>('');
+function AccountProvider({publishableKey, children, recovery}: {publishableKey:string; children:ReactNode; recovery?:ReactNode}) {
+  const base = getLocale() === 'zh-CN' ? zhCN : undefined;
+  const localization = {
+    ...base,
+    signIn:{...base?.signIn, start:{...base?.signIn?.start, title:t("登录 Pianora"),titleCombined:t("登录 Pianora")}},
+    signUp:{...base?.signUp, start:{...base?.signUp?.start, subtitle:'Pianora',subtitleCombined:'Pianora'}},
+  };
+  return <ClerkProvider publishableKey={publishableKey} localization={localization}
+    routerPush={navigate} routerReplace={navigate} signInForceRedirectUrl={completed} signUpForceRedirectUrl={completed}>
+    <ClerkFailed><p role="alert">{t("请求未完成，请重试。")} {recovery}</p></ClerkFailed>
+    {children}
+  </ClerkProvider>;
+}
+
+function Login() {
+  const [ready,setReady] = useState(false);
   useEffect(() => {
-    let active = true;
-    dialog.current?.showModal();
-    currentDraft(intent).then(value => { if (active) setDraft(value); })
-      .catch(e => { if (active) setError(() => errorText(e)); })
-      .finally(() => { if (active) setReady(true); });
-    return () => { active = false; };
-  }, [intent]);
-  return <dialog className="account-dialog" ref={dialog} aria-labelledby="account-title" onCancel={()=>close()}>
-    <header><h2 id="account-title">{t("我的曲库")}</h2>
-      <button aria-label={t("关闭")} onClick={()=>close()}><X size={19}/></button></header>
-    {error && <p role="alert">{display(error)}</p>}
-    <ClerkProvider publishableKey={publishableKey} localization={getLocale() === 'zh-CN' ? zhCN : undefined}
-      routerPush={navigate} routerReplace={navigate} signInForceRedirectUrl={completed} signUpForceRedirectUrl={completed}>
-      <ClerkFailed><p role="alert">{t("请求未完成，请重试。")}</p></ClerkFailed>
-      {ready && <SessionLibrary draft={draft} clearDraft={() => setDraft(null)} close={close}/>}
-    </ClerkProvider>
+    const current = new URL(location.href);
+    const page = current.searchParams.get('pianora-login') || current.hash.slice(1) || 'profile';
+    if (!current.searchParams.has('pianora-login')) {
+      current.searchParams.set('pianora-login',page);
+      current.hash = '';
+      history.replaceState(history.state,'',current.href);
+    }
+    setReady(true);
+    return () => {
+      const next = new URL(location.href);
+      if (!next.searchParams.has('pianora-login')) return;
+      next.searchParams.delete('pianora-login');
+      if (!/^#(library|editor|studio|profile)(\/|$)/.test(next.hash)) next.hash = page;
+      history.replaceState(history.state,'',next.href);
+    };
+  }, []);
+  if (!ready) return null;
+  return <SignIn routing="hash" withSignUp oauthFlow="popup" appearance={{
+    variables:{colorPrimary:'#28513d', borderRadius:'8px'},
+    elements:{rootBox:{maxWidth:'100%'}, cardBox:{maxWidth:'100%',boxShadow:'none',border:'1px solid #d8dcd1'}},
+  }}/>;
+}
+
+function LoginDialog({close, title}: {close:()=>void; title:string}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => { ref.current?.showModal(); }, []);
+  return <dialog className="save-login" ref={ref} aria-label={title} onCancel={close}>
+    <header><strong>{title}</strong><button aria-label={t("关闭")} onClick={close}><X size={18}/></button></header>
+    <Login/>
   </dialog>;
 }
 
-interface LibraryProps { draft: Draft | null; clearDraft: () => void; close: (target?: 'editor' | 'studio') => void }
-function SessionLibrary(props: LibraryProps) {
-  const { isLoaded, userId } = useAuth();
-  const needsSave = useRef(false);
-  useEffect(() => {
-    if (isLoaded && !userId) needsSave.current = !!props.draft;
-  }, [isLoaded, userId, props.draft]);
-  if (!isLoaded) return <p role="status">{t("正在打开曲库…")}</p>;
-  if (!userId) return <>
-    {props.draft && <p>{t("登录后将保存《{0}》。", props.draft.title)}</p>}
-    <SignIn routing="hash" withSignUp oauthFlow="popup" />
-  </>;
-  return <PrivateLibrary key={userId} {...props} autoSave={needsSave.current}/>;
+type SaveProps = {intent:Intent; finish:(saved:boolean, error?:DisplayText)=>void};
+export function SaveRequest({publishableKey,...props}: SaveProps & {publishableKey:string}) {
+  return <AccountProvider publishableKey={publishableKey} recovery={<button onClick={()=>props.finish(false)}>{t("关闭")}</button>}><SaveDraft {...props}/></AccountProvider>;
 }
 
-function PrivateLibrary({ draft, clearDraft, close, autoSave }: LibraryProps & { autoSave: boolean }) {
+function SaveDraft({intent,finish}:SaveProps) {
+  const {getToken,isLoaded,userId} = useAuth();
+  const [draft,setDraft] = useState<Draft | null>(null);
+  const callback = useRef(finish);
+  callback.current = finish;
+  useEffect(() => {
+    let active = true;
+    currentDraft(intent).then(value => { if (active) setDraft(value); })
+      .catch(err => { if (active) callback.current(false,errorText(err)); });
+    return () => { active=false; };
+  }, [intent]);
+  const submitted = useRef<Promise<Response> | null>(null);
+  useEffect(() => {
+    if (!draft || !isLoaded || !userId) return;
+    let active = true;
+    const form = new FormData();
+    form.set('title',draft.title);
+    if (draft.source) form.set('source',draft.source);
+    if (draft.performance) {
+      form.set('performance',new Blob([draft.performance],{type:'audio/midi'}),'performance.mid');
+      form.set('take_label',draft.takeLabel ?? '');
+    }
+    submitted.current ??= api(getToken,'library',form);
+    submitted.current.then(() => { if (active) callback.current(true); })
+      .catch(err => { if (active) callback.current(false,errorText(err)); });
+    return () => { active=false; };
+  }, [draft,isLoaded,userId,getToken]);
+  return isLoaded && !userId && draft ? <LoginDialog title={t("登录后将保存《{0}》。",draft.title)} close={()=>finish(false)}/> : null;
+}
+
+function RecordArt() {
+  return <div className="profile-art" aria-hidden="true"><div className="vinyl"/><div className="record-sleeve"><i/><i/><i/></div></div>;
+}
+
+export default function AccountLibrary({publishableKey}:{publishableKey:string}) {
+  return <AccountProvider publishableKey={publishableKey}><Profile/></AccountProvider>;
+}
+
+function Profile() {
+  const {isLoaded,userId} = useAuth();
+  if (!isLoaded) return <p role="status">{t("正在打开曲库…")}</p>;
+  if (userId) return <PrivateLibrary key={userId}/>;
+  return <section className="profile-page profile-guest">
+    <div className="guest-cover"><LibraryBig size={28}/><h1>{t("个人中心")}</h1>
+      <p>{t("登录后，在这里打开保存的乐谱和演奏，管理分享链接。")}</p><RecordArt/></div>
+    <div className="profile-signin"><Login/></div>
+  </section>;
+}
+
+function PrivateLibrary() {
   const { getToken } = useAuth();
   const { signOut } = useClerk();
   const { user } = useUser();
   const mounted = useRef(false);
-  const initialized = useRef(false);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(true);
+  const [filter, setFilter] = useState<'all'|'scores'|'takes'|'shared'>('all');
   const [status, setStatus] = useState<DisplayText>('');
   const [error, setError] = useState<DisplayText>('');
   const refresh = async () => setItems(await (await api(getToken, 'library')).json());
   useEffect(() => {
     mounted.current = true;
-    if (!initialized.current) {
-      initialized.current = true;
-      void run(() => autoSave && draft ? save(draft) : refresh());
-    }
+    void run(refresh);
     return () => { mounted.current = false; };
   }, []);
   async function run(work: () => Promise<unknown>) {
     setBusy(true); setError(''); setStatus('');
     try { await work(); } catch (e) { setError(() => errorText(e) || message("操作失败，请重试。")); }
     finally { setBusy(false); }
-  }
-  async function save(value: Draft) {
-    const form = new FormData();
-    form.set('title', value.title);
-    if (value.source) form.set('source', value.source);
-    if (value.performance) {
-      form.set('performance', new Blob([value.performance], {type:'audio/midi'}), 'performance.mid');
-      form.set('take_label', value.takeLabel ?? '');
-      setStatus(() => message("正在保存演奏…"));
-    }
-    await api(getToken, 'library', form);
-    clearDraft(); setStatus(() => message("已保存到我的曲库。"));
-    await refresh();
   }
   async function openPerformance(item: Item) {
     const [response, { useStudioStore }] = await Promise.all([
@@ -134,44 +179,73 @@ function PrivateLibrary({ draft, clearDraft, close, autoSave }: LibraryProps & {
     const bytes = new Uint8Array(await response.arrayBuffer());
     if (!mounted.current) return;
     useStudioStore.getState().openPerformanceMidi(bytes, item.title, item.take_label);
-    close('studio');
+    location.hash='studio';
   }
   async function share(item: Item, method: 'POST' | 'DELETE') {
     const {share_id} = await (await api(getToken, 'library/'+item.id+'/share', undefined, method)).json();
     setItems(rows => rows.map(row => row.id === item.id ? {...row, share_id} : row));
     setStatus(() => message(share_id ? "有链接的人都可以试听这版演奏。" : "已取消公开分享。"));
   }
-  return <>
-      <div className="account-identity"><span>{user?.primaryEmailAddress?.emailAddress}</span>
-        <button disabled={busy} onClick={()=>void run(async()=>{
-          await signOut({ redirectUrl: completed }); close();
-        })}>{t("退出登录")}</button></div>
-      {draft && <button className="account-primary" disabled={busy} onClick={()=>void run(()=>save(draft))}>{t("保存《{0}》", draft.title)}</button>}
-      {!items.length && !busy && <p>{t("曲库里还没有作品。在编辑页或演奏室点击「保存到曲库」即可添加。")}</p>}
-      <ul>{items.map(item=><li key={item.id}><strong>{item.title}</strong>{item.take_label && <small className="take-label">{item.take_label}</small>}<div>
-        {item.filename && <button disabled={busy} onClick={()=>void run(async()=>{
-          const file=new File([await (await api(getToken, 'library/'+item.id+'/source')).blob()],item.filename);
-          if (!await useScoreStore.getState().importFile(file)) throw new LocalizedError("无法打开这份乐谱。");
-          close('editor');
-        })}>{t("打开乐谱")}</button>}
-        {Boolean(item.has_performance) && <><button disabled={busy} onClick={()=>void run(()=>openPerformance(item))}>{t("打开演奏")}</button><button disabled={busy} onClick={()=>void run(async()=>{
-          const blob = await (await api(getToken, 'library/'+item.id+'/performance')).blob();
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a'); link.href=url; link.download='Pianora.mid'; link.click();
-          setTimeout(()=>URL.revokeObjectURL(url), 1000);
-        })}>{t("下载 MIDI")}</button></>}
-      </div>
-      {!!item.has_performance && <div className="share-actions">
-        {!item.has_audio && <small>{t("公开后，持链接者可在演奏室播放和下载这份 MIDI。")}</small>}
-        {item.share_id ? <>
-        <a href={'/p/'+item.share_id} target="_blank" rel="noreferrer">{t("打开分享页")}</a>
-        <button disabled={busy} onClick={()=>void run(async()=>{
-          const url = location.origin+'/p/'+item.share_id;
-          await navigator.clipboard.writeText(url); setStatus(() => message("已复制分享链接。"));
-        })}>{t("复制链接")}</button>
-        <button disabled={busy} onClick={()=>void run(()=>share(item,'DELETE'))}>{t("取消公开分享")}</button>
-      </> : <button disabled={busy} onClick={()=>void run(()=>share(item,'POST'))}>{t("公开分享演奏")}</button>}</div>}
-      </li>)}</ul>
-    {status && <p role="status">{display(status)}</p>}{error && <p role="alert">{display(error)}</p>}
-  </>;
+  async function openScore(item:Item) {
+    const file = new File([await (await api(getToken,'library/'+item.id+'/source')).blob()],item.filename);
+    if (!mounted.current) return;
+    if (!await useScoreStore.getState().importFile(file)) throw new LocalizedError("无法打开这份乐谱。");
+    if (mounted.current) location.hash='editor';
+  }
+  async function download(item:Item) {
+    const blob = await (await api(getToken,'library/'+item.id+'/performance')).blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a'); link.href=url; link.download=item.title+'.mid'; link.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  const filters = [
+    {key:'all',label:t("全部作品"),rows:items},
+    {key:'scores',label:t("乐谱"),rows:items.filter(item=>item.filename)},
+    {key:'takes',label:t("演奏"),rows:items.filter(item=>item.has_performance)},
+    {key:'shared',label:t("已分享"),rows:items.filter(item=>item.share_id)},
+  ] as const;
+  const visible = filters.find(f=>f.key===filter)!.rows;
+  const date = new Intl.DateTimeFormat(getLocale(),{year:'numeric',month:'short',day:'numeric'});
+  const name = user?.fullName || user?.username || t("个人中心");
+  const initial = Array.from(user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || 'P')[0];
+  return <section className="profile-page">
+    <header className="profile-cover"><div className="profile-identity">
+      <div className="profile-monogram" aria-hidden="true">{initial.toUpperCase()}</div>
+      <h1>{name}</h1><p title={user?.primaryEmailAddress?.emailAddress}>{user?.primaryEmailAddress?.emailAddress}</p>
+      <button className="profile-signout" disabled={busy} onClick={()=>void run(()=>signOut({redirectUrl:'/#profile'}))}><LogOut size={15}/>{t("退出登录")}</button>
+    </div><RecordArt/></header>
+    <section className="profile-collection" aria-labelledby="collection-title">
+      <header><h2 id="collection-title">{t("我的曲库")}</h2></header>
+      <div className="collection-filters">{filters.map(f=><button key={f.key} aria-pressed={filter===f.key}
+        aria-label={f.key==='takes'?t("仅看演奏"):f.label} onClick={()=>setFilter(f.key)}>{f.label}<span>{f.rows.length}</span></button>)}</div>
+      {status && <p className="profile-message" role="status">{display(status)}</p>}
+      {error && <p className="profile-message" role="alert">{display(error)} <button onClick={()=>void run(refresh)}>{t("重试")}</button></p>}
+      {busy && !items.length && <p role="status">{t("正在打开曲库…")}</p>}
+      {!busy && !error && !visible.length && <div className="collection-empty"><LibraryBig size={30}/>
+        <h3>{items.length ? t("暂无此类作品") : t("曲库里还没有作品")}</h3>
+        {!items.length && <a href="#editor">{t("前往乐谱编辑")} <ArrowUpRight size={16}/></a>}</div>}
+      <ul className="collection-list">{visible.map(item=>{
+        const performance=Boolean(item.has_performance);
+        return <li key={item.id}><div className="work-main">
+          <div aria-hidden="true" className={'work-cover '+(performance?'disc-cover':'score-cover')}>{performance?<Disc3/>:<FileMusic/>}</div>
+          <div className="work-info"><div className="work-meta">{performance?t("演奏"):t("乐谱")}<span>·</span><time dateTime={new Date(item.created_at).toISOString()}>{date.format(item.created_at)}</time></div>
+            <h3>{item.title}</h3><small>{item.take_label || item.filename}</small></div>
+          <span className="work-visibility">{item.share_id?<Link2 size={14}/>:<LockKeyhole size={14}/>}
+            {item.share_id?t("已分享"):t("仅自己可见")}</span>
+          <button className="work-open" disabled={busy} onClick={()=>void run(()=>performance?openPerformance(item):openScore(item))}>
+            {performance?t("打开演奏"):t("打开乐谱")}<ArrowUpRight size={15}/></button>
+        </div>
+        {performance && <details className="work-options"><summary><MoreHorizontal size={17}/>{t("作品操作")}</summary><div>
+          {item.filename && <button disabled={busy} onClick={()=>void run(()=>openScore(item))}><BookOpen size={15}/>{t("打开乐谱")}</button>}
+          <button disabled={busy} onClick={()=>void run(()=>download(item))}><Download size={15}/>{t("下载 MIDI")}</button>
+          {item.share_id ? <>
+            <a href={'/p/'+item.share_id} target="_blank" rel="noreferrer">{t("打开分享页")}<ArrowUpRight size={15}/></a>
+            <button disabled={busy} onClick={()=>void run(async()=>{await navigator.clipboard.writeText(location.origin+'/p/'+item.share_id); setStatus(() => message("已复制分享链接。"));})}><Link2 size={15}/>{t("复制链接")}</button>
+            <button disabled={busy} onClick={()=>void run(()=>share(item,'DELETE'))}><Unlink size={15}/>{t("取消公开分享")}</button>
+          </> : <button disabled={busy} onClick={()=>void run(()=>share(item,'POST'))}><Link2 size={15}/>{t("公开分享演奏")}</button>}
+          {!item.has_audio && <small>{t("公开后，持链接者可在演奏室播放和下载这份 MIDI。")}</small>}
+        </div></details>}</li>;
+      })}</ul>
+    </section>
+  </section>;
 }

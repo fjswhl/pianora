@@ -8,7 +8,7 @@ import {
   LibraryBig,
   Piano,
   SlidersHorizontal,
-  Upload,
+  Upload, UserRound,
 } from 'lucide-react';
 import { Library } from './components/Library';
 import { useScoreStore } from './store/useScoreStore';
@@ -18,6 +18,7 @@ const AccountLibrary = lazy(() => import('./components/AccountLibrary'));
 const Workspace = lazy(() => import('./components/Workspace'));
 
 const pages = {
+  profile: { get title() { return t('个人中心'); }, icon:UserRound, get desc() { return ''; } },
   library: {
     get title() { return t("曲谱馆"); },
     icon: LibraryBig,
@@ -39,7 +40,9 @@ function sharedTake() { return /^#studio\/([0-9a-f]{32})$/.exec(location.hash)?.
 function currentPage(): Page {
   if (sharedTake()) return 'studio';
   const hash = location.hash.slice(1);
-  return Object.hasOwn(pages, hash) ? (hash as Page) : 'library';
+  const loginPage = new URLSearchParams(location.search).get('pianora-login')?.split('/')[0];
+  if (Object.hasOwn(pages,hash)) return hash as Page;
+  return loginPage && Object.hasOwn(pages,loginPage) ? loginPage as Page : 'library';
 }
 
 export function App() {
@@ -48,28 +51,17 @@ export function App() {
     document.documentElement.lang = language;
     document.title = t('Pianora 琴境 · 钢琴演奏工作站');
   }, [language]);
+  const [accountChecked, setAccountChecked] = useState(false);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
-  const [account, setAccount] = useState<'library' | 'editor' | 'studio' | null>(null);
   useEffect(() => {
     const abort = new AbortController();
-    fetch('/api/account/options', { signal: abort.signal }).then(r => r.json()).then(options => setPublishableKey(options.publishableKey ?? null)).catch(() => {});
+    fetch('/api/account/options', { signal: abort.signal }).then(r => r.json()).then(options => setPublishableKey(options.publishableKey ?? null)).catch(() => {}).finally(() => { if (!abort.signal.aborted) setAccountChecked(true); });
     return () => abort.abort();
   }, []);
   const [page, setPage] = useState<Page>(currentPage);
   const [shareId, setShareId] = useState(sharedTake);
-  function openAccount(intent: 'library' | 'editor' | 'studio') {
-    // Clerk uses the fragment for the steps inside its sign-in component.
-    history.replaceState(history.state, '', location.pathname + location.search);
-    setAccount(intent);
-  }
-  function closeAccount(target: Page = page) {
-    history.replaceState(history.state, '', '#' + target);
-    setPage(target);
-    setShareId(null);
-    setAccount(null);
-  }
   useEffect(() => {
-    if (sharedTake()) return;
+    if (shareId || page === 'profile') return;
     let disposed = false;
     let stop: (() => void) | undefined;
     const timer = window.setTimeout(() => {
@@ -78,21 +70,20 @@ export function App() {
       }).catch(() => {});
     }, 1000);
     return () => { disposed = true; clearTimeout(timer); stop?.(); };
-  }, []);
+  }, [shareId, page === 'profile']);
   const upload = useRef<HTMLInputElement>(null);
   const pipelineBusy = useScoreStore((s) => s.pipelineBusy);
   const { selectPreset, importFile } = useScoreStore.getState();
   const fileError = useScoreStore(s => s.error);
   useEffect(() => {
     const navigate = () => {
-      if (account) return;
       setPage(currentPage());
       setShareId(sharedTake());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [account]);
+  }, []);
   return (
     <div className="shell">
       <aside className="rail">
@@ -100,7 +91,7 @@ export function App() {
           <Piano aria-hidden="true" /> Pianora
         </a>
         <nav aria-label={t("工作空间")}>
-          {(Object.keys(pages) as Page[]).map((key) => {
+          {(['library','editor','studio',...(publishableKey ? ['profile'] : [])] as Page[]).map((key) => {
             const Icon = pages[key].icon;
             return (
               <a
@@ -128,14 +119,7 @@ export function App() {
             <option value="zh-CN" lang="zh-CN">中文</option>
             <option value="en" lang="en">English</option>
           </select>
-          {publishableKey && <div className="account-actions">
-            {page !== 'library' && <button disabled={pipelineBusy} onClick={()=>openAccount(page)}>{page === 'studio' ? t("保存最终演奏") : t("保存到曲库")}</button>}
-            <button onClick={()=>openAccount('library')}>{t("我的曲库")}</button>
-          </div>}
         </header>
-        {account && publishableKey && <Suspense fallback={<p role="status">{t("正在打开曲库…")}</p>}>
-          <AccountLibrary intent={account} publishableKey={publishableKey} close={closeAccount} />
-        </Suspense>}
         <main className="content">
           {page === 'library' && (
             <div className="page-title">
@@ -174,10 +158,13 @@ export function App() {
               }}
             />
           )}
-          {page !== 'library' && (
+          {page === 'profile' && (publishableKey ? <Suspense fallback={<p role="status">{t("正在打开曲库…")}</p>}>
+            <AccountLibrary publishableKey={publishableKey} />
+          </Suspense> : <p role="status">{accountChecked ? t("账户服务尚未启用") : t("正在打开曲库…")}</p>)}
+          {(page === 'editor' || page === 'studio') && (
             <Suspense fallback={<p role="status">{t("正在打开工作区…")}</p>}>
               <Workspace
-                page={page} shareId={shareId}
+                page={page} shareId={shareId} publishableKey={publishableKey}
                 title={pages[page].title}
                 description={pages[page].desc}
               />

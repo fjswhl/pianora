@@ -16,7 +16,11 @@ const views = [
   { id: 'sheet', get label() { return t("查看谱面"); }, icon: BookOpen },
 ] as const;
 
-export function StudioPanel() {
+import { SaveControl } from './SaveControl';
+
+export function StudioPanel({publishableKey}: {publishableKey:string | null}) {
+  const activeTakeId = useStudioStore(s => s.activeTakeId);
+  const live = useStudioStore(s => s.liveActive);
   const [view, setView] = useState<(typeof views)[number]['id']>('listen');
   const [showHarmony, setShowHarmony] = useState(true);
   const [degrees, setDegrees] = useState(false);
@@ -44,6 +48,7 @@ export function StudioPanel() {
           <p>
             {t("钢琴独奏")} <i /> {bars} {t("小节")} <i /> {savedMidi ? t("演奏时长") : t("原谱")} {fmtTime(duration)}
           </p>
+          {publishableKey && <div className="studio-save"><SaveControl publishableKey={publishableKey} intent="studio" source={activeTakeId} disabled={busy || live}/></div>}
         </div>
         <div className="session-print" aria-hidden="true">
           <div className="session-disc" />

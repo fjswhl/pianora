@@ -10,12 +10,13 @@ const StudioPanel = lazy(() =>
 );
 
 export default function Workspace({
-  page, shareId,
+  page, shareId, publishableKey,
   title,
   description,
 }: {
   page: 'editor' | 'studio';
   shareId: string | null;
+  publishableKey: string | null;
   title: string;
   description: string;
 }) {
@@ -91,7 +92,7 @@ export default function Workspace({
       )}
       {page === 'editor' && (
         <div className="editing">
-          <ScoreSidebar
+          <ScoreSidebar publishableKey={publishableKey}
             onGenerated={() => {
               if (location.hash === '#editor') location.hash = 'studio';
             }}
@@ -101,7 +102,7 @@ export default function Workspace({
       {page === 'studio' && !shareId && <RecentGenerations hasSession={Boolean(takes.length)} />}
       {page === 'studio' && !takes.length && error && <p role="alert">{display(error)}</p>}
       {page === 'studio' && !takes.length && busy && <p role="status">{display(progress)}</p>}
-      {page === 'studio' && takes.length > 0 && <StudioPanel key={takes[0].id} />}
+      {page === 'studio' && takes.length > 0 && <StudioPanel publishableKey={publishableKey} key={takes[0].id} />}
     </Suspense>
   );
 }

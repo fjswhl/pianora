@@ -4,12 +4,13 @@ import { lilypondEngine } from '../engine/instances';
 import { useScoreStore } from '../store/useScoreStore';
 import { useScores, label } from '../engine/presets';
 import { FileUp, Play, Sparkles, AlertCircle, Music2, RotateCcw } from 'lucide-react';
+import { SaveControl } from './SaveControl';
 import { fmtTime, useStudioStore } from '../store/useStudioStore';
 
 import { modelNames } from '../engine/performance/types';
 
-export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
-  const { loading, error, importedScore } = useScoreStore();
+export function ScoreSidebar({ onGenerated, publishableKey }: { onGenerated: () => void; publishableKey: string | null }) {
+  const { loading, error, importedScore, originalFile } = useScoreStore();
   const selectedPresetId = useScoreStore((s) => s.selectedPresetId);
   const presets = useScores();
   const current = useScoreStore(s => s.selectedPreset);
@@ -296,6 +297,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         </div>
       </details>
 
+      <div className="editor-commands">
       <button
         id="renderBtn"
         disabled={!canGenerate}
@@ -309,6 +311,8 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         {busy ? t("正在生成演奏…") : t("生成演奏")}
       </button>
 
+      {publishableKey && <SaveControl publishableKey={publishableKey} intent="editor" source={originalFile ?? lyCode} disabled={!canGenerate}/>}
+      </div>
       {busy && model !== 'pianoflow' && <button type="button" className="min-h-11" onClick={() => useStudioStore.getState().cancelGeneration()}>{t("取消生成")}</button>}
       {progressMsg && (
         <div className="mt-3 rounded-xl border border-slate-800 bg-[#0b101c] p-2.5">

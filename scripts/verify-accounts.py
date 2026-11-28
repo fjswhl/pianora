@@ -11,7 +11,7 @@ with sync_playwright() as pw:
     browser = pw.chromium.launch(channel=os.environ.get("PIANORA_BROWSER", "chromium"))
     page = browser.new_page()
     page.goto(base + "/#editor")
-    expect(page.get_by_role("button", name="我的曲库")).to_be_visible()
+    expect(page.get_by_role("link", name="个人中心", exact=True)).to_be_visible()
     result = page.evaluate("""async ({tokens, source}) => {
       const path = '/api/library';
       const headers = token => ({Authorization: 'Bearer '+token});

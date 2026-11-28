@@ -173,7 +173,7 @@ The listening view follows the selected performance through up to three engraved
 
 ### Accounts and private scores
 
-Opening “我的曲库” loads Clerk on demand. Clerk handles registration, sign-in and verification email. The Worker checks the Clerk session signature, issuer, expiration and authorized origin before accessing the owner's scores in D1 and private R2. “保存到曲库” in the editor saves the source score.
+The main navigation opens “个人中心” at `/#profile`. “我的曲库” groups saved scores, performances and public links. Opening the profile or saving a work loads Clerk on demand. Clerk handles registration, sign-in and verification email. The Worker checks the Clerk session signature, issuer, expiration and authorized origin before accessing the owner's scores in D1 and private R2. “保存到曲库” in the editor saves the source score.
 
 In the studio, “保存最终演奏” uploads the selected take’s final MIDI as a single file. Click “打开演奏” in the private library to go straight to the studio. The owner can publish a revocable link with “公开分享演奏”. Anyone with that link can play or download the same MIDI in the studio without signing in or running a performance model. Previously published recording links continue to stream their original audio. Set `PIANORA_TEST_PERFORMANCE=1` when running `scripts/verify-clerk-login.py` with local model assets to exercise the complete sharing flow. The test writes `artifacts/shared-performance.json`.
 

@@ -171,6 +171,9 @@ The listening view follows the selected performance through up to three engraved
 
 Opening “我的曲库” loads Clerk on demand. Clerk handles registration, sign-in and verification email. The Worker checks the Clerk session signature, issuer, expiration and authorized origin before accessing the owner's scores in D1 and private R2. “保存到曲库” saves the source score and, when available, the selected performance.
 
+In the studio, “保存最终演奏” saves the selected take's final MIDI and a stereo MP3 rendered with its piano, hall and resonance settings. The saved take stays private until its owner clicks “公开分享演奏”. The public player streams the recording without sign-in or model downloads. “取消公开分享” revokes the URL; publishing again creates a new one. Older MIDI-only saves still open and play in the private library. Set `PIANORA_TEST_PERFORMANCE=1` when running `scripts/verify-clerk-login.py` with local model assets to exercise the complete sharing flow. The test writes `artifacts/shared-performance.json`.
+
+
 Create a Clerk Hobby production instance for `opuslin.uk`, enable email codes for registration and sign-in, and verify the DNS records supplied by Clerk. Set the GitHub repository variable `CLERK_PUBLISHABLE_KEY` to the production publishable key. The Worker fetches public signing keys from the instance. Set `PIANORA_D1_ID` to the private library database ID. The account controls appear when the Worker has the database, bucket and publishable key.
 
 Deployment applies D1 migrations. With a restricted deployment token, run `PIANORA_D1_ID=<uuid> node scripts/deploy-accounts.mjs --apply-schema` using an authorized Wrangler profile and set the repository variable `PIANORA_APPLIED_SCHEMA` to the printed database ID and digest. Changes to the migration files or database require a new migration run.

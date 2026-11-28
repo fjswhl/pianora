@@ -123,7 +123,7 @@ export function App() {
             <option value="en" lang="en">English</option>
           </select>
           {publishableKey && <div className="account-actions">
-            {page !== 'library' && <button disabled={pipelineBusy} onClick={()=>openAccount(page)}>{t("保存到曲库")}</button>}
+            {page !== 'library' && <button disabled={pipelineBusy} onClick={()=>openAccount(page)}>{page === 'studio' ? t("保存最终演奏") : t("保存到曲库")}</button>}
             <button onClick={()=>openAccount('library')}>{t("我的曲库")}</button>
           </div>}
         </header>

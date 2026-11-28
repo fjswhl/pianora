@@ -1,3 +1,4 @@
+import { sharedPerformance } from './sharedPerformance';
 import { accountApi } from './accounts';
 import type { AccountEnv } from './auth';
 
@@ -89,6 +90,7 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ): Promise<Response> {
+    if (new URL(request.url).pathname.startsWith('/p/')) return sharedPerformance(request, env);
     if (new URL(request.url).pathname.startsWith('/api/')) return accountApi(request, env);
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method Not Allowed', { status: 405 });

@@ -35,6 +35,29 @@ with sync_playwright() as pw:
       };
       for (const k of ['expired','pending','foreign','wrongIssuer'])
         report[k] = (await read(file,tokens[k])).status;
+      // A recording remains private and unlisted while the audio upload is incomplete.
+      const bytes = new Uint8Array([255,251,144,100,0,0,0,0]);
+      const sha = await crypto.subtle.digest('SHA-256',bytes);
+      form.set('audio_sha256',Array.from(new Uint8Array(sha),x=>x.toString(16).padStart(2,'0')).join(''));
+      form.set('take_label','Final take');
+      const upload = await (await write()).json();
+      const item = path+'/'+upload.id;
+      const share = (token,method) => fetch(item+'/share',{headers:headers(token),method});
+      report.pending = upload.ready === false && (await share(tokens.owner,'POST')).status === 404;
+      const audioPut = await fetch(item+'/audio',{method:'PUT',headers:{...headers(tokens.owner),'Content-Type':'audio/mpeg'},body:bytes});
+      report.uploaded = audioPut.ok && (await (await write()).json()).ready;
+      report.foreignPublish = (await share(tokens.other,'POST')).status;
+      const published = await (await share(tokens.owner,'POST')).json();
+      const link = '/p/'+published.share_id;
+      report.publicPage = (await fetch(link)).status;
+      report.range = (await fetch(link+'/audio',{headers:{Range:'bytes=1-3'}})).status;
+      report.rangeMatches = (await (await fetch(link+'/audio',{headers:{Range:'bytes=1-3'}})).arrayBuffer()).byteLength === 3;
+      report.publicSource = (await fetch(link+'/source')).status;
+      report.foreignRevoke = (await share(tokens.other,'DELETE')).status;
+      await share(tokens.owner,'DELETE');
+      report.revoked = (await fetch(link+'/audio')).status;
+      report.privateAudio = (await read(item+'/audio',tokens.owner)).status;
+      report.rotated = (await (await share(tokens.owner,'POST')).json()).share_id !== published.share_id;
       return report;
     }""", {"tokens": tokens, "source": source})
     result["foreignWrite"] = page.request.post(base+"/api/library", headers={
@@ -42,6 +65,8 @@ with sync_playwright() as pw:
     browser.close()
 expected = dict(saved=201, repeated=200, ownEntries=1, source=True, take=True, private=404,
                 otherEntries=0, signedOut=401, expired=401, pending=401, foreign=401, wrongIssuer=401, foreignWrite=403)
+expected.update(pending=True, uploaded=True, foreignPublish=404, publicPage=200, range=206, rangeMatches=True,
+                publicSource=404, foreignRevoke=404, revoked=404, privateAudio=200, rotated=True)
 assert result == expected, result
 out = Path(os.environ.get("PIANORA_ARTIFACTS", "artifacts"))
 out.mkdir(parents=True, exist_ok=True)

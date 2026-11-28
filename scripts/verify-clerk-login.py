@@ -27,6 +27,60 @@ email = "pianora-" + uuid.uuid4().hex + "+clerk_test@example.com"
 testing_token = clerk("testing_tokens", body={})["token"]
 user = clerk("users", body={"email_address":[email], "skip_password_requirement":True})
 music = '\\header {\n title = "Pianora Clerk E2E"\n}\n\\score { { c4 d e f } }'
+def verify_performance(page, browser):
+    import hashlib
+    page.locator("#fileInput").set_input_files(str(Path("artifacts/browser-models/inputs/classical.mid").resolve()))
+    page.locator("#importedScoreCard").wait_for()
+    page.locator("#performanceModel").select_option("pianist")
+    page.locator("#renderBtn").click()
+    page.wait_for_url("**/#studio", timeout=300000)
+    def download(button):
+        with page.expect_download() as result:
+            button.click()
+        return hashlib.sha256(Path(result.value.path()).read_bytes()).hexdigest()
+    final_midi = download(page.locator("#dlMidiBtn"))
+    page.get_by_role("button", name="原谱演奏", exact=True).click()
+    assert download(page.locator("#dlMidiBtn")) != final_midi
+    page.get_by_role("button", name="保存最终演奏").click()
+    page.locator("dialog .account-primary").click()
+    expect(page.locator("dialog [role=status]")).to_contain_text("已保存", timeout=180000)
+    row = page.locator("dialog li").filter(has=page.get_by_role("button", name="公开分享演奏")).first
+    assert download(row.get_by_role("button", name="下载 MIDI")) == final_midi
+    row.get_by_role("button", name="公开分享演奏").click()
+    row = page.locator("dialog li").filter(has=page.get_by_role("link",name="打开分享页")).first
+    link = base + row.get_by_role("link",name="打开分享页").get_attribute("href")
+    guest = browser.new_context(viewport={"width":390,"height":844})
+    listener = guest.new_page()
+    assert listener.goto(link).status == 200
+    audio = listener.locator("audio")
+    audio.evaluate("(a)=>a.play()")
+    audio.evaluate("""a => new Promise(resolve => {
+      if (a.currentTime > .25) return resolve();
+      const tick = () => { if (a.currentTime > .25) { a.removeEventListener('timeupdate', tick); resolve(); } };
+      a.addEventListener('timeupdate', tick);
+    })""", timeout=20000)
+    response = guest.request.get(link + "/audio", headers={"Range":"bytes=0-63"})
+    assert response.status == 206 and len(response.body()) == 64
+    encoded = base64.b64encode(guest.request.get(link + "/audio").body()).decode()
+    energy = listener.evaluate("""async encoded => {
+      const ctx = new AudioContext();
+      const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0)).buffer;
+      const recording = await ctx.decodeAudioData(bytes);
+      const pcm = recording.getChannelData(0);
+      let max = 0;
+      for (const v of pcm) max = Math.max(max, Math.abs(v));
+      await ctx.close();
+      return {durationSeconds:recording.duration, peak:max};
+    }""", encoded)
+    assert energy['peak'] > .001 and energy['durationSeconds'] > 3, energy
+    row.get_by_role("button",name="取消公开分享").click()
+    expect(page.locator("dialog [role=status]")).to_contain_text("已取消")
+    assert guest.request.get(link).status == guest.request.get(link + "/audio").status == 404
+    guest.close()
+    page.get_by_role("button",name="关闭").click()
+    return {"finalMidiMatchesExport":True,"anonymousPlayback":True,"revokedLinkStatus":404,**energy}
+
+performance = None
 try:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(channel=os.environ.get("PIANORA_BROWSER", "chromium"))
@@ -46,13 +100,15 @@ try:
         identifier.fill(email, timeout=45000)
         identifier.press("Enter")
         page.locator('dialog input[autocomplete=one-time-code]').first.fill("424242", timeout=20000)
-        expect(page.get_by_role("status")).to_contain_text("已保存", timeout=20000)
+        expect(page.locator("dialog [role=status]")).to_contain_text("已保存", timeout=20000)
         page.get_by_role("button", name="关闭").click()
         page.reload()
         page.get_by_role("button", name="我的曲库").click()
         expect(page.locator("dialog li").first).to_contain_text("Pianora Clerk E2E", timeout=20000)
         page.get_by_role("button", name="打开乐谱").click()
         expect(page.locator("#lyEditor")).to_have_value(music)
+        if os.getenv("PIANORA_TEST_PERFORMANCE"):
+            performance = verify_performance(page, browser)
         page.get_by_role("button", name="我的曲库").click()
         page.get_by_role("button", name="退出登录").click()
         expect(page.locator("dialog")).to_have_count(0)
@@ -66,3 +122,6 @@ out.mkdir(exist_ok=True, parents=True)
     "saveAfterSignIn":True, "restoreAfterRefresh":True, "reopenSource":True, "signOut":True
 }, indent=2)+"\n")
 print("Clerk development email code and private library passed")
+
+if performance:
+    (out / "shared-performance.json").write_text(json.dumps(performance, indent=2)+"\n")

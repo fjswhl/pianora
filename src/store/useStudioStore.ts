@@ -128,7 +128,7 @@ interface StudioState {
   setModel: (model: keyof typeof modelNames) => void;
   setDexSteps: (steps: number) => void;
   cancelGeneration: () => void;
-  activeMidi: () => Uint8Array;
+  activeMidi: (track?: TrackKey) => Uint8Array;
   cfmSteps: number;
   stepFactor: number;
   seed: number;
@@ -327,15 +327,18 @@ export const useStudioStore = create<StudioState>((set, get) => {
       const tk = st.takes.find((t) => t.id === st.activeTakeId);
       if (!st.scoreMidi || !tk) return;
       const t0 = performance.now();
-      const fixed = restoreArpeggios(st.scoreMidi, tk.rawNotes, st.rawAnnotations, v);
+      const fixed = restoreArpeggios(st.scoreMidi, tk.midi?.raw ?? tk.rawNotes, st.rawAnnotations, v);
+      const restored = tk.midi ? withSustain(fixed.notes, tk.midi.pedals) : fixed.notes;
+      const length = restored.reduce((end,n) => Math.max(end,n.s+n.d),fixed.duration);
       const updatedTakes = st.takes.map((item) =>
         item.id === tk.id
           ? {
               ...item,
-              restoredNotes: fixed.notes,
-              restoredDuration: fixed.duration,
+              midi: tk.midi && { ...tk.midi, restored: fixed.notes },
+              restoredNotes: restored,
+              restoredDuration: length,
               arpeggios: fixed.arpeggios,
-              subtitle: message("{0} · {1}", fmtTime(fixed.duration), summarizeNotes(fixed.notes)),
+              subtitle: message("{0} · {1}", fmtTime(length), summarizeNotes(restored)),
             }
           : item,
       );
@@ -346,7 +349,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       if (st.activeTrack === 'final_restored' && !st.liveActive) {
         const cur = pianoPlayer.getCurrentTime();
         const wasPlaying = pianoPlayer.isPlaying;
-        pianoPlayer.setTrack(fixed.notes, fixed.duration);
+        pianoPlayer.setTrack(restored, length);
         if (wasPlaying) void pianoPlayer.play(cur, () => set({ isPlaying: false }));
       }
     },
@@ -735,15 +738,15 @@ export const useStudioStore = create<StudioState>((set, get) => {
       pianoPlayer.seek(sec);
     },
 
-    activeMidi: () => {
+    activeMidi: (track = get().activeTrack) => {
       const st = get();
       const take = st.takes.find(t => t.id === st.activeTakeId);
-      const scoreHeader = take?.model === 'pianist' || st.activeTrack === 'score' ? st.scoreMidi?.header : undefined;
-      if (take?.midi && st.activeTrack !== 'score') {
-        const notes = st.activeTrack === 'pianoflow_raw' ? take.midi.raw : take.midi.restored;
+      const scoreHeader = take?.model === 'pianist' || track === 'score' ? st.scoreMidi?.header : undefined;
+      if (take?.midi && track !== 'score') {
+        const notes = track === 'pianoflow_raw' ? take.midi.raw : take.midi.restored;
         return notesToMidiBytes(notes, modelNames[take.model], take.midi.pedals, scoreHeader);
       }
-      return notesToMidiBytes(st.getActiveTrackData().notes, st.activeTrack, [], scoreHeader);
+      return notesToMidiBytes(track === 'final_restored' && take ? take.restoredNotes : st.getActiveTrackData().notes, track, [], scoreHeader);
     },
     downloadMidi: () => {
       const st = get();

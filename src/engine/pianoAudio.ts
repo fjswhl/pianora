@@ -782,7 +782,13 @@ export class StudioGrandPianoPlayer {
     reverbWet: number,
     resonanceAmount = this.resonanceAmount,
   ): Promise<Blob> {
-    const { WorkletSynthesizer, audioBufferToWav } = await import('spessasynth_lib');
+    const { audioBufferToWav } = await import('spessasynth_lib');
+    return audioBufferToWav(await this.renderOfflineAudio(notes, duration, reverbWet, resonanceAmount));
+  }
+
+  async renderOfflineAudio(notes: SimpleNote[], duration: number, reverbWet: number, resonanceAmount: number, hall = this.activeHallId): Promise<AudioBuffer> {
+    const sfBuf = this.activeEngine === 'sf2' && this.activeSf2Id ? this.sf2Cache.get(this.activeSf2Id) : null;
+    const { WorkletSynthesizer } = await import('spessasynth_lib');
     const sr = 44100;
     const leadIn = 0.05;
     const totalSamples = Math.ceil((duration + 3.8) * sr);
@@ -834,7 +840,7 @@ export class StudioGrandPianoPlayer {
     offSum.connect(offLimiter);
 
     if (reverbWet > 0.001) {
-      const irRaw = await this.fetchIrRaw(this.activeHallId);
+      const irRaw = await this.fetchIrRaw(hall);
       const irBuf = await offCtx.decodeAudioData(irRaw.slice(0));
       const hp = offCtx.createBiquadFilter();
       hp.type = 'highpass';
@@ -851,30 +857,26 @@ export class StudioGrandPianoPlayer {
     }
 
     // 3. Feed active piano source into offDry
-    if (this.activeEngine === 'sf2' && this.activeSf2Id) {
-      const sfBuf = this.sf2Cache.get(this.activeSf2Id);
-      if (sfBuf) {
-        await offCtx.audioWorklet.addModule('/spessa/spessasynth_processor.min.js');
-        const offSynth = new WorkletSynthesizer(offCtx);
-        offSynth.connect(offDry);
-        await offSynth.isReady;
-        // Disable built-in reverb so our real Concert Hall IR handles all reverb
-        offSynth.controllerChange(0, 91, 0);
-        offSynth.controllerChange(0, 93, 0);
-        offSynth.midiChannels[0]?.lockController(91 as never, true);
+    if (sfBuf) {
+      await offCtx.audioWorklet.addModule('/spessa/spessasynth_processor.min.js');
+      const offSynth = new WorkletSynthesizer(offCtx);
+      offSynth.connect(offDry);
+      await offSynth.isReady;
+      // Disable built-in reverb so our real Concert Hall IR handles all reverb
+      offSynth.controllerChange(0, 91, 0);
+      offSynth.controllerChange(0, 93, 0);
+      offSynth.midiChannels[0]?.lockController(91 as never, true);
 
-        const shiftedNotes = notes.map((n) => ({ ...n, s: n.s + leadIn }));
-        const midiBytes = notesToMidiBytes(shiftedNotes, 'PianoFlow');
-        const { BasicMIDI } = await import('spessasynth_core');
-        const basicMidi = BasicMIDI.fromArrayBuffer(midiBytes.buffer as ArrayBuffer);
-        await offSynth.startOfflineRender({
-          midiSequence: basicMidi,
-          loopCount: 0,
-          soundBankList: [{ bankOffset: 0, soundBankBuffer: sfBuf.slice(0) }],
-        });
-        const renderedBuf = await offCtx.startRendering();
-        return audioBufferToWav(renderedBuf);
-      }
+      const shiftedNotes = notes.map((n) => ({ ...n, s: n.s + leadIn }));
+      const midiBytes = notesToMidiBytes(shiftedNotes, 'PianoFlow');
+      const { BasicMIDI } = await import('spessasynth_core');
+      const basicMidi = BasicMIDI.fromArrayBuffer(midiBytes.buffer as ArrayBuffer);
+      await offSynth.startOfflineRender({
+        midiSequence: basicMidi,
+        loopCount: 0,
+        soundBankList: [{ bankOffset: 0, soundBankBuffer: sfBuf.slice(0) }],
+      });
+      return offCtx.startRendering();
     }
 
     // Multi-Velocity Salamander C5 offline render
@@ -895,7 +897,6 @@ export class StudioGrandPianoPlayer {
       this.triggerMultiNote(offCtx, offDry, offBufs, n.p, n.v, n.s + leadIn, Math.max(0.06, n.d), false);
     }
 
-    const renderedBuf = await offCtx.startRendering();
-    return audioBufferToWav(renderedBuf);
+    return offCtx.startRendering();
   }
 }

@@ -1020,3 +1020,10 @@ body {
 .harmony-labels text { font: 600 1.85px system-ui, sans-serif; fill: #345943; stroke: white; stroke-width: .48px; paint-order: stroke; }
 .harmony-labels .harmony-degree { font-size: 1.45px; }
 .harmony-labels .current text { fill: #183d26; text-decoration: underline; font-weight: 800; }
+
+.account-dialog .take-label { display:block; color:var(--muted); margin:.25rem 0; }
+.account-dialog .share-actions { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+.account-dialog .share-actions a { color:var(--green); padding:8px 10px; text-decoration:underline; }
+.account-dialog .share-actions :focus-visible { outline:2px solid var(--green); outline-offset:2px; }
+
+.account-dialog .library-audio { display:block; width:100%; margin:8px 0; }

@@ -2,6 +2,8 @@ import { unpackNotation } from '../engine/savedNotation';
 import { t, display, errorText, type DisplayText } from '../i18n';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { Alert, AlertDescription } from './ui/alert';
+import { Button } from './ui/button';
 import { useScoreStore } from '../store/useScoreStore';
 import { useStudioStore } from '../store/useStudioStore';
 import { RecentGenerations } from './RecentGenerations';
@@ -90,21 +92,19 @@ export default function Workspace({
             <h1>{title}</h1>
             <p>{description}</p>
           </div>
-          {page === 'studio' && <a href="#editor" className="import">{t("前往乐谱编辑")} <ArrowRight size={16} /></a>}
+          {page === 'studio' && <Button asChild variant="outline"><a href="#editor">{t("前往乐谱编辑")} <ArrowRight /></a></Button>}
         </div>
       )}
       {page === 'editor' && (
-        <div className="editing">
-          <ScoreSidebar publishableKey={publishableKey}
-            onGenerated={() => {
-              if (location.hash === '#editor') location.hash = 'studio';
-            }}
-          />
-        </div>
+        <ScoreSidebar publishableKey={publishableKey}
+          onGenerated={() => {
+            if (location.hash === '#editor') location.hash = 'studio';
+          }}
+        />
       )}
       {page === 'studio' && !shareId && <RecentGenerations hasSession={Boolean(takes.length)} />}
-      {page === 'studio' && !takes.length && error && <p role="alert">{display(error)}</p>}
-      {page === 'studio' && !takes.length && busy && <p role="status">{display(progress)}</p>}
+      {page === 'studio' && !takes.length && error && <Alert variant="destructive" className="mb-4"><AlertDescription>{display(error)}</AlertDescription></Alert>}
+      {page === 'studio' && !takes.length && busy && <p role="status" className="muted mb-4">{display(progress)}</p>}
       {page === 'studio' && takes.length > 0 && <StudioPanel publishableKey={publishableKey} key={takes[0].id} />}
     </Suspense>
   );

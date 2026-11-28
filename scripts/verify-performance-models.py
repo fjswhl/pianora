@@ -41,7 +41,7 @@ with sync_playwright() as p:
             page.locator("#renderBtn").click()
             page.wait_for_function("location.hash === '#studio' || !!document.querySelector('#errBox')",timeout=1800000)
             assert page.url.endswith("#studio"), page.locator("#errBox").inner_text()
-            expect(page.locator("#takesBar option:checked")).to_contain_text(re.compile({"pianist":"Pianist Transformer","dexter":"DExter","virtuosonet":"VirtuosoNet"}[model]))
+            expect(page.locator("#takesBar [aria-pressed=true]")).to_contain_text(re.compile({"pianist":"Pianist Transformer","dexter":"DExter","virtuosonet":"VirtuosoNet"}[model]))
             with page.expect_download() as download:
                 page.locator("#dlMidiBtn").click()
             file = args.output / f"{model}-{genre}.mid"

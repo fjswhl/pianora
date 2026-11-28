@@ -6,6 +6,7 @@ import { pianoPlayer } from '../engine/instances';
 import { getLiveSession, useStudioStore } from '../store/useStudioStore';
 
 type HarmonyProps = { harmony: Harmony; degrees: boolean };
+type Bar = ReturnType<typeof followTimeline>[number]['bar'];
 function ScoreWindow({ score, images, harmony, degrees }: { score: FollowScore; images: string[] } & HarmonyProps) {
   const labels = useHarmonyLayout(score, harmony);
   const midi = useStudioStore(s => s.scoreMidi);
@@ -22,6 +23,23 @@ function ScoreWindow({ score, images, harmony, degrees }: { score: FollowScore; 
       ? followTimeline(score, midi, take.rawNotes, take.rawDuration)
       : followTimeline(score, midi, take.scoreClock ?? take.restoredNotes, take.restoredDuration);
   }, [score, midi, take, track, scoreDuration, liveStatus]);
+  // Red pencil: bars where the AI pianist noticeably slows down or presses on against the score.
+  const pencil = useMemo(() => {
+    const marks = new Map<Bar, string>();
+    if (!midi || track === 'score' || liveStatus !== null) return marks;
+    const written = followTimeline(score, midi, [], scoreDuration);
+    const span = (list: typeof timeline) => (list.at(-1)?.end ?? 0) - (list[0]?.start ?? 0);
+    // Compare each bar with the take's own average pace, so the pencil shows rubato, not overall tempo.
+    const pace = span(written) / Math.max(1e-3, span(timeline));
+    timeline.forEach((entry, i) => {
+      const plain = written[i];
+      if (!plain || marks.has(entry.bar) || !pace) return;
+      const ratio = (plain.end - plain.start) / Math.max(1e-3, entry.end - entry.start) / pace;
+      const change = Math.round((ratio - 1) * 100);
+      if (Math.abs(change) >= 15) marks.set(entry.bar, change < 0 ? `rit. ${change}%` : `accel. +${change}%`);
+    });
+    return marks;
+  }, [score, midi, timeline, track, scoreDuration, liveStatus]);
   const [index, setIndex] = useState(0);
   const rail = useRef<SVGRectElement>(null);
   useEffect(() => {
@@ -65,7 +83,10 @@ function ScoreWindow({ score, images, harmony, degrees }: { score: FollowScore; 
         const here = start + i === active.row;
         const height = row.bottom - row.top;
         const width = row.right - row.left + 4;
-        const band = labels[start+i]?.length ? (degrees ? 4.8 : 3) : 0;
+        const harmonyBand = labels[start+i]?.length ? (degrees ? 4.8 : 3) : 0;
+        const rowMarks = [...pencil].filter(([bar]) => bar.row === start + i);
+        const pencilBand = rowMarks.length ? 2.8 : 0;
+        const band = harmonyBand + pencilBand;
         return <svg className="follow-system" key={start + i} role="img"
           aria-label={t("第 {0} 行钢琴谱", start + i + 1)} data-row={start + i + 1}
           viewBox={`${row.left - 3} ${row.top - 0.7 - band} ${width} ${height + 1.4 + band}`}>
@@ -74,15 +95,19 @@ function ScoreWindow({ score, images, harmony, degrees }: { score: FollowScore; 
             <image href={images[row.page]} x={page.box[0]} y={page.box[1]}
             width={page.box[2]} height={page.box[3]} />
           </svg>
-          {band > 0 && <>
-            <rect x={row.left-3} y={row.top-band-0.7} width={width} height={band} fill="white" />
-            <HarmonyLabels labels={labels[start+i]} y={row.top-1.1} right={row.right} current={here ? harmony.current : undefined} degrees={degrees} />
-          </>}
+          {band > 0 && <rect x={row.left-3} y={row.top-band-0.7} width={width} height={band} fill="white" />}
+          {harmonyBand > 0 && <HarmonyLabels labels={labels[start+i]} y={row.top-1.1} right={row.right} current={here ? harmony.current : undefined} degrees={degrees} />}
+          {rowMarks.length > 0 && <g className="pencil" aria-hidden="true">
+            {rowMarks.map(([bar, text]) => <g key={bar.left}>
+              <rect x={bar.left + 0.3} y={row.top - harmonyBand - 0.9} width={Math.max(1, bar.right - bar.left - 0.6)} height=".16" fill="var(--red)" />
+              <text x={bar.left + 0.4} y={row.top - harmonyBand - 1.4}>{text}</text>
+            </g>)}
+          </g>}
           {here && <g key={index} className="follow-highlight" data-bar={active.number}>
             <rect x={active.left} y={row.top} width={active.right - active.left}
-              height={height} rx=".4" fill="#547f54" fillOpacity=".13" />
-            <rect x={active.left} y={row.top} width=".32" height={height} fill="#47734e" />
-            <rect className="follow-progress" ref={rail} x={active.left} y={row.top} height=".36" fill="#47734e" />
+              height={height} rx=".4" fill="#c8361f" fillOpacity=".08" />
+            <rect x={active.left} y={row.top} width=".3" height={height} fill="#c8361f" />
+            <rect className="follow-progress" ref={rail} x={active.left} y={row.top} height=".3" fill="#c8361f" />
           </g>}
         </svg>;
       })}

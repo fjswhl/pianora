@@ -33,7 +33,7 @@ export function RecentGenerations({ hasSession }: { hasSession: boolean }) {
   }, [open]);
   const dates = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   return <div className="recent-generations">
-    <details open={open} onToggle={e => setOpen(e.currentTarget.open)}>
+    <details className="disclosure" open={open} onToggle={e => setOpen(e.currentTarget.open)}>
       <summary><History size={17} aria-hidden="true" />{t("最近生成")}
         {entries && entries.length > 0 && <small>{entries.length} / 10</small>}</summary>
       {failed ? <p role="status">{t("无法读取此浏览器的生成记录。")}</p>

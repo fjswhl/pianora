@@ -1,6 +1,8 @@
 """Verify server pagination, nested browser filters and opening a score across categories."""
 import argparse, hashlib, json, os, re
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
+from urllib.request import urlopen
 from pathlib import Path
 from urllib.parse import urlencode, urljoin
 from playwright.sync_api import sync_playwright, expect
@@ -46,7 +48,10 @@ with sync_playwright() as pw:
     def select_composer(key, name):
         page.locator('#catalogComposer').or_(page.get_by_role('tab', name=name)).first.wait_for()
         if page.locator('#catalogComposer').count():
-            page.locator('#catalogComposer').select_option(key)
+            chooser = page.locator('#catalogComposer')
+            if not chooser.evaluate('(el, key) => [...el.options].some(o => o.value === key)', key):
+                page.get_by_role('button', name='更多作曲家').click()
+            chooser.select_option(key)
         else:
             page.get_by_role('tab', name=name).click()
     select_composer('Beethoven','贝多芬')
@@ -65,12 +70,14 @@ with sync_playwright() as pw:
         if args.manifest:
             editions = json.loads(args.manifest.read_text())['scores']
             published = {score['id']:score for score in scores}
-            for edition in editions:
+            def verify_edition(edition):
                 score = published[edition['id']]
                 for field in ('name','composer','collection','file','sha256','license','sourceUrl'):
                     assert score[field] == edition[field], (edition['id'],field)
-                response = page.request.get(urljoin(base,score['url']))
-                assert response.ok and hashlib.sha256(response.body()).hexdigest() == edition['sha256'], edition['id']
+                with urlopen(urljoin(base, score['url']), timeout=60) as response:
+                    assert hashlib.sha256(response.read()).hexdigest() == edition['sha256'], edition['id']
+            with ThreadPoolExecutor(max_workers=6) as pool:
+                list(pool.map(verify_edition, editions))
             samples = [(s['composer'],s['composer'],s['collection'],s['id'])
                        for s in (editions[0], editions[len(editions)//2], editions[-1])]
         for composer, translated, collection, sample in samples:
@@ -78,7 +85,8 @@ with sync_playwright() as pw:
             select_composer(composer, translated)
             menu.select_option(collection)
             expected = next(s for s in scores if s['id'] == sample)
-            page.locator('.score-card').filter(has_text=expected['name']).first.click()
+            card = page.locator('.score-card').filter(has=page.locator('.catalogue-no', has_text=f"PN / {expected['number']:03}"))
+            card.first.click()
             expect(page.locator('#presetSelect')).to_have_value(sample)
             if expected['file'].endswith('.ly'):
                 expect(page.locator('#lyEditor')).to_have_value(re.compile(r'\\version'), timeout=30000)

@@ -46,6 +46,10 @@ const chineseComposerNames: Record<string, string> = {
   Mascagni: '马斯卡尼', Mussorgsky: '穆索尔斯基', Offenbach: '奥芬巴赫', Puccini: '普契尼',
   Rossini: '罗西尼', Smetana: '斯美塔那', Vivaldi: '维瓦尔第', Wagner: '瓦格纳',
   'C. P. E. Bach': '卡尔·菲利普·埃马努埃尔·巴赫', Pachelbel: '帕赫贝尔',
+  Clementi: '克莱门蒂', Lemoine: '勒穆瓦纳', Moszkowski: '莫什科夫斯基',
+  Paderewski: '帕德雷夫斯基', Moniuszko: '莫纽什科', Szymanowska: '玛丽亚·席曼诺夫斯卡',
+  Szymanowski: '卡罗尔·席曼诺夫斯基', 'Józef Wieniawski': '约瑟夫·维尼亚夫斯基',
+  'Henryk Wieniawski': '亨里克·维尼亚夫斯基', 'Xaver Scharwenka': '克萨韦尔·沙尔文卡',
 };
 export function composerName(composer: string) {
   if (composer === '周杰伦' || composer === '林俊杰') return t(composer);

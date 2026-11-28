@@ -64,6 +64,20 @@ def source_edition(group):
         directory = Path(tmp)
         archive = directory / 'edition.tar.gz'
         fetch(url, archive)
+        # MusicXML editions are self-contained. Read only the listed files
+        # from the pinned repository archive, without unpacking its other assets.
+        if all(row.get('scoreType') == 'MusicXML' for row in editions):
+            wanted = {row['sourceEntry']: row for row in editions}
+            with tarfile.open(archive, 'r|gz') as tar:
+                for member in tar:
+                    row = wanted.pop(member.name.partition('/')[2], None)
+                    if row:
+                        if not member.isfile():
+                            raise ValueError(member.name)
+                        save(row, tar.extractfile(member).read())
+            if wanted:
+                raise ValueError(f'Missing {len(wanted)} MusicXML files in {url}')
+            return
         with tarfile.open(archive) as tar:
             members = [m for m in tar if m.isfile()]
             tar.extractall(directory, members=members, filter='data')

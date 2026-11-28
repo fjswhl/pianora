@@ -2517,23 +2517,6 @@
       "sha256": "0e06d74e1f8227d7e9a3e40e1eee52bba82adc4c7f20bafba9173395a51e965a"
     },
     {
-      "id": "pdmx_6333579",
-      "name": "Swan Lake 14. Scène (Moderato Piano)",
-      "composer": "Tchaikovsky",
-      "collection": "天鹅湖 · 钢琴改编",
-      "file": "pdmx/6333579.mxl",
-      "scoreType": "MusicXML",
-      "subtitle": "天鹅湖 · 钢琴改编",
-      "art": "romantic",
-      "bars": 70,
-      "sourceUrl": "https://musescore.com/score/6333579",
-      "edition": "PDMX v2 · Zenodo 15571083",
-      "license": "CC0 1.0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "archiveMember": "mxl/10/4/QmS5DSbHJEjTVpdNkNoSbqdugdqKEgmucL3x4ViK9JBZ5x.mxl",
-      "sha256": "77cb697fb4c8daafeb328e58e74af43754a6981b78b292efa80c3e74cf56f30d"
-    },
-    {
       "id": "pdmx_6333583",
       "name": "Swan Lake 15. Entry March (Piano)",
       "composer": "Tchaikovsky",

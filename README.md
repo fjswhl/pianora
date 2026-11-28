@@ -169,9 +169,9 @@ The listening view follows the selected performance through up to three engraved
 
 ### Accounts and private scores
 
-Opening “我的曲库” loads Clerk on demand. Clerk handles registration, sign-in and verification email. The Worker checks the Clerk session signature, issuer, expiration and authorized origin before accessing the owner's scores in D1 and private R2. “保存到曲库” saves the source score and, when available, the selected performance.
+Opening “我的曲库” loads Clerk on demand. Clerk handles registration, sign-in and verification email. The Worker checks the Clerk session signature, issuer, expiration and authorized origin before accessing the owner's scores in D1 and private R2. “保存到曲库” in the editor saves the source score.
 
-In the studio, “保存最终演奏” saves the selected take's final MIDI and a stereo MP3 rendered with its piano, hall and resonance settings. The saved take stays private until its owner clicks “公开分享演奏”. The public player streams the recording without sign-in or model downloads. “取消公开分享” revokes the URL; publishing again creates a new one. Older MIDI-only saves still open and play in the private library. Set `PIANORA_TEST_PERFORMANCE=1` when running `scripts/verify-clerk-login.py` with local model assets to exercise the complete sharing flow. The test writes `artifacts/shared-performance.json`.
+In the studio, “保存最终演奏” uploads the selected take’s final MIDI as a single file. Click “打开演奏” in the private library to go straight to the studio. The owner can publish a revocable link with “公开分享演奏”. Anyone with that link can play or download the same MIDI in the studio without signing in or running a performance model. Previously published recording links continue to stream their original audio. Set `PIANORA_TEST_PERFORMANCE=1` when running `scripts/verify-clerk-login.py` with local model assets to exercise the complete sharing flow. The test writes `artifacts/shared-performance.json`.
 
 
 Create a Clerk Hobby production instance for `opuslin.uk`, enable email codes for registration and sign-in, and verify the DNS records supplied by Clerk. Set the GitHub repository variable `CLERK_PUBLISHABLE_KEY` to the production publishable key. The Worker fetches public signing keys from the instance. Set `PIANORA_D1_ID` to the private library database ID. The account controls appear when the Worker has the database, bucket and publishable key.

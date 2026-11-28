@@ -6,6 +6,7 @@ export const modelNames = {
   dexter: 'DExter',
   virtuosonet: 'VirtuosoNet',
 };
+export const takeModelNames = { ...modelNames, midi: 'MIDI' };
 export type LocalModel = Exclude<keyof typeof modelNames, 'pianoflow'>;
 export interface ScoreMark {
   voice: number;

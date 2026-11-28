@@ -35,50 +35,48 @@ def verify_performance(page, browser):
     page.locator("#renderBtn").click()
     page.wait_for_url("**/#studio", timeout=300000)
     def download(button):
-        with page.expect_download() as result:
+        with button.page.expect_download() as result:
             button.click()
         return hashlib.sha256(Path(result.value.path()).read_bytes()).hexdigest()
     final_midi = download(page.locator("#dlMidiBtn"))
     page.get_by_role("button", name="原谱演奏", exact=True).click()
     assert download(page.locator("#dlMidiBtn")) != final_midi
     page.get_by_role("button", name="保存最终演奏").click()
+    uploads = []
+    page.on("request", lambda request: uploads.append(request) if "/api/library" in request.url and request.method in ("POST","PUT") else None)
     page.locator("dialog .account-primary").click()
     expect(page.locator("dialog [role=status]")).to_contain_text("已保存", timeout=180000)
     row = page.locator("dialog li").filter(has=page.get_by_role("button", name="公开分享演奏")).first
     assert download(row.get_by_role("button", name="下载 MIDI")) == final_midi
+    assert len(uploads) == 1
+    payload = uploads[0].post_data_buffer
+    assert b'name="performance"' in payload and b'name="source"' not in payload and b'audio_sha256' not in payload
+    page.get_by_role("button", name="关闭").click()
+    page.goto(base + "/#library")
+    page.reload()
+    page.get_by_role("button", name="我的曲库").click()
+    row.get_by_role("button", name="打开演奏").click()
+    page.wait_for_url("**/#studio")
+    expect(page.locator("dialog")).to_have_count(0)
+    assert download(page.locator("#dlMidiBtn")) == final_midi
+    page.get_by_role("button", name="我的曲库").click()
     row.get_by_role("button", name="公开分享演奏").click()
     row = page.locator("dialog li").filter(has=page.get_by_role("link",name="打开分享页")).first
     link = base + row.get_by_role("link",name="打开分享页").get_attribute("href")
     guest = browser.new_context(viewport={"width":390,"height":844})
     listener = guest.new_page()
     assert listener.goto(link).status == 200
-    audio = listener.locator("audio")
-    audio.evaluate("(a)=>a.play()")
-    audio.evaluate("""a => new Promise(resolve => {
-      if (a.currentTime > .25) return resolve();
-      const tick = () => { if (a.currentTime > .25) { a.removeEventListener('timeupdate', tick); resolve(); } };
-      a.addEventListener('timeupdate', tick);
-    })""", timeout=20000)
-    response = guest.request.get(link + "/audio", headers={"Range":"bytes=0-63"})
-    assert response.status == 206 and len(response.body()) == 64
-    encoded = base64.b64encode(guest.request.get(link + "/audio").body()).decode()
-    energy = listener.evaluate("""async encoded => {
-      const ctx = new AudioContext();
-      const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0)).buffer;
-      const recording = await ctx.decodeAudioData(bytes);
-      const pcm = recording.getChannelData(0);
-      let max = 0;
-      for (const v of pcm) max = Math.max(max, Math.abs(v));
-      await ctx.close();
-      return {durationSeconds:recording.duration, peak:max};
-    }""", encoded)
-    assert energy['peak'] > .001 and energy['durationSeconds'] > 3, energy
+    assert listener.url.endswith("#studio/" + link.rsplit("/", 1)[-1])
+    listener.locator("#playBtn").click()
+    listener.wait_for_function("Number(document.querySelector('#seekSlider').value) > 0.2")
+    assert download(listener.locator("#dlMidiBtn")) == final_midi
+    assert guest.request.get(link + "/source").status == guest.request.get(link + "/audio").status == 404
     row.get_by_role("button",name="取消公开分享").click()
     expect(page.locator("dialog [role=status]")).to_contain_text("已取消")
-    assert guest.request.get(link).status == guest.request.get(link + "/audio").status == 404
+    assert guest.request.get(link).status == guest.request.get(link + "/performance").status == 404
     guest.close()
     page.get_by_role("button",name="关闭").click()
-    return {"finalMidiMatchesExport":True,"anonymousPlayback":True,"revokedLinkStatus":404,**energy}
+    return {"finalMidiMatchesExport":True,"singleMidiUpload":True,"privateStudio":True,"sharedStudio":True,"anonymousPlayback":True,"revokedLinkStatus":404}
 
 performance = None
 try:

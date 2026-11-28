@@ -1,4 +1,4 @@
-import { modelNames } from '../engine/performance/types';
+import { takeModelNames } from '../engine/performance/types';
 import { t, display } from '../i18n';
 import { Disc3 } from 'lucide-react';
 import { useStudioStore, type TrackKey } from '../store/useStudioStore';
@@ -14,13 +14,14 @@ const STAGE_META = [
 export function GenerationRecord() {
   const model = useStudioStore(s => s.takes.find(take => take.id === s.activeTakeId)?.model ?? 'pianoflow');
   const stages = useStudioStore((s) => s.stages);
+  if (model === 'midi') return null;
   return (
     <details className="generation-record">
       <summary>{t("生成记录")}</summary>
       <ul>
         {STAGE_META.map((stage) => (
           <li key={stage.key}>
-            <strong>{stage.key === 'st3' ? modelNames[model] : stage.name}</strong>
+            <strong>{stage.key === 'st3' ? takeModelNames[model] : stage.name}</strong>
             <span>{display(stages[stage.key].stat)}</span>
           </li>
         ))}
@@ -61,7 +62,7 @@ export function PipelineHeader() {
           </select>
         </label>
       </header>
-      <div className="track-switch" aria-label={t("试听音轨")}>
+      {take?.finalMidi ? null : <div className="track-switch" aria-label={t("试听音轨")}>
         {tracks.map((t) => (
           <button
             key={t.key}
@@ -71,7 +72,7 @@ export function PipelineHeader() {
             {t.name}
           </button>
         ))}
-      </div>
+      </div>}
     </>
   );
 }

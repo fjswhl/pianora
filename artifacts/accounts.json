@@ -14,6 +14,7 @@
   "wrongIssuer": 401,
   "uploaded": true,
   "foreignPublish": 404,
+  "recordingMidiPrivate": 404,
   "publicPage": 200,
   "range": 206,
   "rangeMatches": true,
@@ -22,5 +23,9 @@
   "revoked": 404,
   "privateAudio": 200,
   "rotated": true,
+  "midiShare": true,
+  "midiSource": 404,
+  "midiAudio": 404,
+  "midiRevoked": 404,
   "foreignWrite": 403
 }

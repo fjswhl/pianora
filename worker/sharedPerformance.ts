@@ -36,12 +36,25 @@ const escapeText = (s: string) => s.replaceAll('&', '&amp;').replaceAll('<', '&l
 export async function sharedPerformance(request: Request, env: AccountEnv): Promise<Response> {
   if (!['GET','HEAD'].includes(request.method)) return new Response(null, { status: 405, headers: { ...privateHeaders, Allow: 'GET, HEAD' } });
   const path = new URL(request.url).pathname;
-  const match = /^\/p\/([a-f0-9]{32})(\/audio)?\/?$/.exec(path);
+  const match = /^\/p\/([a-f0-9]{32})(\/audio|\/performance)?\/?$/.exec(path);
   const row = match && env.DB && env.PRIVATE_SCORES ? await env.DB.prepare(
-    'SELECT id,user_id,title,take_label FROM saved_scores WHERE share_id=? AND ready=1 AND audio_sha256 IS NOT NULL',
-  ).bind(match[1]).first<{id:string;user_id:string;title:string;take_label:string}>() : null;
-  if (row && match?.[2]) return recordedAudio(request, env.PRIVATE_SCORES!, row.user_id+'/'+row.id+'/audio');
-  if (!row && path.endsWith('/audio')) return new Response(null, { status: 404, headers: privateHeaders });
+    'SELECT id,user_id,title,take_label,audio_sha256 FROM saved_scores WHERE share_id=? AND ready=1 AND has_performance=1',
+  ).bind(match[1]).first<{id:string;user_id:string;title:string;take_label:string;audio_sha256:string|null}>() : null;
+  if (match?.[2]) {
+    if (row?.audio_sha256 && match[2] === '/audio') return recordedAudio(request, env.PRIVATE_SCORES!, row.user_id+'/'+row.id+'/audio');
+    if (row && !row.audio_sha256 && match[2] === '/performance') {
+      const key = row.user_id+'/'+row.id+'/performance';
+      const object = request.method === 'HEAD' ? await env.PRIVATE_SCORES!.head(key) : await env.PRIVATE_SCORES!.get(key);
+      if (object) return new Response('body' in object ? (object as R2ObjectBody).body : null, { headers: {
+        ...privateHeaders, 'Content-Type':'audio/midi', 'X-Pianora-Title':encodeURIComponent(row.title),
+        'X-Pianora-Take':encodeURIComponent(row.take_label ?? ''),
+      } });
+    }
+    return new Response(null, {status:404, headers:privateHeaders});
+  }
+  if (row && !row.audio_sha256 && match) return new Response(null, {status:302, headers:{
+    ...privateHeaders, Location:'/#studio/'+match[1], 'Referrer-Policy':'no-referrer',
+  }});
   const en = /^en\b/i.test(request.headers.get('accept-language') ?? '');
   const title = row ? escapeText(row.title) : en ? 'Performance unavailable' : '这场演奏暂不可用';
   const html = `<!doctype html><html lang="${en?'en':'zh-CN'}"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

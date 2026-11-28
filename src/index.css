@@ -1026,7 +1026,7 @@ body {
 .account-dialog .share-actions a { color:var(--green); padding:8px 10px; text-decoration:underline; }
 .account-dialog .share-actions :focus-visible { outline:2px solid var(--green); outline-offset:2px; }
 
-.account-dialog .library-audio { display:block; width:100%; margin:8px 0; }
+.account-dialog .share-actions small { flex-basis: 100%; color: var(--muted); }
 
 .recent-generations { margin: 0 0 1rem; color: var(--ink); }
 .recent-generations details { border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }

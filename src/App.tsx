@@ -35,7 +35,9 @@ const pages = {
   },
 };
 type Page = keyof typeof pages;
+function sharedTake() { return /^#studio\/([0-9a-f]{32})$/.exec(location.hash)?.[1] ?? null; }
 function currentPage(): Page {
+  if (sharedTake()) return 'studio';
   const hash = location.hash.slice(1);
   return Object.hasOwn(pages, hash) ? (hash as Page) : 'library';
 }
@@ -54,6 +56,7 @@ export function App() {
     return () => abort.abort();
   }, []);
   const [page, setPage] = useState<Page>(currentPage);
+  const [shareId, setShareId] = useState(sharedTake);
   function openAccount(intent: 'library' | 'editor' | 'studio') {
     // Clerk uses the fragment for the steps inside its sign-in component.
     history.replaceState(history.state, '', location.pathname + location.search);
@@ -62,9 +65,11 @@ export function App() {
   function closeAccount(target: Page = page) {
     history.replaceState(history.state, '', '#' + target);
     setPage(target);
+    setShareId(null);
     setAccount(null);
   }
   useEffect(() => {
+    if (sharedTake()) return;
     let disposed = false;
     let stop: (() => void) | undefined;
     const timer = window.setTimeout(() => {
@@ -82,6 +87,7 @@ export function App() {
     const navigate = () => {
       if (account) return;
       setPage(currentPage());
+      setShareId(sharedTake());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', navigate);
@@ -171,7 +177,7 @@ export function App() {
           {page !== 'library' && (
             <Suspense fallback={<p role="status">{t("正在打开工作区…")}</p>}>
               <Workspace
-                page={page}
+                page={page} shareId={shareId}
                 title={pages[page].title}
                 description={pages[page].desc}
               />

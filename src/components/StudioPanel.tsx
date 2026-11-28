@@ -25,6 +25,7 @@ export function StudioPanel() {
   const playing = useStudioStore(s => s.isPlaying);
   const togglePlay = useStudioStore(s => s.togglePlay);
   const title = useStudioStore((s) => s.performanceTitle);
+  const savedMidi = useStudioStore(s => s.takes[0]?.model === 'midi');
   const midiNotation = useStudioStore(s => s.midiNotation);
   const score = useStudioStore(s => s.scoreMidi);
   const [requestedScore, setRequestedScore] = useState<typeof score>(null);
@@ -41,7 +42,7 @@ export function StudioPanel() {
           <span>{t("演奏室")}</span>
           <h1>{display(title)}</h1>
           <p>
-            {t("钢琴独奏")} <i /> {bars} {t("小节")} <i /> {t("原谱")} {fmtTime(duration)}
+            {t("钢琴独奏")} <i /> {bars} {t("小节")} <i /> {savedMidi ? t("演奏时长") : t("原谱")} {fmtTime(duration)}
           </p>
         </div>
         <div className="session-print" aria-hidden="true">

@@ -1,4 +1,4 @@
-import { modelNames, type Pedal } from '../engine/performance/types';
+import { modelNames, takeModelNames, type Pedal } from '../engine/performance/types';
 import { modelScore, renderLocal } from '../engine/performance/client';
 import { setPianoFlowPreload } from '../engine/assetPacks';
 import { withSustain } from '../engine/performance/playback';
@@ -42,7 +42,8 @@ export interface TakeRecord {
   label: DisplayText;
   subtitle: DisplayText;
   seed: number;
-  model: keyof typeof modelNames;
+  model: keyof typeof takeModelNames;
+  finalMidi?: Uint8Array<ArrayBuffer>;
   perfState?: PerfState;
   midi?: { raw: SimpleNote[]; restored: SimpleNote[]; pedals: Pedal[] };
   rawNotes: SimpleNote[];
@@ -105,6 +106,7 @@ export function getLiveSession(): LiveConductorSession | null {
 
 export interface StudioState {
   historyWarning: DisplayText;
+  openPerformanceMidi: (bytes: Uint8Array<ArrayBuffer>, title: string, label: string | null) => void;
   openGeneration: (id: number) => Promise<boolean>;
   // Engine status pills
   wasmReady: boolean;
@@ -265,6 +267,36 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
   return {
     historyWarning: '',
+    openPerformanceMidi: (bytes, title, label) => {
+      const st = get();
+      if (st.busy || st.liveActive) throw new LocalizedError("请在当前演奏生成结束后试听。");
+      const midi = new Midi(bytes);
+      const notes = midi.tracks.filter(track => track.channel !== 9).flatMap(track => {
+        const strikes = track.notes.map(n => ({p:n.midi, s:n.time, d:n.duration, v:Math.round(n.velocity*127)}));
+        const pedal = (track.controlChanges[64] ?? []).map(cc => ({
+          number:64 as const, time:cc.time, value:Math.round(cc.value*127),
+        }));
+        return withSustain(strikes, pedal);
+      }).sort((a,b) => a.s-b.s);
+      if (!notes.length) throw new LocalizedError("无法打开这份演奏 MIDI。");
+      const duration = notes.reduce((end,n) => Math.max(end, n.s+n.d),0);
+      const source = new File([bytes], title+'.mid', {type:'audio/midi'});
+      const take: TakeRecord = {
+        id:crypto.randomUUID(), model:'midi', label:label || message("最终演奏"), subtitle:fmtTime(duration),
+        seed:0, finalMidi:bytes, rawNotes:notes, rawDuration:duration, restoredNotes:notes,
+        restoredDuration:duration, arpeggios:[],
+      };
+      pianoPlayer.stop(true);
+      pianoPlayer.setTrack(notes, duration);
+      pianoPlayer.seek(0);
+      const lastTick = midi.tracks.reduce((last, track) => Math.max(last, track.notes.at(-1)?.ticks ?? 0),0);
+      set({ performanceTitle:title, performanceSource:source, scoreMidi:midi, scoreNotes:notes,
+        scoreDuration:duration, totalBars:1 + Math.floor(midi.header.ticksToMeasures(lastTick)),
+        takes:[take], activeTakeId:take.id, activeTrack:'final_restored', rawAnnotations:[], writtenChords:[],
+        loadSheetPages:importedSheetLoader({midiFile:source, title, composer:''}), midiNotation:true,
+        isPlaying:false, progressMsg:'', progressPct:100, errorMsg:'' });
+      if (!st.pianoReady && !st.pianoLoading) void st.switchTimbre(st.activeTimbreId);
+    },
     openGeneration: async id => {
       const previous = get();
       if (previous.busy || previous.liveActive || previous.exportingWav) return false;
@@ -387,7 +419,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       set({ arpMs: v });
       const st = get();
       const tk = st.takes.find((t) => t.id === st.activeTakeId);
-      if (!st.scoreMidi || !tk) return;
+      if (!st.scoreMidi || !tk || tk.finalMidi) return;
       const t0 = performance.now();
       const fixed = restoreArpeggios(st.scoreMidi, tk.midi?.raw ?? tk.rawNotes, st.rawAnnotations, v);
       const restored = tk.midi ? withSustain(fixed.notes, tk.midi.pedals) : fixed.notes;
@@ -782,10 +814,11 @@ export const useStudioStore = create<StudioState>((set, get) => {
     activeMidi: (track = get().activeTrack) => {
       const st = get();
       const take = st.takes.find(t => t.id === st.activeTakeId);
+      if (take?.finalMidi) return take.finalMidi;
       const scoreHeader = take?.model === 'pianist' || track === 'score' ? st.scoreMidi?.header : undefined;
       if (take?.midi && track !== 'score') {
         const notes = track === 'pianoflow_raw' ? take.midi.raw : take.midi.restored;
-        return notesToMidiBytes(notes, modelNames[take.model], take.midi.pedals, scoreHeader);
+        return notesToMidiBytes(notes, takeModelNames[take.model], take.midi.pedals, scoreHeader);
       }
       return notesToMidiBytes(track === 'final_restored' && take ? take.restoredNotes : st.getActiveTrackData().notes, track, [], scoreHeader);
     },

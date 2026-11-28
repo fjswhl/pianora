@@ -16,7 +16,6 @@
     "deploy": "npm run build && node scripts/deploy-accounts.mjs"
   },
   "dependencies": {
-    "@breezystack/lamejs": "^1.2.7",
     "@clerk/localizations": "^4.28.0",
     "@clerk/react": "^6.19.7",
     "@sightread/lilypond-wasm": "^0.2.0",

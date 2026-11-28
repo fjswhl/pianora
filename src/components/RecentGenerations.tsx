@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, History } from 'lucide-react';
 import { display, t, useLocale } from '../i18n';
-import { modelNames } from '../engine/performance/types';
+import { takeModelNames } from '../engine/performance/types';
 import { listGenerations, type HistoryEntry } from '../store/generationHistory';
 import { fmtTime, useStudioStore } from '../store/useStudioStore';
 
@@ -45,7 +45,7 @@ export function RecentGenerations({ hasSession }: { hasSession: boolean }) {
             else setEntries(await listGenerations().catch(() => entries));
           }}>
             <span><strong>{entry.title}</strong>
-              <small>{modelNames[entry.model]} · Seed {entry.seed} · {fmtTime(entry.duration)} · {t("{0} 版", entry.count)}</small>
+              <small>{takeModelNames[entry.model]} · Seed {entry.seed} · {fmtTime(entry.duration)} · {t("{0} 版", entry.count)}</small>
             </span>
             <time dateTime={new Date(entry.time).toISOString()}>{dates.format(entry.time)}</time>
             <ArrowUpRight size={16} aria-hidden="true" />

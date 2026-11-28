@@ -35,25 +35,32 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
     const audioHash = form.get('audio_sha256'), label = form.get('take_label');
     if (audioHash !== null && (typeof audioHash !== 'string' || !/^[a-f0-9]{64}$/.test(audioHash) ||
         !(midi instanceof File) || typeof label !== 'string' || label.length > 200)) return json({ error: 'Invalid recording' }, 400);
-    if (!(source instanceof File) || !source.size || !/\.(ly|txt|mid|midi|musicxml|xml|mxl)$/i.test(source.name)
-      || source.name.length > 255 || typeof title !== 'string' || !title.trim() || title.length > 200
+    const midiOnly = source === null && midi instanceof File && audioHash === null;
+    if (label !== null && (typeof label !== 'string' || label.length > 200)) return json({error:'Invalid take label'},400);
+    if ((!midiOnly && (!(source instanceof File) || !source.size || !/\.(ly|txt|mid|midi|musicxml|xml|mxl)$/i.test(source.name)
+      || source.name.length > 255)) || typeof title !== 'string' || !title.trim() || title.length > 200
       || (midi !== null && (!(midi instanceof File) || !midi.size)))
       return json({ error: formatMessage(locale, '乐谱文件或名称无效') }, 400);
     // A retry (including two tabs saving the same take) completes the same private entry.
     const digest = async (bytes: BufferSource) =>
       Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), n => n.toString(16).padStart(2, '0')).join('');
-    const sourceHash = await digest(await source.arrayBuffer());
-    const takeHash = midi instanceof File ? await digest(await midi.arrayBuffer()) : '';
-    const identity = [owner, title.trim(), source.name, sourceHash, takeHash];
+    const midiBytes = midi instanceof File ? await midi.arrayBuffer() : null;
+    if (midiOnly && (!midiBytes || midiBytes.byteLength < 14 ||
+        new DataView(midiBytes).getUint32(0) !== 0x4d546864)) return json({error:'Invalid MIDI'},400);
+    const filename = source instanceof File ? source.name : '';
+    const sourceHash = source instanceof File ? await digest(await source.arrayBuffer()) : '';
+    const takeHash = midiBytes ? await digest(midiBytes) : '';
+    const identity = [owner, title.trim(), filename, sourceHash, takeHash];
+    if (midiOnly) identity.push(String(label ?? ''));
     if (audioHash) identity.push(audioHash, String(label));
     const id = await digest(new TextEncoder().encode(JSON.stringify(identity)));
     const prefix = `${owner}/${id}`;
     await db.prepare('INSERT OR IGNORE INTO saved_scores (id,user_id,title,filename,has_performance,created_at,audio_sha256,take_label) VALUES (?,?,?,?,?,?,?,?)')
-      .bind(id, owner, title.trim(), source.name, midi ? 1 : 0, Date.now(), audioHash, label).run();
+      .bind(id, owner, title.trim(), filename, midi ? 1 : 0, Date.now(), audioHash, label).run();
     const row = await db.prepare('SELECT ready FROM saved_scores WHERE id=? AND user_id=?').bind(id, owner).first<{ready: number}>();
     if (row?.ready === 1) return json({ id, ready: true });
     if (row?.ready === -1) return json({ id, ready: false });
-    await bucket.put(prefix + '/source', source.stream());
+    if (source instanceof File) await bucket.put(prefix + '/source', source.stream());
     if (midi instanceof File) await bucket.put(prefix + '/performance', midi.stream());
     if (audioHash) {
       // Mark the source and MIDI durable before accepting the recording upload.
@@ -66,9 +73,9 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
   const action = /^\/api\/library\/([a-f0-9]{64})\/(share|audio)$/.exec(path);
   if (action) {
     const id = action[1];
-    const row = await db.prepare('SELECT audio_sha256,ready FROM saved_scores WHERE id=? AND user_id=?')
-      .bind(id, owner).first<{audio_sha256:string|null;ready:number}>();
-    if (!row?.audio_sha256) return json({ error: 'Recording not found' }, 404);
+    const row = await db.prepare('SELECT has_performance,audio_sha256,ready FROM saved_scores WHERE id=? AND user_id=?')
+      .bind(id, owner).first<{has_performance:number;audio_sha256:string|null;ready:number}>();
+    if (!row?.has_performance || (action[2] === 'audio' && !row.audio_sha256)) return json({ error: 'Recording not found' }, 404);
     const key = owner + '/' + id + '/audio';
     if (action[2] === 'audio' && request.method === 'PUT') {
       if (row.ready === 1) return json({ id, ready:true });
@@ -77,7 +84,7 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
       if (!Number.isSafeInteger(size) || size < 4 || size > 96 * 1024 * 1024 || !request.body) return json({ error:'Invalid audio size' }, 413);
       if (request.headers.get('content-type') !== 'audio/mpeg') return json({error:'Expected MP3'},415);
       // R2 validates the digest while streaming; incomplete uploads never become visible.
-      await bucket.put(key, request.body, { sha256: row.audio_sha256, httpMetadata:{contentType:'audio/mpeg'} });
+      await bucket.put(key, request.body, { sha256: row.audio_sha256!, httpMetadata:{contentType:'audio/mpeg'} });
       const prefix = await bucket.get(key, {range:{offset:0,length:4}});
       const bytes = prefix && new Uint8Array(await prefix.arrayBuffer());
       if (!bytes || bytes[0] !== 255 || (bytes[1] & 0xe0) !== 0xe0) {

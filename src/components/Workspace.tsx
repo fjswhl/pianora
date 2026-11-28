@@ -1,5 +1,5 @@
-import { t, display } from '../i18n';
-import { lazy, Suspense, useEffect } from 'react';
+import { t, display, errorText, type DisplayText } from '../i18n';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useScoreStore } from '../store/useScoreStore';
 import { useStudioStore } from '../store/useStudioStore';
@@ -10,14 +10,33 @@ const StudioPanel = lazy(() =>
 );
 
 export default function Workspace({
-  page,
+  page, shareId,
   title,
   description,
 }: {
   page: 'editor' | 'studio';
+  shareId: string | null;
   title: string;
   description: string;
 }) {
+  const [shared, setShared] = useState<{id: string; error?: DisplayText} | null>(null);
+  useEffect(() => {
+    if (page !== 'studio' || !shareId) return;
+    const controller = new AbortController();
+    void (async () => {
+      try {
+        const response = await fetch('/p/'+shareId+'/performance', {signal:controller.signal});
+        if (!response.ok) throw new Error(t("这场演奏暂不可用。"));
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        if (controller.signal.aborted) return;
+        useStudioStore.getState().openPerformanceMidi(bytes,
+          decodeURIComponent(response.headers.get('X-Pianora-Title') ?? ''),
+          decodeURIComponent(response.headers.get('X-Pianora-Take') ?? ''));
+        setShared({id:shareId});
+      } catch (error) { if (!controller.signal.aborted) setShared({id:shareId, error:errorText(error)}); }
+    })();
+    return () => controller.abort();
+  }, [page, shareId]);
   const takes = useStudioStore((s) => s.takes);
   const error = useStudioStore(s => s.errorMsg);
   const progress = useStudioStore(s => s.progressMsg);
@@ -55,6 +74,10 @@ export default function Workspace({
     window.addEventListener('keydown', play);
     return () => window.removeEventListener('keydown', play);
   }, [page]);
+  if (page === 'studio' && shareId) {
+    if (shared?.id !== shareId) return <p role="status">{t("正在打开演奏…")}</p>;
+    if (shared.error) return <p role="alert">{display(shared.error)}</p>;
+  }
   return (
     <Suspense fallback={<p role="status">{t("正在打开演奏室…")}</p>}>
       {(page === 'editor' || !takes.length) && (
@@ -75,7 +98,7 @@ export default function Workspace({
           />
         </div>
       )}
-      {page === 'studio' && <RecentGenerations hasSession={Boolean(takes.length)} />}
+      {page === 'studio' && !shareId && <RecentGenerations hasSession={Boolean(takes.length)} />}
       {page === 'studio' && !takes.length && error && <p role="alert">{display(error)}</p>}
       {page === 'studio' && !takes.length && busy && <p role="status">{display(progress)}</p>}
       {page === 'studio' && takes.length > 0 && <StudioPanel key={takes[0].id} />}

@@ -2,7 +2,7 @@ import { t, LocalizedError } from '../i18n';
 import { renderMusicXmlToSvgPages } from './musicXmlSheet';
 import type { ImportedScoreData } from './scoreImport';
 
-export function importedSheetLoader(imported: ImportedScoreData) {
+export function importedSheetLoader(imported: Pick<ImportedScoreData, 'midiFile' | 'musicXmlText' | 'title' | 'composer'>) {
   const render = async () => {
     let xml = imported.musicXmlText;
     if (imported.midiFile) {

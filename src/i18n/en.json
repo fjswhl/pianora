@@ -1,4 +1,9 @@
 {
+  "演奏时长": "Duration",
+  "这场演奏暂不可用。": "This performance is unavailable.",
+  "无法打开这份演奏 MIDI。": "Could not open this performance MIDI.",
+  "最终演奏": "Final performance",
+  "打开演奏": "Open performance",
   "最近生成": "Recent generations",
   "无法读取此浏览器的生成记录。": "This browser could not read your recent generations.",
   "此浏览器会保留最近 10 次生成。": "This browser keeps your last 10 generations.",
@@ -9,7 +14,7 @@
   "正在加载 PianoFlow…": "Loading PianoFlow…",
   "演奏已生成，但浏览器未能保存本次记录。": "Your performance is ready, but this browser could not save it to recent generations.",
   "保存最终演奏": "Save final performance",
-  "正在渲染最终演奏…": "Rendering the final performance…",
+  "公开后，持链接者可在演奏室播放和下载这份 MIDI。": "Anyone with the link can play and download this MIDI in the studio.",
   "正在保存演奏…": "Saving the performance…",
   "有链接的人都可以试听这版演奏。": "Anyone with the link can listen to this performance.",
   "已取消公开分享。": "Public sharing is off.",

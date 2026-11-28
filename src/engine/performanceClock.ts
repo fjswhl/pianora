@@ -1,7 +1,7 @@
 import type { SimpleNote } from './arpeggio';
 
 // Call with ascending score times. Use the earliest attack when a chord is rolled.
-export function scoreToPerformanceTime(notes: SimpleNote[]) {
+export function scoreToPerformanceTime(notes: Pick<SimpleNote, 'scoreTime' | 's'>[]) {
   const earliest = new Map<number, number>();
   for (const note of notes) {
     if (note.scoreTime !== undefined)

@@ -20,7 +20,7 @@ function ScoreWindow({ score, images, harmony, degrees }: { score: FollowScore; 
     if (!take || track === 'score') return followTimeline(score, midi, [], scoreDuration);
     return track === 'pianoflow_raw'
       ? followTimeline(score, midi, take.rawNotes, take.rawDuration)
-      : followTimeline(score, midi, take.restoredNotes, take.restoredDuration);
+      : followTimeline(score, midi, take.scoreClock ?? take.restoredNotes, take.restoredDuration);
   }, [score, midi, take, track, scoreDuration, liveStatus]);
   const [index, setIndex] = useState(0);
   const rail = useRef<SVGRectElement>(null);

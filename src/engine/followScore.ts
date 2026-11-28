@@ -138,6 +138,9 @@ export function performanceOrder({ measures, repeats }: FollowScore, midi: Midi)
   const stack: { count: number; sections: Section[] }[] = [];
   const order: Measure[] = [];
   const current = () => stack.at(-1)?.sections.at(-1)?.bars ?? order;
+  // Bound expansion for imported and shared scores with malformed repeat metadata.
+  let work = 0;
+  const budget = Math.max(100_000, measures.length * 16);
   let next = 0;
   for (let i = 0; i <= measures.length; i++) {
     const bar = measures[i];
@@ -145,6 +148,7 @@ export function performanceOrder({ measures, repeats }: FollowScore, midi: Midi)
       const { kind, numbers } = events[next++];
       const frame = stack.at(-1);
       if (kind === 'start') {
+        if (!Number.isSafeInteger(numbers[0]) || numbers[0] < 1 || numbers[0] > budget) return measures;
         stack.push({ count: numbers[0], sections: [{ passes: [], bars: [] }] });
       } else if (frame && kind === 'ending' && numbers.length) {
         frame.sections.push({ passes: numbers, bars: [] });
@@ -153,6 +157,8 @@ export function performanceOrder({ measures, repeats }: FollowScore, midi: Midi)
         const target = current();
         for (let pass = 1; pass <= frame.count; pass++) {
           for (const section of frame.sections) {
+            work += 1 + section.bars.length;
+            if (work > budget) return measures;
             if (!section.passes.length || section.passes.includes(pass))
               for (const measure of section.bars) target.push(measure);
           }
@@ -164,7 +170,7 @@ export function performanceOrder({ measures, repeats }: FollowScore, midi: Midi)
   return stack.length || !order.length ? measures : order;
 }
 
-export function followTimeline(score: FollowScore, midi: Midi, notes: SimpleNote[], duration: number) {
+export function followTimeline(score: FollowScore, midi: Midi, notes: Pick<SimpleNote, 'scoreTime' | 's'>[], duration: number) {
   const playbackTime = scoreToPerformanceTime(notes);
   let ticks = 0;
   let previous = 0;

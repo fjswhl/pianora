@@ -71,8 +71,23 @@ with sync_playwright() as pw:
         String(new Uint8Array(await midiResponse.arrayBuffer())) === String(midiBytes);
       report.midiSource = (await fetch(midiLink+'/source')).status;
       report.midiAudio = (await fetch(midiLink+'/audio')).status;
+      const notationPath = midiItem+'/notation';
+      const sheetBytes = Uint8Array.of(31,139,8,1,2,3);
+      const attach = (token, bytes) => fetch(notationPath,{method:'PUT',headers:headers(token),body:bytes});
+      report.missingNotation = (await read(notationPath,tokens.owner)).status;
+      report.foreignNotationWrite = (await attach(tokens.other,sheetBytes)).status;
+      report.repaired = (await attach(tokens.owner,sheetBytes)).ok;
+      await attach(tokens.owner,Uint8Array.of(4));
+      const matches = async response => String(new Uint8Array(await response.arrayBuffer())) === String(sheetBytes);
+      report.privateNotation = await matches(await read(notationPath,tokens.owner));
+      report.foreignNotation = (await read(notationPath,tokens.other)).status;
+      report.sharedNotation = await matches(await fetch(midiLink+'/notation'));
+      form.set('notation',new Blob([sheetBytes]),'notation.gz');
+      const packet = await (await write()).json();
+      report.savedNotation = await matches(await read(path+'/'+packet.id+'/notation',tokens.owner));
       await fetch(midiItem+'/share',{method:'DELETE',headers:headers(tokens.owner)});
       report.midiRevoked = (await fetch(midiLink+'/performance')).status;
+      report.revokedNotation = (await fetch(midiLink+'/notation')).status;
       return report;
     }""", {"tokens": tokens, "source": source})
     result["foreignWrite"] = page.request.post(base+"/api/library", headers={
@@ -83,6 +98,8 @@ expected = dict(saved=201, repeated=200, ownEntries=1, source=True, take=True, p
 expected.update(pending=True, uploaded=True, foreignPublish=404, publicPage=200, range=206, rangeMatches=True,
                 publicSource=404, foreignRevoke=404, revoked=404, privateAudio=200, rotated=True, recordingMidiPrivate=404,
                 midiShare=True, midiSource=404, midiAudio=404, midiRevoked=404)
+expected.update(missingNotation=404,foreignNotationWrite=404,repaired=True,privateNotation=True,
+                foreignNotation=404,sharedNotation=True,savedNotation=True,revokedNotation=404)
 assert result == expected, result
 out = Path(os.environ.get("PIANORA_ARTIFACTS", "artifacts"))
 out.mkdir(parents=True, exist_ok=True)

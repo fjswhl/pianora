@@ -35,6 +35,9 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
     const audioHash = form.get('audio_sha256'), label = form.get('take_label');
     if (audioHash !== null && (typeof audioHash !== 'string' || !/^[a-f0-9]{64}$/.test(audioHash) ||
         !(midi instanceof File) || typeof label !== 'string' || label.length > 200)) return json({ error: 'Invalid recording' }, 400);
+    const notation = form.get('notation');
+    if (notation !== null && (!(notation instanceof File) || !notation.size || !(midi instanceof File) || audioHash !== null))
+      return json({error:'Invalid performance notation'},400);
     const midiOnly = source === null && midi instanceof File && audioHash === null;
     if (label !== null && (typeof label !== 'string' || label.length > 200)) return json({error:'Invalid take label'},400);
     if ((!midiOnly && (!(source instanceof File) || !source.size || !/\.(ly|txt|mid|midi|musicxml|xml|mxl)$/i.test(source.name)
@@ -52,6 +55,7 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
     const takeHash = midiBytes ? await digest(midiBytes) : '';
     const identity = [owner, title.trim(), filename, sourceHash, takeHash];
     if (midiOnly) identity.push(String(label ?? ''));
+    if (notation instanceof File) identity.push(await digest(await notation.arrayBuffer()));
     if (audioHash) identity.push(audioHash, String(label));
     const id = await digest(new TextEncoder().encode(JSON.stringify(identity)));
     const prefix = `${owner}/${id}`;
@@ -62,6 +66,7 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
     if (row?.ready === -1) return json({ id, ready: false });
     if (source instanceof File) await bucket.put(prefix + '/source', source.stream());
     if (midi instanceof File) await bucket.put(prefix + '/performance', midi.stream());
+    if (notation instanceof File) await bucket.put(prefix + '/notation', notation.stream());
     if (audioHash) {
       // Mark the source and MIDI durable before accepting the recording upload.
       await db.prepare('UPDATE saved_scores SET ready=-1 WHERE id=? AND user_id=? AND ready=0').bind(id, owner).run();
@@ -107,7 +112,16 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
     }
     return json({error:'Method not allowed'},405);
   }
-  const match = /^\/api\/library\/([a-f0-9]{64})\/(source|performance)$/.exec(path);
+  const match = /^\/api\/library\/([a-f0-9]{64})\/(source|performance|notation)$/.exec(path);
+  if (match && match[2] === 'notation' && request.method === 'PUT') {
+    const row = await db.prepare('SELECT id FROM saved_scores WHERE id=? AND user_id=? AND ready=1 AND has_performance=1 AND audio_sha256 IS NULL')
+      .bind(match[1], owner).first();
+    if (!row) return json({error:'Performance not found'},404);
+    const length = Number(request.headers.get('content-length'));
+    if (!request.body || !Number.isSafeInteger(length) || length < 1 || length > maxScoreSize) return json({error:'Invalid notation size'},413);
+    await bucket.put(owner+'/'+match[1]+'/notation', request.body, {onlyIf:{etagDoesNotMatch:'*'}});
+    return json({ready:true});
+  }
   if (match && request.method === 'GET') {
     const row = await db.prepare('SELECT filename, has_performance FROM saved_scores WHERE ready=1 AND id=? AND user_id=?')
       .bind(match[1], owner).first<{ filename: string; has_performance: number }>();
@@ -115,7 +129,7 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
       const object = await bucket.get(`${owner}/${match[1]}/${match[2]}`);
       if (object) return new Response(object.body, { headers: { ...headers,
         'Content-Type': 'application/octet-stream',
-        'Content-Disposition': "attachment; filename*=UTF-8''" + encodeURIComponent(match[2] === 'source' ? row.filename : 'Pianora.mid'),
+        'Content-Disposition': "attachment; filename*=UTF-8''" + encodeURIComponent(match[2] === 'source' ? row.filename : match[2] === 'notation' ? 'notation.gz' : 'Pianora.mid'),
       } });
     }
   }

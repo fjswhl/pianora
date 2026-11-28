@@ -38,5 +38,6 @@ for attempt in {1..60}; do
   sleep 1
 done
 python3 scripts/verify-accounts.py
+if [ -n "${PIANORA_NOTATION_DEV_URL:-}" ]; then python3 scripts/verify-saved-notation.py; fi
 
 PIANORA_BROWSER="${PIANORA_BROWSER:-chromium}" python3 scripts/verify-catalog.py http://127.0.0.1:8791 --output artifacts/catalog.json

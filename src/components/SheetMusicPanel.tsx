@@ -5,8 +5,16 @@ import { memo, useEffect, useMemo, useState } from 'react';
 import { FileMusic, Table2, ZoomIn, ZoomOut } from 'lucide-react';
 import { useStudioStore, fmtTime } from '../store/useStudioStore';
 
-const Engraving = memo(function Engraving({ svg }: { svg: string }) {
-  return <div dangerouslySetInnerHTML={{ __html: svg }} />;
+// Treat shared pages as images, including when the full score is open.
+const Engraving = memo(function Engraving({ svg, box }: { svg: string; box: number[] }) {
+  const [url, setUrl] = useState('');
+  useEffect(() => {
+    const object = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    setUrl(object);
+    return () => URL.revokeObjectURL(object);
+  }, [svg]);
+  return <svg viewBox={box.join(' ')}>{url && <image href={url} x={box[0]} y={box[1]}
+    width={box[2]} height={box[3]} />}</svg>;
 });
 
 export function SheetMusicPanel({ harmony, degrees }: { harmony: Harmony; degrees: boolean }) {
@@ -99,7 +107,7 @@ export function SheetMusicPanel({ harmony, degrees }: { harmony: Harmony; degree
                 style={{ width: `${zoom}%` }}
               >
                 <div className="harmony-page">
-                  <Engraving svg={svgHtml} />
+                  {score && <Engraving svg={svgHtml} box={score.pages[i].box} />}
                   {labels.length > 0 && score && <svg className="harmony-overlay" aria-hidden="true" viewBox={score.pages[i].box.join(' ')}>
                     {score.rows.map((row,j) => row.page === i && <HarmonyLabels key={j} labels={labels[j]}
                       y={Math.max(2,row.top-0.4)} right={row.right} current={harmony.current} degrees={degrees} />)}

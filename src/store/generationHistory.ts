@@ -111,3 +111,37 @@ export async function rememberGeneration(state: StudioState, takes: TakeRecord[]
     void state.loadSheetPages().then(pages => storeGenerationPages(Number(key), pages)).catch(() => {});
   }
 }
+
+// Old cloud entries contain only the final MIDI. Titles and seeds can collide;
+// only an identical MIDI export proves which local take supplied this score.
+export async function recoverNotation(bytes: Uint8Array, title: string) {
+  const { finalTakeMidi } = await import('../engine/takeMidi');
+  const { Midi } = await import('@tonejs/midi');
+  const { captureNotation } = await import('../engine/savedNotation');
+  const { readFollowScore } = await import('../engine/followScore');
+  const { isDirectScoreFile, parseDirectScoreFile } = await import('../engine/scoreImport');
+  for (const entry of await listGenerations()) {
+    if (entry.title !== title) continue;
+    const session = await getGeneration(entry.id);
+    if (!session?.performanceSource) continue;
+    const midi = new Midi();
+    midi.fromJSON(session.score);
+    const take = session.takes.find(take => {
+      const candidate = finalTakeMidi(take, midi.header);
+      return candidate.length === bytes.length && candidate.every((v, i) => v === bytes[i]);
+    });
+    if (!take) continue;
+    const file = session.performanceSource;
+    const load = async () => {
+      const pages = await getGenerationPages(entry.id);
+      if (pages?.length && readFollowScore(pages).rows.length) return pages;
+      if (isDirectScoreFile(file.name)) {
+        const { importedSheetLoader } = await import('../engine/importedSheet');
+        return importedSheetLoader(await parseDirectScoreFile(file))();
+      }
+      const { lilypondEngine } = await import('../engine/instances');
+      return lilypondEngine.sheetLoader(await file.text())();
+    };
+    return captureNotation(load, midi, take.restoredNotes, session.writtenChords, session.totalBars, !!session.midiNotation);
+  }
+}

@@ -30,6 +30,7 @@ export function StudioPanel({publishableKey}: {publishableKey:string | null}) {
   const togglePlay = useStudioStore(s => s.togglePlay);
   const title = useStudioStore((s) => s.performanceTitle);
   const savedMidi = useStudioStore(s => s.takes[0]?.model === 'midi');
+  const missingOriginal = useStudioStore(s => s.takes[0]?.model === 'midi' && !s.savedNotation);
   const midiNotation = useStudioStore(s => s.midiNotation);
   const score = useStudioStore(s => s.scoreMidi);
   const [requestedScore, setRequestedScore] = useState<typeof score>(null);
@@ -69,6 +70,7 @@ export function StudioPanel({publishableKey}: {publishableKey:string | null}) {
           </button>
         ))}
       </div>
+      {missingOriginal && <p role="status">{t("这份旧演奏没有保存原谱。显示的谱面由演奏 MIDI 估算。")}</p>}
       {view !== 'shape' && <div className="harmony-tools">
         <label><input type="checkbox" checked={showHarmony} onChange={e => setShowHarmony(e.target.checked)} /> {t('和声分析')}</label>
         {showHarmony && <label><input type="checkbox" checked={degrees} onChange={e => setDegrees(e.target.checked)} /> {t('显示级数')}</label>}

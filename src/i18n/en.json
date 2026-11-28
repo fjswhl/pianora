@@ -9,6 +9,8 @@
   "全部作品集": "All collections",
   "作品集": "Collection",
   "作曲家": "Composer",
+  "公开后，持链接者可试听、下载 MIDI，并查看已保存的谱面。": "Anyone with the link can listen, download the MIDI and view the saved notation.",
+  "这份旧演奏没有保存原谱。显示的谱面由演奏 MIDI 估算。": "The original score is unavailable for this older performance. Its notation is estimated from the performed MIDI.",
   "登录 Pianora": "Sign in to Pianora",
   "个人中心": "My profile",
   "正在保存…": "Saving\u2026",

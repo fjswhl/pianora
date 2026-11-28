@@ -38,6 +38,17 @@ def verify_performance(page, browser):
         with button.page.expect_download() as result:
             button.click()
         return hashlib.sha256(Path(result.value.path()).read_bytes()).hexdigest()
+    def sheet(page):
+        page.get_by_role("button", name="查看谱面",exact=True).click()
+        page.locator(".svg-sheet-page").first.wait_for(timeout=120000)
+        images = page.locator(".svg-sheet-page image")
+        images.first.wait_for()
+        hashes = images.evaluate_all("""imgs => Promise.all(imgs.map(async img =>
+          Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',
+            await (await fetch(img.getAttribute('href'))).arrayBuffer()))).join(',')))""")
+        page.get_by_role("button", name="试听与导出",exact=True).click()
+        return hashes
+    original_sheet = sheet(page)
     final_midi = download(page.locator("#dlMidiBtn"))
     page.get_by_role("button", name="原谱演奏", exact=True).click()
     assert download(page.locator("#dlMidiBtn")) != final_midi
@@ -51,13 +62,14 @@ def verify_performance(page, browser):
     assert download(row.get_by_role("button", name="下载 MIDI")) == final_midi
     assert len(uploads) == 1
     payload = uploads[0].post_data_buffer
-    assert b'name="performance"' in payload and b'name="source"' not in payload and b'audio_sha256' not in payload
+    assert b'name="performance"' in payload and b'name="notation"' in payload and b'name="source"' not in payload and b'audio_sha256' not in payload
     page.goto(base + "/#library")
     page.reload()
     page.get_by_role("link", name="个人中心",exact=True).first.click()
     row.get_by_role("button", name="打开演奏").click()
     page.wait_for_url("**/#studio")
     expect(page.locator("dialog")).to_have_count(0)
+    assert sheet(page) == original_sheet
     assert download(page.locator("#dlMidiBtn")) == final_midi
     page.get_by_role("link", name="个人中心",exact=True).first.click()
     row = page.locator(".collection-list > li").filter(has=page.get_by_role("button",name="打开演奏")).first
@@ -72,6 +84,7 @@ def verify_performance(page, browser):
     listener.locator("#playBtn").click()
     listener.wait_for_function("Number(document.querySelector('#seekSlider').value) > 0.2")
     assert download(listener.locator("#dlMidiBtn")) == final_midi
+    assert sheet(listener) == original_sheet
     assert guest.request.get(link + "/source").status == guest.request.get(link + "/audio").status == 404
     row.get_by_role("button",name="取消公开分享").click()
     expect(page.locator(".profile-page [role=status]")).to_contain_text("已取消")

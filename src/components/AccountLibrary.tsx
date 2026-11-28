@@ -2,22 +2,24 @@ import { message, errorText, display, type DisplayText, LocalizedError, t, getLo
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, BookOpen, Disc3, Download, FileMusic, LibraryBig, Link2, LockKeyhole, LogOut, MoreHorizontal, Unlink, X } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { captureNotation, packNotation, unpackNotation, notationFromSource } from '../engine/savedNotation';
 import { useScoreStore } from '../store/useScoreStore';
 
 import { ClerkFailed, ClerkProvider, SignIn, useAuth, useClerk, useUser } from '@clerk/react';
 import { zhCN } from '@clerk/localizations/zh-CN';
 interface Item { created_at: number; id: string; title: string; filename: string; has_performance: number; has_audio: number; take_label: string | null; share_id: string | null }
-interface Draft { title: string; source?: File; performance?: Uint8Array<ArrayBuffer>; takeLabel?: string }
+interface Draft { title: string; source?: File; notation?: Blob; performance?: Uint8Array<ArrayBuffer>; takeLabel?: string }
 type Intent = 'editor' | 'studio';
 
 type GetToken = () => Promise<string | null>;
-async function api(getToken: GetToken, path: string, body?: FormData | Blob, method = body ? 'POST' : 'GET') {
+async function api(getToken: GetToken, path: string, body?: FormData | Blob, method = body ? 'POST' : 'GET', optional = false) {
   const token = await getToken();
   if (!token) throw new LocalizedError("登录已过期，请重新打开我的曲库并登录。");
   const response = await fetch('/api/' + path, {
     method, body,
     headers: { 'Accept-Language': getLocale(), Authorization: 'Bearer ' + token },
   });
+  if (optional && response.status === 404) return response;
   if (!response.ok) {
     if (response.status === 401) throw new LocalizedError("登录已过期，请重新打开我的曲库并登录。");
     throw new LocalizedError("请求未完成，请重试。");
@@ -36,7 +38,11 @@ async function currentDraft(intent: Intent): Promise<Draft> {
   const s = useStudioStore.getState();
   const take = s.takes.find(item => item.id === s.activeTakeId);
   if (!take || s.liveActive || s.busy) throw new LocalizedError("请先完成演奏生成。");
-  return { title: display(s.performanceTitle), performance: new Uint8Array(s.activeMidi('final_restored')),
+  const performance = new Uint8Array(s.activeMidi('final_restored'));
+  const notation = s.savedNotation ?? (s.performanceSource && s.loadSheetPages && s.scoreMidi
+    ? await captureNotation(s.loadSheetPages, s.scoreMidi, take.restoredNotes, s.writtenChords, s.totalBars, !!s.midiNotation)
+    : null);
+  return { title: display(s.performanceTitle), performance, notation: notation ? await packNotation(notation) : undefined,
     takeLabel: display(take.label) };
 }
 
@@ -120,6 +126,7 @@ function SaveDraft({intent,finish}:SaveProps) {
     const form = new FormData();
     form.set('title',draft.title);
     if (draft.source) form.set('source',draft.source);
+    if (draft.notation) form.set('notation',draft.notation,'notation.gz');
     if (draft.performance) {
       form.set('performance',new Blob([draft.performance],{type:'audio/midi'}),'performance.mid');
       form.set('take_label',draft.takeLabel ?? '');
@@ -173,12 +180,27 @@ function PrivateLibrary() {
     finally { setBusy(false); }
   }
   async function openPerformance(item: Item) {
-    const [response, { useStudioStore }] = await Promise.all([
-      api(getToken, 'library/'+item.id+'/performance'), import('../store/useStudioStore'),
+    const path = 'library/'+item.id;
+    const [response, sheet, { useStudioStore }] = await Promise.all([
+      api(getToken, path+'/performance'), api(getToken,path+'/notation',undefined,'GET',true), import('../store/useStudioStore'),
     ]);
     const bytes = new Uint8Array(await response.arrayBuffer());
+    let notation = sheet.ok ? await unpackNotation(sheet) : undefined;
+    if (!notation) {
+      const { recoverNotation } = await import('../store/generationHistory');
+      notation = await recoverNotation(bytes,item.title).catch(() => undefined);
+      if (!notation && item.filename) {
+        const { Midi } = await import('@tonejs/midi');
+        const source = await api(getToken,path+'/source',undefined,'GET',true);
+        if (source.ok) notation = await notationFromSource(new File([await source.blob()],item.filename),new Midi(bytes)).catch(() => undefined);
+      }
+      if (notation && !item.has_audio) {
+        // Preserve the existing item and its public link when recovering an older take.
+        void packNotation(notation).then(blob => api(getToken,path+'/notation',blob,'PUT')).catch(() => {});
+      }
+    }
     if (!mounted.current) return;
-    useStudioStore.getState().openPerformanceMidi(bytes, item.title, item.take_label);
+    useStudioStore.getState().openPerformanceMidi(bytes, item.title, item.take_label, notation);
     location.hash='studio';
   }
   async function share(item: Item, method: 'POST' | 'DELETE') {
@@ -243,7 +265,7 @@ function PrivateLibrary() {
             <button disabled={busy} onClick={()=>void run(async()=>{await navigator.clipboard.writeText(location.origin+'/p/'+item.share_id); setStatus(() => message("已复制分享链接。"));})}><Link2 size={15}/>{t("复制链接")}</button>
             <button disabled={busy} onClick={()=>void run(()=>share(item,'DELETE'))}><Unlink size={15}/>{t("取消公开分享")}</button>
           </> : <button disabled={busy} onClick={()=>void run(()=>share(item,'POST'))}><Link2 size={15}/>{t("公开分享演奏")}</button>}
-          {!item.has_audio && <small>{t("公开后，持链接者可在演奏室播放和下载这份 MIDI。")}</small>}
+          {!item.has_audio && <small>{t("公开后，持链接者可试听、下载 MIDI，并查看已保存的谱面。")}</small>}
         </div></details>}</li>;
       })}</ul>
     </section>

@@ -36,17 +36,17 @@ const escapeText = (s: string) => s.replaceAll('&', '&amp;').replaceAll('<', '&l
 export async function sharedPerformance(request: Request, env: AccountEnv): Promise<Response> {
   if (!['GET','HEAD'].includes(request.method)) return new Response(null, { status: 405, headers: { ...privateHeaders, Allow: 'GET, HEAD' } });
   const path = new URL(request.url).pathname;
-  const match = /^\/p\/([a-f0-9]{32})(\/audio|\/performance)?\/?$/.exec(path);
+  const match = /^\/p\/([a-f0-9]{32})(\/audio|\/performance|\/notation)?\/?$/.exec(path);
   const row = match && env.DB && env.PRIVATE_SCORES ? await env.DB.prepare(
     'SELECT id,user_id,title,take_label,audio_sha256 FROM saved_scores WHERE share_id=? AND ready=1 AND has_performance=1',
   ).bind(match[1]).first<{id:string;user_id:string;title:string;take_label:string;audio_sha256:string|null}>() : null;
   if (match?.[2]) {
     if (row?.audio_sha256 && match[2] === '/audio') return recordedAudio(request, env.PRIVATE_SCORES!, row.user_id+'/'+row.id+'/audio');
-    if (row && !row.audio_sha256 && match[2] === '/performance') {
-      const key = row.user_id+'/'+row.id+'/performance';
+    if (row && !row.audio_sha256 && (match[2] === '/performance' || match[2] === '/notation')) {
+      const key = row.user_id+'/'+row.id+match[2];
       const object = request.method === 'HEAD' ? await env.PRIVATE_SCORES!.head(key) : await env.PRIVATE_SCORES!.get(key);
       if (object) return new Response('body' in object ? (object as R2ObjectBody).body : null, { headers: {
-        ...privateHeaders, 'Content-Type':'audio/midi', 'X-Pianora-Title':encodeURIComponent(row.title),
+        ...privateHeaders, 'Content-Type':match[2] === '/performance' ? 'audio/midi' : 'application/octet-stream', 'X-Pianora-Title':encodeURIComponent(row.title),
         'X-Pianora-Take':encodeURIComponent(row.take_label ?? ''),
       } });
     }

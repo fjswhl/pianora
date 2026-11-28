@@ -1,3 +1,4 @@
+import { unpackNotation } from '../engine/savedNotation';
 import { t, display, errorText, type DisplayText } from '../i18n';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
@@ -26,13 +27,15 @@ export default function Workspace({
     const controller = new AbortController();
     void (async () => {
       try {
-        const response = await fetch('/p/'+shareId+'/performance', {signal:controller.signal});
+        const [response, sheet] = await Promise.all(['performance','notation'].map(name =>
+          fetch('/p/'+shareId+'/'+name, {signal:controller.signal})));
         if (!response.ok) throw new Error(t("这场演奏暂不可用。"));
         const bytes = new Uint8Array(await response.arrayBuffer());
+        const notation = sheet.status === 404 ? undefined : await unpackNotation(sheet);
         if (controller.signal.aborted) return;
         useStudioStore.getState().openPerformanceMidi(bytes,
           decodeURIComponent(response.headers.get('X-Pianora-Title') ?? ''),
-          decodeURIComponent(response.headers.get('X-Pianora-Take') ?? ''));
+          decodeURIComponent(response.headers.get('X-Pianora-Take') ?? ''), notation);
         setShared({id:shareId});
       } catch (error) { if (!controller.signal.aborted) setShared({id:shareId, error:errorText(error)}); }
     })();

@@ -34,6 +34,10 @@ import { importedSheetLoader } from '../engine/importedSheet';
 import { parseDirectScoreFile, isDirectScoreFile } from '../engine/scoreImport';
 import { rememberGeneration, getGeneration, getGenerationPages, storeGenerationPages } from './generationHistory';
 
+import type { SavedNotation } from '../engine/savedNotation';
+import { readFollowScore } from '../engine/followScore';
+import { finalTakeMidi } from '../engine/takeMidi';
+
 export type TrackKey = 'score' | 'pianoflow_raw' | 'final_restored';
 export type StageStatus = 'idle' | 'active' | 'done';
 
@@ -43,6 +47,7 @@ export interface TakeRecord {
   subtitle: DisplayText;
   seed: number;
   model: keyof typeof takeModelNames;
+  scoreClock?: SavedNotation['clock'];
   finalMidi?: Uint8Array<ArrayBuffer>;
   perfState?: PerfState;
   midi?: { raw: SimpleNote[]; restored: SimpleNote[]; pedals: Pedal[] };
@@ -106,7 +111,7 @@ export function getLiveSession(): LiveConductorSession | null {
 
 export interface StudioState {
   historyWarning: DisplayText;
-  openPerformanceMidi: (bytes: Uint8Array<ArrayBuffer>, title: string, label: string | null) => void;
+  openPerformanceMidi: (bytes: Uint8Array<ArrayBuffer>, title: string, label: string | null, notation?: SavedNotation) => void;
   openGeneration: (id: number) => Promise<boolean>;
   // Engine status pills
   wasmReady: boolean;
@@ -129,6 +134,7 @@ export interface StudioState {
 
   // Score & Pipeline params
   performanceTitle: DisplayText;
+  savedNotation: SavedNotation | null;
   performanceSource: File | null;
   model: keyof typeof modelNames;
   dexSteps: number;
@@ -267,7 +273,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
   return {
     historyWarning: '',
-    openPerformanceMidi: (bytes, title, label) => {
+    openPerformanceMidi: (bytes, title, label, notation) => {
       const st = get();
       if (st.busy || st.liveActive) throw new LocalizedError("请在当前演奏生成结束后试听。");
       const midi = new Midi(bytes);
@@ -280,20 +286,23 @@ export const useStudioStore = create<StudioState>((set, get) => {
       }).sort((a,b) => a.s-b.s);
       if (!notes.length) throw new LocalizedError("无法打开这份演奏 MIDI。");
       const duration = notes.reduce((end,n) => Math.max(end, n.s+n.d),0);
+      const scoreMidi = notation ? new Midi() : midi;
+      if (notation) scoreMidi.fromJSON(notation.score);
       const source = new File([bytes], title+'.mid', {type:'audio/midi'});
       const take: TakeRecord = {
         id:crypto.randomUUID(), model:'midi', label:label || message("最终演奏"), subtitle:fmtTime(duration),
-        seed:0, finalMidi:bytes, rawNotes:notes, rawDuration:duration, restoredNotes:notes,
+        seed:0, scoreClock:notation?.clock, finalMidi:bytes, rawNotes:notes, rawDuration:duration, restoredNotes:notes,
         restoredDuration:duration, arpeggios:[],
       };
       pianoPlayer.stop(true);
       pianoPlayer.setTrack(notes, duration);
       pianoPlayer.seek(0);
       const lastTick = midi.tracks.reduce((last, track) => Math.max(last, track.notes.at(-1)?.ticks ?? 0),0);
-      set({ performanceTitle:title, performanceSource:source, scoreMidi:midi, scoreNotes:notes,
-        scoreDuration:duration, totalBars:1 + Math.floor(midi.header.ticksToMeasures(lastTick)),
-        takes:[take], activeTakeId:take.id, activeTrack:'final_restored', rawAnnotations:[], writtenChords:[],
-        loadSheetPages:importedSheetLoader({midiFile:source, title, composer:''}), midiNotation:true,
+      set({ performanceTitle:title, performanceSource:null, savedNotation:notation ?? null, scoreMidi, scoreNotes:notes,
+        scoreDuration:duration, totalBars:notation?.bars ?? (1 + Math.floor(midi.header.ticksToMeasures(lastTick))),
+        takes:[take], activeTakeId:take.id, activeTrack:'final_restored', rawAnnotations:[], writtenChords:notation?.writtenChords ?? [],
+        loadSheetPages:notation ? async () => notation.pages : importedSheetLoader({midiFile:source, title, composer:''}),
+        midiNotation:notation?.midiNotation ?? true,
         isPlaying:false, progressMsg:'', progressPct:100, errorMsg:'' });
       if (!st.pianoReady && !st.pianoLoading) void st.switchTimbre(st.activeTimbreId);
     },
@@ -311,7 +320,8 @@ export const useStudioStore = create<StudioState>((set, get) => {
         let pending: Promise<string[]> | undefined;
         const loadPages = async () => {
           const cached = await getGenerationPages(id).catch(() => undefined);
-          if (cached) return cached;
+          // MusicXML geometry is registered in memory by OSMD and older page caches lack it.
+          if (cached && (!isDirectScoreFile(source.name) || readFollowScore(cached).rows.length)) return cached;
           const loader = isDirectScoreFile(source.name)
             ? importedSheetLoader(await parseDirectScoreFile(source))
             : lilypondEngine.sheetLoader(await source.text());
@@ -324,7 +334,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         pianoPlayer.setTrack(take.restoredNotes, take.restoredDuration);
         pianoPlayer.seek(0);
         set({
-          ...session, scoreMidi, isPlaying: false, activeTrack: 'final_restored',
+          ...session, savedNotation:null, scoreMidi, isPlaying: false, activeTrack: 'final_restored',
           loadSheetPages: () => pending ??= loadPages().catch(e => { pending = undefined; throw e; }),
           stages: { ...session.stages, st5: get().stages.st5 }, progressMsg: '', progressPct: 100,
         });
@@ -358,6 +368,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     isPlaying: false,
     exportingWav: false,
 
+    savedNotation: null,
     performanceSource: null,
     performanceTitle: '',
     model: 'pianoflow',
@@ -707,6 +718,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         const duration = (notes: SimpleNote[]) => notes.reduce((end,n) => Math.max(end,n.s+n.d),0);
 
         set({
+          savedNotation: null,
           performanceSource: score.originalFile ?? new File([lyCode], score.selectedPresetId + ".ly"),
           performanceTitle:
             imported ? () => imported.title :
@@ -814,6 +826,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     activeMidi: (track = get().activeTrack) => {
       const st = get();
       const take = st.takes.find(t => t.id === st.activeTakeId);
+      if (track === 'final_restored' && take && st.scoreMidi) return finalTakeMidi(take, st.scoreMidi.header);
       if (take?.finalMidi) return take.finalMidi;
       const scoreHeader = take?.model === 'pianist' || track === 'score' ? st.scoreMidi?.header : undefined;
       if (take?.midi && track !== 'score') {

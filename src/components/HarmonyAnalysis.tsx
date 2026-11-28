@@ -41,7 +41,7 @@ export function useHarmony(enabled: boolean) {
         ? []
         : track === 'pianoflow_raw'
           ? take.rawNotes
-          : take.restoredNotes;
+          : take.scoreClock ?? take.restoredNotes;
     const map = scoreToPerformanceTime(notes);
     let previous = 0;
     return events.map((event) => {

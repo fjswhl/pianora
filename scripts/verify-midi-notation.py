@@ -29,7 +29,7 @@ with sync_playwright() as playwright:
         page.get_by_role("button", name="查看谱面").click()
         pages = page.locator(".svg-sheet-page svg:not(.harmony-overlay)")
         expect(pages.first).to_be_visible(timeout=90000)
-        assert pages.first.locator("path").count() > 10
+        assert pages.first.locator("image").evaluate("""async img => new DOMParser().parseFromString(await (await fetch(img.getAttribute('href'))).text(), 'image/svg+xml').querySelectorAll('path').length""") > 10
         report[song] = {"pages": pages.count(), "entry": "preset" if preset else "upload"}
         if preset:
             page.locator("#svgGallery").screenshot(path=output / "midi-notation.png")

@@ -107,8 +107,9 @@ with TemporaryDirectory() as profile, sync_playwright() as pw:
     report["installBytesUncompressed"] = sum(Path("dist"+p).stat().st_size for p in build["core"])
     assert report["installBytesUncompressed"] < 1024 * 1024
     css = next(path for path in build["core"] if path.endswith(".css"))
-    assert page.evaluate("p=>fetch(p,{headers:{Range:'bytes=0-0'}}).then(r=>r.status)",css) == 206
-    assert page.evaluate("p=>fetch(p,{headers:{Authorization:'fixture'}}).then(r=>r.text())",css) == "authorized-network-response"
+    # Bypass the separate HTTP cache to observe whether the service worker forwards each request.
+    assert page.evaluate("p=>fetch(p,{cache:'no-store',headers:{Range:'bytes=0-0'}}).then(r=>r.status)",css) == 206
+    assert page.evaluate("p=>fetch(p,{cache:'no-store',headers:{Authorization:'fixture'}}).then(r=>r.text())",css) == "authorized-network-response"
     expect(page.locator(".score-card").first).to_be_visible()
     page.locator(".score-card").first.click()
     expect(page.locator("#lyEditor")).to_have_value(source.decode())

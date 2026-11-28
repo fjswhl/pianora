@@ -4,6 +4,7 @@ import { display, message, type DisplayText } from '../i18n';
 import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
 import { injectSchemeHook, type RawArpeggioAnnotation } from './arpeggio';
+import { realizeLilyOrnaments } from './ornaments';
 import midiOnly from './midiOnly.ily?raw';
 import glyphCache from './svgGlyphCache.ily?raw';
 import { readScoreFiles } from './scoreFiles';
@@ -107,8 +108,9 @@ export class BrowserLilyPondEngine {
     try {
       await this.prepare();
       onProgress?.(message("正在提取演奏 MIDI 和琶音标记…"), 22);
-      const { midi, rawAnnotations, chordText } = await this.run(source, 'midi');
+      const { midi, rawAnnotations, chordText, ornamentText } = await this.run(source, 'midi');
       const scoreMidi = new Midi(midi);
+      realizeLilyOrnaments(scoreMidi, ornamentText);
       const loadPages = this.sheetLoader(source);
       let writtenChords = readLilyChords(chordText, scoreMidi.header.ppq);
       // ChordNames follows printed order; playback MIDI may unfold voltas.

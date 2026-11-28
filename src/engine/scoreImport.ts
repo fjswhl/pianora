@@ -12,6 +12,8 @@ import { keyNames, readWrittenChord, type WrittenChord } from './harmony';
 import { Midi } from '@tonejs/midi';
 import type { RawArpeggioAnnotation } from './arpeggio';
 
+import { realizeOrnaments, readXmlOrnament, type Ornament } from './ornaments';
+import type { Note } from '@tonejs/midi/dist/Note';
 import type { ScoreMark } from './performance/types';
 
 export type ImportedFormat = 'midi' | 'musicxml';
@@ -248,6 +250,7 @@ async function readMusicXmlText(file: File): Promise<string> {
  */
 export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> {
   const xmlText = await readMusicXmlText(file);
+  const ornamentMarks = new Map<Note, Ornament>();
   const performanceMarks = new Map<string, ScoreMark>();
   const writtenChords = new Map<number, WrittenChord>();
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
@@ -293,14 +296,18 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     let dynamic = 0;
     let dynamicStart = 0;
     let barNum = 0;
+    let fifths = 0;
+    const staffKeys = new Map<string, number>();
+    const trillLines = new Set<string>();
 
     // Active ties keyed by `${voice}_${staff}_${midiPitch}` -> { ticks, durationTicks, velocity }
     const openTies = new Map<string, { midi: number; ticks: number; durationTicks: number; velocity: number }>();
-    const pendingNotes: Array<{ midi: number; ticks: number; durationTicks: number; velocity: number }> = [];
+    const pendingNotes: Array<{ midi: number; ticks: number; durationTicks: number; velocity: number; ornament?: Ornament }> = [];
 
     const measures = Array.from(part.children).filter((el) => el.tagName === 'measure');
     for (const measure of measures) {
       barNum++;
+      const accidentals = new Map<string, number>();
       let measureStartTick = partTick;
       let cursorTick = measureStartTick;
       let lastNoteOnsetTick = measureStartTick;
@@ -314,6 +321,13 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
           if (divTxt) {
             const parsed = parseFloat(divTxt);
             if (parsed > 0) divisions = parsed;
+          }
+          for (const key of child.querySelectorAll('key')) {
+            const value = key.querySelector('fifths')?.textContent;
+            if (value == null) continue;
+            const number = key.getAttribute('number');
+            if (number) staffKeys.set(number, Number(value));
+            else { fifths = Number(value); staffKeys.clear(); }
           }
           if (pIdx === 0) {
             const key = child.querySelector('key');
@@ -401,6 +415,17 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
               if (midiPitch >= 21 && midiPitch <= 108) {
                 const voice = child.querySelector('voice')?.textContent?.trim() || '1';
                 const staff = child.querySelector('staff')?.textContent?.trim() || '1';
+                const accidentalKey = (s: string, o: number) => [staff, s, o].join('/');
+                accidentals.set(accidentalKey(step, octave), alter);
+                const lineKey = voice + '/' + staff + '/';
+                const lines = Array.from(child.querySelectorAll('ornaments > wavy-line'));
+                for (const line of lines) if (line.getAttribute('type') === 'start')
+                  trillLines.add(lineKey + (line.getAttribute('number') || '1'));
+                const ornament = readXmlOrnament(child, step, octave, midiPitch, staffKeys.get(staff) ?? fifths,
+                  lines.length > 0 || (!isChord && !isGrace && Array.from(trillLines).some(key => key.startsWith(lineKey))),
+                  (s, o) => accidentals.get(accidentalKey(s, o)));
+                for (const line of lines) if (line.getAttribute('type') === 'stop')
+                  trillLines.delete(lineKey + (line.getAttribute('number') || '1'));
                 const tieKey = `${voice}_${staff}_${midiPitch}`;
                 const tieEls = Array.from(child.querySelectorAll('tie'));
                 const hasTieStart = tieEls.some((t) => t.getAttribute('type') === 'start');
@@ -422,6 +447,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
                   if (!hasTieStart) openTies.delete(tieKey);
                 } else {
                   const noteObj = {
+                    ornament,
                     midi: midiPitch,
                     ticks: onsetTick,
                     durationTicks: durTicks,
@@ -456,8 +482,9 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     }
 
     pendingNotes.sort((a, b) => a.ticks - b.ticks || a.midi - b.midi);
-    for (const n of pendingNotes) {
+    for (const { ornament, ...n } of pendingNotes) {
       track.addNote(n);
+      if (ornament) ornamentMarks.set(track.notes[track.notes.length - 1], ornament);
       totalNotes++;
     }
   }
@@ -477,6 +504,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     midi.header.timeSignatures.push({ ticks: 0, timeSignature: [4, 4] });
   }
   midi.header.update();
+  realizeOrnaments(midi, ornamentMarks, performanceMarks);
 
   const stats = summarizeMidi(midi);
   return {

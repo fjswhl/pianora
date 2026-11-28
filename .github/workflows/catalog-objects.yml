@@ -5,7 +5,7 @@ on:
       collection:
         description: Score collection
         type: choice
-        options: [seed, mutopia-piano, keyboard-editions, mutopia-keyboard, classical-mxl, classical-mxl-2, well-tempered, concert-repertoire]
+        options: [seed, mutopia-piano, keyboard-editions, mutopia-keyboard, classical-mxl, classical-mxl-2, well-tempered, concert-repertoire, piano-classics]
         default: seed
 permissions:
   contents: read

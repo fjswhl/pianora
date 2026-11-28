@@ -1,0 +1,24 @@
+name: Verify and upload catalog seed
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Upload missing files and verify stored checksums
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          files=catalog/seed/files
+          if [ ! -d "$files" ]; then files=public/presets; fi
+          node scripts/import-catalog.mjs --remote --files "$files" --sql-out catalog.sql
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-catalog-metadata
+          path: catalog.sql

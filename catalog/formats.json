@@ -1,0 +1,12 @@
+{
+  "ly": "text/plain; charset=utf-8",
+  "xml": "application/xml",
+  "musicxml": "application/vnd.recordare.musicxml+xml",
+  "mxl": "application/vnd.recordare.musicxml",
+  "mid": "audio/midi",
+  "midi": "audio/midi",
+  "pdf": "application/pdf",
+  "mscz": "application/octet-stream",
+  "txt": "text/plain; charset=utf-8",
+  "md": "text/plain; charset=utf-8"
+}

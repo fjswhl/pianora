@@ -642,9 +642,14 @@
       "licenseUrl": "http://creativecommons.org/licenses/by-sa/4.0/",
       "transcriber": "Knute Snortum",
       "sourceUrl": "https://github.com/ksnortum/chopin-opus-37/releases/tag/v0.2",
-      "sha256": "8f5216c7f73d9d0c125ca991600a107652160022726d3b1cb6498e3a315b9cd7",
+      "sha256": "7c4d77aebac054f1fa98822e40dca0ecfe8c8d41b47c66fd49ab9bb95630647f",
       "sourceArchive": "https://codeload.github.com/ksnortum/chopin-opus-37/tar.gz/refs/tags/v0.2",
-      "sourceEntry": "two-nocturnes-op37-book.ly"
+      "sourceEntry": "two-nocturnes-op37-book.ly",
+      "sourcePart": {
+        "include": "includes/nocturne-op37-no1-parts.ily",
+        "layout": "nocturneOneMusic",
+        "playback": "nocturneOneMidi"
+      }
     },
     {
       "id": "ks_chopin_nocturne_op37_no2",
@@ -661,9 +666,14 @@
       "licenseUrl": "http://creativecommons.org/licenses/by-sa/4.0/",
       "transcriber": "Knute Snortum",
       "sourceUrl": "https://github.com/ksnortum/chopin-opus-37/releases/tag/v0.2",
-      "sha256": "8f5216c7f73d9d0c125ca991600a107652160022726d3b1cb6498e3a315b9cd7",
+      "sha256": "c2a425c9fc545f92887a834a8f64b9006295ba45e9ac31aa973a09894785edbe",
       "sourceArchive": "https://codeload.github.com/ksnortum/chopin-opus-37/tar.gz/refs/tags/v0.2",
-      "sourceEntry": "two-nocturnes-op37-book.ly"
+      "sourceEntry": "two-nocturnes-op37-book.ly",
+      "sourcePart": {
+        "include": "includes/nocturne-op37-no2-parts.ily",
+        "layout": "nocturneTwoMusic",
+        "playback": "nocturneTwoMidi"
+      }
     },
     {
       "id": "ks_chopin_nocturne_op48_no1",
@@ -756,9 +766,14 @@
       "licenseUrl": "http://creativecommons.org/licenses/by-sa/4.0/",
       "transcriber": "Knute Snortum",
       "sourceUrl": "https://github.com/ksnortum/chopin-opus-62/releases/tag/v0.5",
-      "sha256": "04f9d614908819cd303caa9dde48e24decf5eeb23a9aefae494e91339ee0384a",
+      "sha256": "2d560ad49137298752b3e6c629869c2c23a6e79cf334eeabe5be127fc3c56ba9",
       "sourceArchive": "https://codeload.github.com/ksnortum/chopin-opus-62/tar.gz/refs/tags/v0.5",
-      "sourceEntry": "two-nocturnes-op62-book.ly"
+      "sourceEntry": "two-nocturnes-op62-book.ly",
+      "sourcePart": {
+        "include": "includes/nocturnes-op62-no1-parts.ily",
+        "layout": "nocturneOneMusic",
+        "playback": "nocturneOneMidi"
+      }
     },
     {
       "id": "ks_chopin_nocturne_op62_no2",
@@ -775,9 +790,14 @@
       "licenseUrl": "http://creativecommons.org/licenses/by-sa/4.0/",
       "transcriber": "Knute Snortum",
       "sourceUrl": "https://github.com/ksnortum/chopin-opus-62/releases/tag/v0.5",
-      "sha256": "04f9d614908819cd303caa9dde48e24decf5eeb23a9aefae494e91339ee0384a",
+      "sha256": "20a1f8a48eb7b86119f7fbd6adf3aeb755bc65cc9a00cfe4ed52328fd81fe2e1",
       "sourceArchive": "https://codeload.github.com/ksnortum/chopin-opus-62/tar.gz/refs/tags/v0.5",
-      "sourceEntry": "two-nocturnes-op62-book.ly"
+      "sourceEntry": "two-nocturnes-op62-book.ly",
+      "sourcePart": {
+        "include": "includes/nocturnes-op62-no2-parts.ily",
+        "layout": "nocturneTwoMusic",
+        "playback": "nocturneTwoMidi"
+      }
     },
     {
       "id": "ks_chopin_polonaise_op26_no1",

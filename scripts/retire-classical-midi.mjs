@@ -14,10 +14,13 @@ if (editions.length !== 887 || objects.size !== 887 || editions.some((s) =>
   throw Error('Unexpected historical import');
 
 if (process.argv[2] === '--sql-out') {
-  const values = editions.map((s) => "('" + s.id + "','" + s.file + "','" + s.sha256 + ".mid')").join(',\n');
+  const values = editions.map((s) => "('" + s.id + "','" + s.file + "','" + s.sha256 + ".mid')");
+  const inserts = [];
+  for (let i = 0; i < values.length; i += 100)
+    inserts.push('INSERT INTO retiring_classical_midi VALUES ' + values.slice(i, i + 100).join(',\n') + ';');
   // Hash + path + id must all match. A score upgraded in place keeps its catalog number.
   await writeFile(process.argv[3], `CREATE TABLE retiring_classical_midi(id TEXT PRIMARY KEY, path TEXT UNIQUE, name TEXT UNIQUE);
-INSERT INTO retiring_classical_midi VALUES ${values};
+${inserts.join('\n')}
 DELETE FROM catalog_scores WHERE (id,file) IN (
   SELECT r.id,r.path FROM retiring_classical_midi r JOIN catalog_files f ON f.path=r.path AND f.object_name=r.name
 );

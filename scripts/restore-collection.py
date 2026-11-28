@@ -71,7 +71,7 @@ def source_edition(group):
         if len(folders) != 1:
             raise ValueError('Unexpected source archive structure ' + url)
         for row in editions:
-            data = read_edition(folders[0], row['sourceEntry'])
+            data = read_edition(folders[0], row['sourceEntry'], row.get('sourcePart'))
             if 'sourceSyntaxVersion' in row:
                 if row['sourceSyntaxVersion'] != '2.26.0':
                     raise ValueError('Unknown target syntax')

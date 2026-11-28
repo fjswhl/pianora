@@ -5,7 +5,7 @@ import re
 INCLUDE = re.compile(r'(?m)^([ \t]*)\\include\s+"([^"\n]+)"')
 
 
-def read_edition(root, entry):
+def read_edition(root, entry, part=None):
     root = Path(root).resolve()
     main = (root / entry).resolve()
 
@@ -17,6 +17,21 @@ def read_edition(root, entry):
             source = data.decode('utf-8-sig')
         except UnicodeDecodeError:
             source = data.decode('latin-1')
+
+        if path == main and part:
+            # This publisher supplies some numbered pieces in a single book.
+            # Select the matching original parts file and its two score variables.
+            commands = [part['layout'], part['playback']]
+            if not all(('\\' + command) in source.splitlines() for command in commands):
+                raise ValueError('Missing selection in source book: ' + entry)
+            keep = [line for line in source.splitlines() if
+                    line.startswith(('\\version', '\\language')) or
+                    line.strip() in ('\\include "includes/header-paper.ily"',
+                                      '\\include "' + part['include'] + '"')]
+            if not any(part['include'] in line for line in keep):
+                raise ValueError('Missing included music: ' + entry)
+            source = '% Individual piece from the publisher’s collected edition.\n' + '\n'.join(
+                keep + ['\\' + command for command in commands]) + '\n'
 
         def insert(match):
             name = match[2]

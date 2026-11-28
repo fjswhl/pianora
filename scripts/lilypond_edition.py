@@ -22,6 +22,13 @@ def read_edition(root, entry):
             name = match[2]
             for directory in (path.parent, main.parent):
                 child = (directory / name).resolve()
+                if not child.is_relative_to(root):
+                    continue
+                if not child.is_file() and child.parent.is_dir():
+                    # Some historical editions used capitals that differ from the archive.
+                    matches = [f for f in child.parent.iterdir() if f.name.casefold() == child.name.casefold()]
+                    if len(matches) == 1:
+                        child = matches[0].resolve()
                 if child.is_relative_to(root) and child.is_file():
                     return '\n' + expand(child, parents | {path}) + '\n'
             # Language names and LilyPond's standard library are supplied by the compiler.

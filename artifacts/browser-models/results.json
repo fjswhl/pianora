@@ -35,33 +35,33 @@
     "model": "pianist",
     "genre": "classical",
     "source_sha256": "da76266ed73b410a7cb95c9b5e9a1142a2c679349d5c607b0dddce9db83614c9",
-    "seconds": 27.3,
+    "seconds": 32.5,
     "notes": 285,
     "velocity_range": [
       18,
-      85
+      88
     ],
-    "midi_seconds": 48.0,
+    "midi_seconds": 45.3,
     "cc64": 18,
     "non_read_requests": 0,
-    "bytes": 2474,
-    "sha256": "f93dafaa9bbfe032392142a80fcd7ab6a0d626464500979d8eb74dab82d09d70"
+    "bytes": 2473,
+    "sha256": "832ea12300229af136ff08901f87ea221e12477cf26ead1f6182eeafd8022d46"
   },
   {
     "model": "pianist",
     "genre": "pop",
     "source_sha256": "dc4e22f2031d60d0b2b4ec631c0602051f9f14126ae09b623348be381daac676",
-    "seconds": 12.16,
+    "seconds": 12.67,
     "notes": 143,
     "velocity_range": [
-      26,
-      76
+      28,
+      85
     ],
-    "midi_seconds": 42.55,
-    "cc64": 24,
+    "midi_seconds": 39.93,
+    "cc64": 36,
     "non_read_requests": 0,
-    "bytes": 1414,
-    "sha256": "2cc782f862f3a889153617cf653662d8dfc4e1297ea6a0c93329e5e11a5b5414"
+    "bytes": 1451,
+    "sha256": "6200831fa0494f0a5322c8fa30e41c7d6ba4572f3811c6f1bc96c71657eaef4f"
   },
   {
     "model": "dexter",

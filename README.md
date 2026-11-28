@@ -28,7 +28,7 @@
 | Model | Compressed download | Browser rendering |
 | --- | ---: | --- |
 | PianoFlow (default) | Existing PianoFlow pack | Flow matching with seven interactive editing modes |
-| Pianist Transformer | 97 MiB | Int8 linear projections, cached autoregressive decoding, 512-note windows and nucleus sampling constrained by the score’s tempo and note lengths |
+| Pianist Transformer | 97 MiB | Int8 linear projections, cached autoregressive decoding, 512-note windows. Beat-level rubato carries across barlines, with gradual correction of sustained tempo drift |
 | DExter | 204 MiB | 200-note segments with a 10-note overlap. Choose 32-step DDIM for speed or the original 999-step DDPM sampler in generation settings |
 | VirtuosoNet | 45 MiB | HAN + GRU note, voice, beat and measure encoders with autoregressive tempo, velocity, articulation and pedal prediction |
 

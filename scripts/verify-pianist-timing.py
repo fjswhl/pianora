@@ -14,6 +14,7 @@ from playwright.sync_api import sync_playwright
 parser = argparse.ArgumentParser()
 parser.add_argument("--url", default="http://127.0.0.1:4173")
 parser.add_argument("--output", type=Path, required=True)
+parser.add_argument("--seed", type=int, default=42)
 parser.add_argument("--cases", nargs="+", choices=["full", "classical", "tempo"],
                     default=["full", "classical", "tempo"])
 args = parser.parse_args()
@@ -79,15 +80,14 @@ def download(page, label, path):
     result.value.save_as(path)
 
 
-def measure(score_file, performance_file):
+def measure(score_file, performance_file, case):
     reference, source = read_notes(score_file)
     strikes, rendered = read_notes(performance_file)
     assert [n[0] for n in strikes] == [n[0] for n in reference]
     assert timing_map(rendered) == timing_map(source)
     offsets = [b[1] - a[1] for a, b in zip(reference, strikes)]
-    assert max(map(abs, offsets)) < 0.125
     assert abs(min(n[1] for n in strikes) - min(n[1] for n in reference)) < 0.003
-    assert abs(rendered.length - source.length) < 0.55
+    assert 0.82 < rendered.length / source.length < 1.20
     assert len(set(n[2] for n in strikes)) > 1
     assert max(map(abs, offsets)) > 0.002
     pairs = sorted(zip(reference, strikes), key=lambda pair: pair[0][1])
@@ -100,7 +100,33 @@ def measure(score_file, performance_file):
     score_duration = median_duration_ms(source)
     performed_duration = median_duration_ms(rendered)
     assert 0.50 * score_duration < performed_duration < 1.20 * score_duration
-    return dict(notes=len(strikes), score_seconds=round(source.length, 3),
+    rubato = {}
+    if case in ("full", "classical"):
+        # The two real-score fixtures have a single tempo and meter.
+        tempo = next(m.tempo for m in source if m.type == "set_tempo")
+        meter = next(m for m in source if m.type == "time_signature")
+        bar_seconds = tempo / 1e6 * meter.numerator * 4 / meter.denominator
+        bars = {}
+        for ref, strike in pairs:
+            bar = int((ref[1] + 1e-5) / bar_seconds)
+            if bar not in bars or ref[1] == bars[bar][0]:
+                bars[bar] = (ref[1], min(strike[1], bars.get(bar, (0, strike[1]))[1]))
+        boundaries = list(bars.values())
+        shifts = [abs(y - x) for x, y in boundaries[1:]]
+        assert median(shifts) > 0.025, "performance resets at bar lines"
+        ratios = [(y1 - y0) / (x1 - x0) for (x0, y0), (x1, y1) in zip(boundaries, boundaries[1:])]
+        assert min(ratios) > 0.65 and max(ratios) < 1.5
+        assert max(ratios) - min(ratios) > 0.025, "uniform rescaling"
+        rubato = dict(min_bar_duration_ratio=round(min(ratios), 3),
+                      max_bar_duration_ratio=round(max(ratios), 3),
+                      median_barline_offset_ms=round(1000 * median(shifts), 1))
+        if case == "full":
+            rubato["bars_9_to_16_seconds"] = round(bars[16][1] - bars[8][1], 3)
+    if case == "tempo":
+        # The long gap between strikes includes the last eighth note and the eight-second rest.
+        assert abs((pairs[-1][1][1] - pairs[-2][1][1]) - 8.2) < 0.1
+        assert abs((rendered.length - pairs[-1][1][1]) - 7.5) < 0.3
+    return dict(seed=args.seed, **rubato, notes=len(strikes), score_seconds=round(source.length, 3),
                 generated_seconds=round(rendered.length, 3), tempo_map=timing_map(rendered),
                 first_onset_seconds=round(min(n[1] for n in strikes), 3),
                 median_score_note_ms=score_duration, median_generated_note_ms=performed_duration,
@@ -128,6 +154,9 @@ with sync_playwright() as playwright:
             page.locator("#fileInput").set_input_files(source)
         page.locator("#importedScoreCard").wait_for()
         page.locator("#performanceModel").select_option("pianist")
+        if args.seed != 42:
+            page.locator("details.advanced summary").click()
+            page.locator("#seed").fill(str(args.seed))
         page.locator("#renderBtn").click()
         page.wait_for_function("location.hash === '#studio' || document.querySelector('#errBox')",
                                timeout=1800000)
@@ -138,12 +167,12 @@ with sync_playwright() as playwright:
         download(page, "琶音还原版", restored_file)
         download(page, "原谱演奏", score_file)
         download(page, "AI 演绎", performance_file)
-        report[case] = measure(score_file, performance_file)
+        report[case] = measure(score_file, performance_file, case)
         restored_notes, restored = read_notes(restored_file)
         reference, original = read_notes(score_file)
         assert [n[0] for n in restored_notes] == [n[0] for n in reference]
         assert timing_map(restored) == timing_map(original)
-        assert abs(restored.length - original.length) < 0.55
+        assert abs(restored.length - mido.MidiFile(performance_file).length) < 0.55
         if source:
             assert timing_map(mido.MidiFile(source)) == timing_map(mido.MidiFile(score_file))
         else:

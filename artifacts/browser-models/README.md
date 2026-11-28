@@ -22,10 +22,15 @@ PIANORA_BROWSER=chrome python scripts/verify-performance-models.py \
 
 ## Pianist Transformer tempo regression
 
-The full 101-measure *Hong Chen Ke Zhan* preset exercises overlapping decoder windows. The additional cases cover Beethoven in 9/8 and a 3/4 MIDI that changes from 80 to 150 BPM and includes an eight-second rest and a sustained final note. The check uses the editor and downloads the score, AI performance and arpeggio-restored MIDI. It compares pitches, the tempo and meter maps, note onsets, chord spreads and track lengths. The JSON records the AI performance before written arpeggios are restored.
+The 101-measure *Hong Chen Ke Zhan* preset exercises overlapping decoder windows. Each take keeps its accumulated timing across barlines. The decoder follows the model’s local note intervals, smooths its pulse over one quarter note, and gradually tempers a persistent tempo bias over roughly three measures. The opening rest and the spacing between entrances across full-measure rests follow the score.
 
-[Timing measurements](pianist-timing.json) · [Full restored performance MIDI](pianist-red-dust-inn.mid)
+The browser check downloads the original, performed and arpeggio-restored MIDI. It compares pitches, the tempo and meter maps, chord spreads and durations. It measures the time between successive bar entrances and checks that the performance can vary its pace and carry timing across them. The other fixtures cover Beethoven in 9/8 and a 3/4 MIDI with a change from 80 to 150 BPM, an eight-second rest and a sustained final note.
+
+Listen to measures 9–16 excerpted from two independent full renders with the same Abbey Steinway D soundfont: [seed 42](pianist-red-dust-bars-9-16-seed-42.mp3) and [seed 73](pianist-red-dust-bars-9-16-seed-73.mp3). Each clip plays at its generated speed.
+
+[Timing measurements](pianist-timing.json) · [Full restored performance, seed 42](pianist-red-dust-inn.mid)
 
 ```sh
-python scripts/verify-pianist-timing.py --output /tmp/pianora-timing
+python scripts/verify-pianist-timing.py --output /tmp/pianora-timing-42
+python scripts/verify-pianist-timing.py --cases full --seed 73 --output /tmp/pianora-timing-73
 ```

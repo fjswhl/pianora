@@ -44,21 +44,23 @@ function sampleMillis(
   return overflow + sample(logits, timingStart + low, timingStart + high + 1, random) - timingStart;
 }
 
-function scoreTiming(notes: ModelScore['notes'], starts: number[]) {
+function onsetGroups(notes: ModelScore['notes'], starts: number[]) {
   const groups = [];
+  let previousFirst = 0;
+  let soundingUntilQuarter = 0;
   for (let first = 0; first < notes.length;) {
     let end = first + 1;
     while (end < starts.length && starts[end] === starts[first]) end++;
     const beat = 60000 / notes[first].bpm;
-    const before = starts[first] - (starts[first - 1] ?? 0);
     const after = (starts[end] ?? Infinity) - starts[first];
-    // Anchor each bar's first strike. On interior strikes leave room on both
-    // sides for rubato, scaled to the beat and the surrounding note density.
-    const anchor = first === 0 || notes[first].bar !== notes[first - 1].bar;
-    const slack = anchor ? 0 : Math.floor(Math.min(80, beat / 8, before / 4, after / 4));
     const spread = Math.floor(Math.min(30, beat / 20, after / 4));
-    const group = { first, slack, spread };
-    for (let i = first; i < end; i++) groups.push(group);
+    const restQuarters = Math.max(0, notes[first].quarter - soundingUntilQuarter);
+    const group = { first, previousFirst, spread, restQuarters };
+    previousFirst = first;
+    for (let i = first; i < end; i++) {
+      groups.push(group);
+      soundingUntilQuarter = Math.max(soundingUntilQuarter, notes[i].quarter + notes[i].length);
+    }
     first = end;
   }
   return groups;
@@ -90,10 +92,57 @@ export async function pianist(
     }
     tokens.push(...row.map((v, j) => Math.min(ranges[j][1] - 1, Math.max(ranges[j][0], v))));
   }
-  const groups = scoreTiming(notes, starts);
-  // Absolute milliseconds indexed by score note survive overlapping windows.
-  // When the decoder rewrites a suffix, its first interval uses the retained onset.
+  const groups = onsetGroups(notes, starts);
+  // Index tempo history by score onset so rewriting a decoder window also
+  // rewinds the tempo estimates. Chord tones share their first strike's pulse.
+  const beatTrend: number[] = [];
+  const phraseTrend: number[] = [];
+  const pulse: number[] = [];
   const onsets: number[] = [];
+
+  function nextInterval(i: number, logits: Float32Array) {
+    const { first, previousFirst, spread, restQuarters } = groups[i];
+    if (i === 0) {
+      beatTrend[i] = phraseTrend[i] = 0;
+      pulse[i] = 1;
+      return starts[i]; // Keep the written lead-in.
+    }
+    if (i !== first) {
+      const remaining = spread - (onsets[i - 1] - onsets[first]);
+      return sampleMillis(logits, 1, 0, 0, remaining, random);
+    }
+
+    const gap = starts[i] - starts[previousFirst];
+    const rolled = onsets[i - 1] - onsets[previousFirst];
+    const quarters = notes[i].quarter - notes[previousFirst].quarter;
+    const meterLength = notes[i].numerator * 4 / notes[i].denominator;
+    // A written rest spanning a full measure carries the accumulated time offset through
+    // the silence and gives the next entrance a fresh pulse.
+    if (restQuarters >= meterLength) {
+      beatTrend[i] = phraseTrend[i] = 0;
+      pulse[i] = 1;
+      return gap - rolled;
+    }
+    const movable = Math.min(gap, 90000 / notes[previousFirst].bpm);
+    const proposal = sampleMillis(logits, 1, gap - rolled,
+      Math.floor(0.30 * movable), Math.floor(0.38 * movable), random);
+    const logStretch = Math.log((rolled + proposal) / gap);
+
+    // Average log period ratios in musical time, independent of note density.
+    // Keep local accelerando/ritardando; gently compress a persistent tempo
+    // preference toward the score over approximately three measures.
+    const smooth = (previous: number, span: number) =>
+      previous + (-Math.expm1(-quarters / span)) * (logStretch - previous);
+    beatTrend[i] = smooth(beatTrend[previousFirst], 1);
+    phraseTrend[i] = smooth(phraseTrend[previousFirst], 3 * meterLength);
+    const bias = phraseTrend[i];
+    // Retain about ±8% of sustained period variation, with a smooth knee.
+    const correction = bias - 0.08 * Math.tanh(bias / 0.08);
+    pulse[i] = Math.exp(beatTrend[i] - correction);
+    const stretch = Math.exp(0.7 * logStretch + 0.3 * beatTrend[i] - correction);
+    return Math.max(1, Math.round(gap * Math.max(0.68, Math.min(1.45, stretch))) - rolled);
+  }
+
   const durations: number[] = [];
   const generated: number[] = [];
   // The trained window is 512 notes. Retain a performance prefix across overlapping windows.
@@ -119,13 +168,8 @@ export async function pianist(
         const i = Math.floor((start + pos) / 8);
         const logits = values(out.logits);
         if (column === 1) {
-          const group = groups[i];
-          const preceding = onsets[i - 1] ?? 0;
-          const first = group.first === i;
-          const target = first ? starts[i] - preceding : 0;
-          const late = first ? group.slack : onsets[group.first] + group.spread - preceding;
-          const interval = sampleMillis(logits, 1, target, first ? group.slack : 0, late, random);
-          onsets[i] = preceding + interval;
+          const interval = nextInterval(i, logits);
+          onsets[i] = (onsets[i - 1] ?? 0) + interval;
           prev = Math.min(ranges[1][1] - 1, timingStart + interval);
         } else if (column === 3) {
           const written = Math.max(1, Math.round(notes[i].d * 1000));
@@ -133,7 +177,8 @@ export async function pianist(
           // Let the pianist articulate short notes, but retain held notes and ties.
           const early = Math.floor(Math.min(written * 0.48, beat * 0.45));
           const late = Math.floor(Math.min(written * 0.15, beat * 0.12));
-          durations[i] = sampleMillis(logits, 3, written, early, late, random);
+          const target = Math.max(1, Math.round(written + Math.min(written, beat) * (pulse[groups[i].first] - 1)));
+          durations[i] = sampleMillis(logits, 3, target, early, late, random);
           prev = Math.min(ranges[3][1] - 1, timingStart + durations[i]);
         } else {
           prev = column === 0 ? input[pos] : sample(logits, ranges[column][0], ranges[column][1], random);

@@ -1,8 +1,9 @@
 {
   "tempo": {
+    "seed": 42,
     "notes": 14,
     "score_seconds": 20.15,
-    "generated_seconds": 20.15,
+    "generated_seconds": 19.564,
     "tempo_map": [
       [
         0.0,
@@ -25,16 +26,20 @@
     ],
     "first_onset_seconds": 0.75,
     "median_score_note_ms": 200.0,
-    "median_generated_note_ms": 133.3,
-    "median_abs_offset_ms": 5.4,
-    "max_abs_offset_ms": 49.2,
+    "median_generated_note_ms": 139.9,
+    "median_abs_offset_ms": 406.3,
+    "max_abs_offset_ms": 585.8,
     "max_chord_spread_ms": 0,
-    "midi_sha256": "a583b9e92dfdcb35d31b3f55c7e49cf2f09aeac115128d397ac5225e5880de58"
+    "midi_sha256": "467677199af3c0e5358c61631bbde9c8480ee7190f0d1031be44efd4c39795c5"
   },
   "classical": {
+    "seed": 42,
+    "min_bar_duration_ratio": 0.9,
+    "max_bar_duration_ratio": 1.0,
+    "median_barline_offset_ms": 947.2,
     "notes": 285,
     "score_seconds": 48.0,
-    "generated_seconds": 48.003,
+    "generated_seconds": 45.303,
     "tempo_map": [
       [
         0.0,
@@ -52,16 +57,21 @@
     ],
     "first_onset_seconds": 0,
     "median_score_note_ms": 666.7,
-    "median_generated_note_ms": 408.3,
-    "median_abs_offset_ms": 30.6,
-    "max_abs_offset_ms": 91.7,
+    "median_generated_note_ms": 405.6,
+    "median_abs_offset_ms": 755.6,
+    "max_abs_offset_ms": 2491.7,
     "max_chord_spread_ms": 30.6,
-    "midi_sha256": "b646a210ec774e951591527c848fcec699f06fc19c496841499824c9e67f6b67"
+    "midi_sha256": "6a674106c957bdc4a6fd02d3ac84c15e965bdf5fe4529142e0228f536300b535"
   },
   "full": {
+    "seed": 42,
+    "min_bar_duration_ratio": 0.857,
+    "max_bar_duration_ratio": 1.155,
+    "median_barline_offset_ms": 8640.3,
+    "bars_9_to_16_seconds": 20.012,
     "notes": 1218,
     "score_seconds": 269.333,
-    "generated_seconds": 269.359,
+    "generated_seconds": 251.969,
     "tempo_map": [
       [
         0.0,
@@ -79,10 +89,42 @@
     ],
     "first_onset_seconds": 2.333,
     "median_score_note_ms": 333.3,
-    "median_generated_note_ms": 337.5,
-    "median_abs_offset_ms": 31.9,
-    "max_abs_offset_ms": 80.6,
-    "max_chord_spread_ms": 29.2,
-    "midi_sha256": "aca96dfa1fc5c702369651e4056b59b92678f10e0554f2c8eb25fcbf525d3020"
+    "median_generated_note_ms": 313.9,
+    "median_abs_offset_ms": 9105.5,
+    "max_abs_offset_ms": 17597.2,
+    "max_chord_spread_ms": 30.6,
+    "midi_sha256": "406e2a6fcfdfe154a41f711c16251067d5b3d76293339247b6755ae05a25a93c"
+  },
+  "full_seed_73": {
+    "seed": 73,
+    "min_bar_duration_ratio": 0.779,
+    "max_bar_duration_ratio": 1.156,
+    "median_barline_offset_ms": 8950.7,
+    "bars_9_to_16_seconds": 20.389,
+    "notes": 1218,
+    "score_seconds": 269.333,
+    "generated_seconds": 252.886,
+    "tempo_map": [
+      [
+        0.0,
+        "set_tempo",
+        666666
+      ],
+      [
+        0.0,
+        "time_signature",
+        [
+          4,
+          4
+        ]
+      ]
+    ],
+    "first_onset_seconds": 2.333,
+    "median_score_note_ms": 333.3,
+    "median_generated_note_ms": 312.5,
+    "median_abs_offset_ms": 9318.7,
+    "max_abs_offset_ms": 17222.2,
+    "max_chord_spread_ms": 30.6,
+    "midi_sha256": "7c1d44fff95cb1a390f0fd54da4baad0102764fb07ec66a3eb9669dfecb56fe7"
   }
 }

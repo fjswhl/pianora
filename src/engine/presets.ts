@@ -23,6 +23,7 @@ export interface ScorePreset {
   collection?: string;
   sourceUrl?: string;
   transcriber?: string;
+  uploader?: string;
   license?: string;
   licenseUrl?: string;
 }
@@ -32,10 +33,19 @@ export function label(
 ) {
   return (getLocale() === 'en' && p[`${key}En`]) || p[key] || '';
 }
+const chineseComposerNames: Record<string, string> = {
+  Bach: '巴赫', Mozart: '莫扎特', Beethoven: '贝多芬', Schumann: '舒曼', Liszt: '李斯特',
+  Debussy: '德彪西', Satie: '萨蒂', Scarlatti: '斯卡拉蒂', Chopin: '肖邦', Brahms: '勃拉姆斯',
+  Tchaikovsky: '柴可夫斯基', Burgmüller: '布格缪勒', Scriabin: '斯克里亚宾', Czerny: '车尔尼',
+  Diabelli: '迪亚贝利', Handel: '亨德尔', Schubert: '舒伯特', Rachmaninoff: '拉赫玛尼诺夫',
+  Verdi: '威尔第', Grieg: '格里格', Ravel: '拉威尔', Mendelssohn: '门德尔松', Haydn: '海顿',
+  'Rimsky-Korsakov': '里姆斯基-科萨科夫', Alkan: '阿尔康', Rameau: '拉莫', Kuhlau: '库劳',
+  Field: '菲尔德', 'J. C. F. Fischer': '约翰·卡斯帕·费迪南德·费舍尔', Albéniz: '阿尔贝尼兹',
+  'C. P. E. Bach': '卡尔·菲利普·埃马努埃尔·巴赫', Pachelbel: '帕赫贝尔',
+};
 export function composerName(composer: string) {
-  return composer === '周杰伦' || composer === '林俊杰'
-    ? t(composer)
-    : composer;
+  if (composer === '周杰伦' || composer === '林俊杰') return t(composer);
+  return (getLocale() === 'zh-CN' && chineseComposerNames[composer]) || composer;
 }
 
 async function read<T>(path: string, signal?: AbortSignal): Promise<T> {

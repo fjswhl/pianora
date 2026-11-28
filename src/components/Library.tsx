@@ -16,92 +16,9 @@ import {
 } from '../engine/presets';
 import { CoverArt } from './CoverArt';
 
-const COMPOSER_FILTERS = [
-  {
-    id: '周杰伦',
-    get label() {
-      return t('周杰伦');
-    },
-  },
-  {
-    id: '林俊杰',
-    get label() {
-      return t('林俊杰');
-    },
-  },
-  {
-    id: 'Bach',
-    get label() {
-      return t('巴赫');
-    },
-  },
-  {
-    id: 'Mozart',
-    get label() {
-      return t('莫扎特');
-    },
-  },
-  {
-    id: 'Beethoven',
-    get label() {
-      return t('贝多芬');
-    },
-  },
-  {
-    id: 'Schumann',
-    get label() {
-      return t('舒曼');
-    },
-  },
-  {
-    id: 'Liszt',
-    get label() {
-      return t('李斯特');
-    },
-  },
-  {
-    id: 'Debussy',
-    get label() {
-      return t('德彪西');
-    },
-  },
-  {
-    id: 'Satie',
-    get label() {
-      return t('萨蒂');
-    },
-  },
-  {
-    id: 'Scarlatti',
-    get label() {
-      return t('斯卡拉蒂');
-    },
-  },
-  {
-    id: 'Chopin',
-    get label() {
-      return t('肖邦');
-    },
-  },
-  {
-    id: 'Brahms',
-    get label() {
-      return t('勃拉姆斯');
-    },
-  },
-  {
-    id: 'Tchaikovsky',
-    get label() {
-      return t('柴可夫斯基');
-    },
-  },
-  {
-    id: 'Burgmüller',
-    get label() {
-      return t('布格缪勒');
-    },
-  },
-  { id: 'Pianora', label: 'Pianora' },
+const primaryComposers = [
+  '周杰伦', '林俊杰', 'Bach', 'Mozart', 'Beethoven', 'Schumann', 'Liszt',
+  'Debussy', 'Satie', 'Scarlatti', 'Chopin', 'Brahms', 'Tchaikovsky', 'Burgmüller', 'Pianora',
 ];
 
 export function Library({ openScore }: { openScore: (id: string) => void }) {
@@ -115,12 +32,15 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
   }
   const composers = useComposers();
   const counts = new Map(composers.items.map((c) => [c.composer, c.pieces]));
+  const orderedComposers = [
+    ...primaryComposers.filter((id) => counts.has(id)),
+    ...composers.items
+      .map((entry) => entry.composer)
+      .filter((id) => !primaryComposers.includes(id)),
+  ];
   const filters = [
     { id: '', label: t('全部') },
-    ...COMPOSER_FILTERS.filter((f) => counts.has(f.id)),
-    ...composers.items
-      .filter((c) => !COMPOSER_FILTERS.some((f) => f.id === c.composer))
-      .map((c) => ({ id: c.composer, label: c.composer })),
+    ...orderedComposers.map((id) => ({ id, label: composerName(id) })),
   ];
   const countFor = (id: string) => (id ? counts.get(id) : composers.total);
   const count = collection

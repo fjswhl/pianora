@@ -118,6 +118,7 @@ export function ScoreSidebar({ onGenerated, publishableKey }: { onGenerated: () 
       {current?.id === selectedPresetId && current.sourceUrl && <p className="mt-2 text-xs text-slate-300">
         {current.collection} · <a className="underline" href={current.sourceUrl} target="_blank" rel="noreferrer">{t('版本来源')}</a>
         {current.transcriber && ' · ' + current.transcriber}
+        {current.uploader && <> · {t('发布者：{0}', current.uploader)}</>}
         {current.license && <> · {current.licenseUrl
           ? <a className="underline" href={current.licenseUrl} target="_blank" rel="noreferrer">{current.license}</a>
           : current.license}</>}

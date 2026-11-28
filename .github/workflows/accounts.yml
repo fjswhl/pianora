@@ -37,3 +37,4 @@ jobs:
           path: |
             artifacts/accounts.json
             artifacts/catalog.json
+            artifacts/catalog-collections.json

@@ -37,7 +37,7 @@ with sync_playwright() as pw:
         assert all(counts[c['composer'],a['collection']]==a['pieces'] for a in sets)
     page.goto(base)
     def select_composer(key, name):
-        page.locator('.score-card').first.wait_for()
+        page.locator('#catalogComposer').or_(page.get_by_role('tab', name=name)).first.wait_for()
         if page.locator('#catalogComposer').count():
             page.locator('#catalogComposer').select_option(key)
         else:
@@ -48,13 +48,23 @@ with sync_playwright() as pw:
     expect(page.locator('.score-card')).to_have_count(3)
     page.locator('.score-card').first.click()
     expect(page.locator('#presetSelect')).to_have_value('beethoven_pathetique_1')
+    opened = []
     if args.minimum >= 1000:
-        page.goto(base)
-        select_composer('Scarlatti','斯卡拉蒂')
-        menu.select_option(index=1)
-        page.locator('.score-card').first.click()
-        expect(page.locator('#importedScoreCard')).to_be_visible(timeout=30000)
-        expect(page.locator('#renderBtn')).to_be_enabled()
+        for composer, translated, collection, sample in [
+            ('Scarlatti','斯卡拉蒂','键盘奏鸣曲 · K. 001–010','scarlatti_k1'),
+            ('Czerny','车尔尼','初步教程 · Op. 599','pdmx_6080531'),
+            ('Czerny','车尔尼','50 首旋律练习曲 · Op. 840','mutopia_2146'),
+        ]:
+            page.goto(base)
+            select_composer(composer, translated)
+            menu.select_option(collection)
+            expected = next(s for s in scores if s['id'] == sample)
+            page.locator('.score-card').filter(has_text=expected['name']).first.click()
+            expect(page.locator('#presetSelect')).to_have_value(sample)
+            expect(page.locator('#importedScoreCard')).to_be_visible(timeout=30000)
+            expect(page.locator('#renderBtn')).to_be_enabled()
+            expect(page.get_by_role('link',name='版本来源')).to_have_attribute('href', expected['sourceUrl'])
+            opened.append(sample)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps({'url':base,'scores':len(scores),'collections':len(counts),
-        'composers':composers,'verifiedNestedNavigation':True},ensure_ascii=False,indent=2)+'\n')
+        'composers':composers,'openedScores':opened,'verifiedNestedNavigation':True},ensure_ascii=False,indent=2)+'\n')

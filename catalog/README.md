@@ -4,7 +4,7 @@
 
 ## 读取与更新
 
-- 曲谱馆读取 `/api/catalog/composers` 和 `/api/catalog/scores`。曲目默认每页 48 首，作曲家每页 100 位。两个接口均通过返回的 `next` 继续翻页。作品编号、作曲家索引和发布时维护的计数器支持按页查询。
+- 曲谱馆先读取 `/api/catalog/composers` 和首页曲目。选择作曲家后，`/api/catalog/collections?composer=Bach` 返回作品集及各自曲目数；选择作品集后，`/api/catalog/scores` 同时接受 `composer` 和 `collection`。曲目默认每页 48 首，作曲家和作品集每页 100 条。各接口均通过返回的 `next` 继续翻页。作品编号、作曲家索引和发布时维护的计数器支持按页查询。
 - 每个乐谱版本有独立的稳定曲目 ID。以同一 ID 更新文件保留作品编号。文件 URL 包含原始文件 SHA-256 和格式，相同内容与格式只占一个 R2 对象。旧的 `/presets/…` 按原路径跳转至当前版本。旧哈希保留，可供已打开的页面继续下载。
 - LilyPond、MusicXML 和文本附件预先 gzip。浏览器读取解压后的原始内容，照常在本机解析、制谱和推理。PDF、MXL、MuseScore 与 MIDI 保留原始字节。
 - 目录的浏览器缓存 60 秒，边缘缓存 5 分钟。带哈希的文件可在浏览器缓存一年。常见小文件也在边缘缓存，大文件直接从 R2 流式返回。边缘缓存按数据中心生效。命中 Worker Cache API 仍计一次 Worker 请求。
@@ -22,6 +22,7 @@ Node 24，在仓库根目录运行。每个批次提供一份 JSON 清单及文�
     "id": "bach_bwv846_example",
     "composer": "Bach",
     "name": "C 大调前奏曲 BWV 846",
+    "collection": "平均律钢琴曲集 I",
     "file": "collection-a/bwv846.musicxml",
     "scoreType": "MusicXML",
     "subtitle": "钢琴独奏"
@@ -42,6 +43,26 @@ npx wrangler d1 execute CATALOG --remote --file /tmp/catalog-verified.sql
 规划会打印批次曲目数、唯一对象数、原始和压缩字节。上传先检查已有对象，只写缺失对象，读回并核对 SHA-256 后才生成 SQL。仅在上传命令成功后使用它本次生成的 SQL。同一批次可重跑，重复曲目通过 ID 更新，未改动的行跳过写入。导入后等目录缓存刷新即可浏览，前端无需重新部署。GitHub Actions 的 **Verify and upload catalog objects** 支持选择种子或已收录的开放曲集，生成经远端校验的 SQL artifact。
 
 首批新增的 [Mutopia 钢琴曲目](collections/mutopia-piano.json) 含 14 首公有领域排版，每首记录作品页、版本来源、制谱者和文件哈希。选取 `mutopia-piano` 可从固定上游版本重新下载原件。也可以在本地运行 `python3 scripts/fetch-mutopia.py /tmp/mutopia`，然后向导入工具传入 `--manifest catalog/collections/mutopia-piano.json --files /tmp/mutopia`。上线后用 `python3 scripts/verify-mutopia.py` 复验编辑器选曲和播放，加 `--dev-origin http://127.0.0.1:5173` 可在本地 Vite 的浏览器引擎中逐首复验 MIDI 与 SVG 排版。
+
+## 古典键盘曲集
+
+| 清单 | 数量 | 版本来源 |
+| --- | ---: | --- |
+| [keyboard-editions](collections/keyboard-editions.json) | 505 | Knute Snortum 的 LilyPond 排版所附 MIDI，按发布版本保存，含斯卡拉蒂、肖邦和斯克里亚宾。[版本示例](https://github.com/ksnortum/scarlatti-sonatas-k1-k10/releases/tag/v0.2) |
+| [mutopia-keyboard](collections/mutopia-keyboard.json) | 382 | Mutopia 发布的键盘 MIDI。作品页与制谱者逐条记录，按各谱采用公有领域、CC BY 或 CC BY-SA。[授权说明](https://www.mutopiaproject.org/legal.html) |
+| [classical-mxl](collections/classical-mxl.json) | 182 | 从 PDMX 的 `no_license_conflict` 与 `all_valid` 交集中挑选的压缩 MusicXML。保留可直接呈现的谱面、归档位置和逐谱授权。[数据版本及论文](https://zenodo.org/records/15571083) |
+
+按可单独打开的曲目计数，包括单独发行的乐章、变奏和舞曲。若几个乐章在同一个文件内，计为一条。大型套曲可以收录其中的一部分；下拉框的数字是实际馆藏数量。斯卡拉蒂键盘奏鸣曲按 K. 编号每十号分组浏览。MIDI 来自制谱项目的乐谱导出，访客设备按需生成五线谱；MXL 保留原来的谱面信息。
+
+在仓库根目录执行以下命令可还原清单内的原始文件并复验。PDMX 的上游压缩包约 1.9 GB，已有副本时可以加 `--pdmx-archive /path/to/mxl.tar.gz` 复用。
+
+```sh
+python3 scripts/restore-collection.py catalog/collections/keyboard-editions.json /tmp/pianora-scores
+# 启动 Vite 后，使用真实浏览器逐谱解析，输出音符数、时长、音高指纹和源文件 SHA-256
+python3 scripts/audit-catalog-files.py catalog/collections/keyboard-editions.json /tmp/pianora-scores --dev-origin http://localhost:5173 --output artifacts/keyboard-editions-audit.json
+# 从线上分页、核对每位作曲家的各作品集计数，并在手机宽度的浏览器打开不同来源的谱
+python3 scripts/verify-collections.py https://opuslin.uk --minimum 1011 --output artifacts/collections-production.json
+```
 
 ## 免费容量规划
 

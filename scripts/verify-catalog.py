@@ -48,7 +48,13 @@ with sync_playwright() as pw:
     page.get_by_role('button', name='更多曲谱').click()
     expect(page.locator('.score-card').nth(2)).to_be_visible()
     expect(page.locator('.score-card').first).to_be_visible()
-    page.get_by_role('tab', name='巴赫').click()
+    composer_select = page.locator('#catalogComposer')
+    bach_tab = page.get_by_role('tab', name='巴赫')
+    composer_select.or_(bach_tab).first.wait_for()
+    if composer_select.count():
+        composer_select.select_option('Bach')
+    else:
+        bach_tab.click()
     expect(page.locator('.score-card')).to_have_count(len(filtered))
     page.locator('.score-card').first.click()
     expect(page.locator('#lyEditor')).to_have_value((seed/'files'/manifest['scores'][3]['file']).read_text())

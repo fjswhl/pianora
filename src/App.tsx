@@ -46,17 +46,24 @@ export function App() {
     document.documentElement.lang = language;
     document.title = t('Pianora 琴境 · 钢琴演奏工作站');
   }, [language]);
-  const [providers, setProviders] = useState({ email: false, google: false });
+  const [publishableKey, setPublishableKey] = useState<string | null>(null);
   const [account, setAccount] = useState<'library' | 'editor' | 'studio' | null>(null);
   useEffect(() => {
-    if (new URLSearchParams(location.search).get('account') === 'complete') {
-      window.close();
-    }
     const abort = new AbortController();
-    fetch('/api/account/options', { signal: abort.signal }).then(r => r.json()).then(setProviders).catch(() => {});
+    fetch('/api/account/options', { signal: abort.signal }).then(r => r.json()).then(options => setPublishableKey(options.publishableKey ?? null)).catch(() => {});
     return () => abort.abort();
   }, []);
   const [page, setPage] = useState<Page>(currentPage);
+  function openAccount(intent: 'library' | 'editor' | 'studio') {
+    // Clerk uses the fragment for the steps inside its sign-in component.
+    history.replaceState(history.state, '', location.pathname + location.search);
+    setAccount(intent);
+  }
+  function closeAccount(target: Page = page) {
+    history.replaceState(history.state, '', '#' + target);
+    setPage(target);
+    setAccount(null);
+  }
   useEffect(() => {
     let disposed = false;
     let stop: (() => void) | undefined;
@@ -73,12 +80,13 @@ export function App() {
   const fileError = useScoreStore(s => s.error);
   useEffect(() => {
     const navigate = () => {
+      if (account) return;
       setPage(currentPage());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, []);
+  }, [account]);
   return (
     <div className="shell">
       <aside className="rail">
@@ -114,13 +122,13 @@ export function App() {
             <option value="zh-CN" lang="zh-CN">中文</option>
             <option value="en" lang="en">English</option>
           </select>
-          {(providers.email || providers.google) && <div className="account-actions">
-            {page !== 'library' && <button disabled={pipelineBusy} onClick={()=>setAccount(page)}>{t("保存到曲库")}</button>}
-            <button onClick={()=>setAccount('library')}>{t("我的曲库")}</button>
+          {publishableKey && <div className="account-actions">
+            {page !== 'library' && <button disabled={pipelineBusy} onClick={()=>openAccount(page)}>{t("保存到曲库")}</button>}
+            <button onClick={()=>openAccount('library')}>{t("我的曲库")}</button>
           </div>}
         </header>
-        {account && <Suspense fallback={<p role="status">{t("正在打开曲库…")}</p>}>
-          <AccountLibrary intent={account} providers={providers} close={()=>setAccount(null)} />
+        {account && publishableKey && <Suspense fallback={<p role="status">{t("正在打开曲库…")}</p>}>
+          <AccountLibrary intent={account} publishableKey={publishableKey} close={closeAccount} />
         </Suspense>}
         <main className="content">
           {page === 'library' && (

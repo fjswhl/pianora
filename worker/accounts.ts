@@ -1,5 +1,5 @@
 import { formatMessage } from '../src/i18n/catalog';
-import { authFor, providers, type AccountEnv } from './auth';
+import { signedInOwner, type AccountEnv } from './auth';
 
 const maxScoreSize = 12 * 1024 * 1024;
 
@@ -8,22 +8,16 @@ export async function accountApi(request: Request, env: AccountEnv): Promise<Res
   const json = (data: unknown, status = 200) => Response.json(data, { status, headers });
   const path = new URL(request.url).pathname;
   const locale = /^en(?:[-,;]|$)/i.test(request.headers.get('accept-language') ?? '') ? 'en' : 'zh-CN';
-  const enabled = providers(env);
-  if (request.method === 'GET' && path === '/api/account/options') return json(enabled);
-  if (!enabled.email && !enabled.google) return json({ error: formatMessage(locale, '账户服务尚未启用') }, 503);
-  const auth = authFor(env, locale);
-  if (path.startsWith('/api/auth/')) {
-    const res = await auth.handler(request);
-    const copy = new Response(res.body, res);
-    copy.headers.set('cache-control', 'private, no-store');
-    return copy;
-  }
-  if (!path.startsWith('/api/library')) return json({ error: formatMessage(locale, '未找到接口') }, 404);
-  if (request.method !== 'GET' && request.headers.get('origin') !== new URL(env.BETTER_AUTH_URL!).origin)
+  const publishableKey = env.DB && env.PRIVATE_SCORES && env.APP_ORIGIN ? env.CLERK_PUBLISHABLE_KEY : undefined;
+  if (request.method === 'GET' && path === '/api/account/options') return json({ publishableKey: publishableKey ?? null });
+  if (!/^\/api\/library(?:\/|$)/.test(path)) return json({ error: formatMessage(locale, '未找到接口') }, 404);
+  if (!publishableKey) return json({ error: formatMessage(locale, '账户服务尚未启用') }, 503);
+  if (request.method !== 'GET' && request.headers.get('origin') !== env.APP_ORIGIN)
     return json({ error: formatMessage(locale, '请求来源无效') }, 403);
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return json({ error: formatMessage(locale, '请先登录') }, 401);
-  const owner = session.user.id;
+  let owner: string | null;
+  try { owner = await signedInOwner(request, env); }
+  catch { return json({ error: formatMessage(locale, '请求未完成，请重试。') }, 503); }
+  if (!owner) return json({ error: formatMessage(locale, '请先登录') }, 401);
   const db = env.DB!, bucket = env.PRIVATE_SCORES!;
   if (path === '/api/library' && request.method === 'GET') {
     const { results } = await db.prepare(

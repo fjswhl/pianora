@@ -15,9 +15,11 @@
     "deploy": "npm run build && node scripts/deploy-accounts.mjs"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.28.0",
+    "@clerk/react": "^6.19.7",
     "@sightread/lilypond-wasm": "^0.2.0",
     "@tonejs/midi": "^2.0.28",
-    "better-auth": "^1.7.28",
+    "jose": "^6.2.18",
     "lucide-react": "^1.82.0",
     "onnxruntime-web": "^1.21.0",
     "opensheetmusicdisplay": "^3.0.0",

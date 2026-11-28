@@ -1,11 +1,16 @@
 {
-  "simulatedOtp": true,
-  "saveAfterLogin": true,
-  "sessionAfterRefresh": true,
-  "reopenSource": true,
-  "bundledMidiSaved": true,
-  "crossAccountRead": 404,
-  "signedOutRead": 401,
-  "foreignOriginWrite": 403,
-  "generatedTakeTested": true
+  "verification": "local Worker with signed session fixtures",
+  "saved": 201,
+  "repeated": 200,
+  "ownEntries": 1,
+  "source": true,
+  "take": true,
+  "private": 404,
+  "otherEntries": 0,
+  "signedOut": 401,
+  "expired": 401,
+  "pending": 401,
+  "foreign": 401,
+  "wrongIssuer": 401,
+  "foreignWrite": 403
 }

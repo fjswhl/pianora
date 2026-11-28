@@ -1,46 +1,36 @@
-import { formatMessage, type Locale } from '../src/i18n/catalog';
-import { betterAuth } from 'better-auth';
-import { emailOTP } from 'better-auth/plugins/email-otp';
+import { createRemoteJWKSet, importSPKI, jwtVerify } from 'jose';
 
 export interface AccountEnv {
   DB?: D1Database;
   PRIVATE_SCORES?: R2Bucket;
-  BETTER_AUTH_URL?: string;
-  BETTER_AUTH_SECRET?: string;
-  EMAIL?: SendEmail;
-  AUTH_FROM?: string;
-  GOOGLE_CLIENT_ID?: string;
-  GOOGLE_CLIENT_SECRET?: string;
+  APP_ORIGIN?: string;
+  CLERK_PUBLISHABLE_KEY?: string;
+  CLERK_JWT_KEY?: string;
 }
 
-export function providers(env: AccountEnv) {
-  const configured = !!(env.DB && env.PRIVATE_SCORES && env.BETTER_AUTH_URL && env.BETTER_AUTH_SECRET);
-  return {
-    email: configured && !!(env.EMAIL && env.AUTH_FROM),
-    google: configured && !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
-  };
-}
+let cachedKeys: { issuer: string; keys: ReturnType<typeof createRemoteJWKSet> } | undefined;
 
-export function authFor(env: AccountEnv, locale: Locale) {
-  const enabled = providers(env);
-  return betterAuth({
-    appName: 'Pianora', baseURL: env.BETTER_AUTH_URL!, secret: env.BETTER_AUTH_SECRET!,
-    database: env.DB!,
-    advanced: { ipAddress: { ipAddressHeaders: ['cf-connecting-ip'] } },
-    rateLimit: { enabled: true, storage: 'database' },
-    socialProviders: enabled.google ? {
-      google: { clientId: env.GOOGLE_CLIENT_ID!, clientSecret: env.GOOGLE_CLIENT_SECRET! },
-    } : {},
-    plugins: enabled.email ? [emailOTP({
-      expiresIn: 300, allowedAttempts: 5, storeOTP: 'hashed',
-      rateLimit: { window: 60, max: 3 },
-      async sendVerificationOTP({ email, otp, type }) {
-        if (type !== 'sign-in') throw new Error('Unsupported verification request');
-        await env.EMAIL!.send({
-          from: env.AUTH_FROM!, to: email, subject: formatMessage(locale, 'Pianora 登录验证码'),
-          text: formatMessage(locale, '你的 Pianora 登录验证码是 {0}，5 分钟内有效。如果你没有请求登录，可以忽略这封邮件。', otp),
-        });
-      },
-    })] : [],
-  });
+export async function signedInOwner(request: Request, env: AccountEnv): Promise<string | null> {
+  const header = request.headers.get('Authorization');
+  if (!header?.startsWith('Bearer ')) return null;
+  // The issuer is selected exclusively by deployment configuration.
+  const frontend = atob(env.CLERK_PUBLISHABLE_KEY!.split('_')[2]).replace(/\$$/, '');
+  const issuer = 'https://' + frontend;
+  if (cachedKeys?.issuer !== issuer) {
+    cachedKeys = { issuer, keys: createRemoteJWKSet(new URL('/.well-known/jwks.json', issuer)) };
+  }
+  try {
+    const keys = env.CLERK_JWT_KEY ? await importSPKI(env.CLERK_JWT_KEY, 'RS256') : cachedKeys.keys;
+    const { payload } = await jwtVerify(header.slice(7), keys, {
+      algorithms: ['RS256'], issuer, requiredClaims: ['exp', 'iat', 'sub', 'sid', 'azp'],
+    });
+    if (payload.azp !== env.APP_ORIGIN || payload.sts === 'pending' ||
+        typeof payload.sid !== 'string' || !payload.sid.startsWith('sess_') ||
+        typeof payload.sub !== 'string' || !/^user_[A-Za-z0-9]+$/.test(payload.sub)) return null;
+    return payload.sub;
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && typeof error.code === 'string' &&
+        /^(ERR_JWT_|ERR_JWS_|ERR_JWKS_NO_MATCHING_KEY|ERR_JOSE_ALG_NOT_ALLOWED)/.test(error.code)) return null;
+    throw error;
+  }
 }

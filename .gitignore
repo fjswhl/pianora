@@ -25,3 +25,7 @@ public/packs-*/
 
 wrangler.accounts.generated.json
 .dev.vars*
+
+# Clerk CLI project links and development configuration
+.clerk/
+wrangler.accounts-test.*.json

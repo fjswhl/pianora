@@ -1,0 +1,8 @@
+{
+  "instance": "Clerk development",
+  "verification": "test-mode email code",
+  "saveAfterSignIn": true,
+  "restoreAfterRefresh": true,
+  "reopenSource": true,
+  "signOut": true
+}

@@ -155,21 +155,21 @@ The listening view follows the selected performance through up to three engraved
 
 ### Accounts and private scores
 
-The public studio works independently of sign-in. When a provider is enabled, “我的曲库” opens a same-origin Better Auth session. “保存到曲库” saves the editor source or the generated performance's source and selected MIDI take. D1 stores sessions and each owner's library index. Only authenticated owner requests can retrieve files from the separate private R2 bucket.
+Opening “我的曲库” loads Clerk on demand. Clerk handles registration, sign-in and verification email. The Worker checks the Clerk session signature, issuer, expiration and authorized origin before accessing the owner's scores in D1 and private R2. “保存到曲库” saves the source score and, when available, the selected performance.
 
-For local development, run `node scripts/account-config.mjs --local`, set a random development-only `BETTER_AUTH_SECRET` in the gitignored `.dev.vars`, apply `npx wrangler d1 migrations apply DB --local -c wrangler.accounts.generated.json`, build the UI, then run `npx wrangler dev --local --port 8791 -c wrangler.accounts.generated.json`. Local mail is captured in Wrangler's local mail simulator. Access its log privately.
+Create a Clerk Hobby production instance for `opuslin.uk`, enable email codes for registration and sign-in, and verify the DNS records supplied by Clerk. Set the GitHub repository variable `CLERK_PUBLISHABLE_KEY` to the production publishable key. The Worker fetches public signing keys from the instance. Set `PIANORA_D1_ID` to the private library database ID. The account controls appear when the Worker has the database, bucket and publishable key.
 
-For production, run the **Check account infrastructure** workflow in prepare mode using a token with D1 and R2 edit permissions. Enable **Email Sending** for `opuslin.uk` and verify its DNS records. Set the GitHub repository variables `PIANORA_D1_ID` and `PIANORA_AUTH_FROM` (for example `login@opuslin.uk`), and set a stable, randomly generated `BETTER_AUTH_SECRET` in repository Secrets. Public recipients require a sending plan that supports them. Optional Google OAuth uses repository Secrets `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, with the authorized redirect URI `https://opuslin.uk/api/auth/callback/google`. Re-run the deploy workflow after configuration. The deployment applies D1 migrations before publishing the Worker. Keep the private R2 bucket free of public domains and r2.dev access.
+Deployment applies D1 migrations. With a restricted deployment token, run `PIANORA_D1_ID=<uuid> node scripts/deploy-accounts.mjs --apply-schema` using an authorized Wrangler profile and set the repository variable `PIANORA_APPLIED_SCHEMA` to the printed database ID and digest. Changes to the migration files or database require a new migration run.
 
-The account regression workflow exercises simulated email, sign-in, session persistence, private saves, reopening a score, logout and cross-user denial. Dependency PRs also check a session created by the previous version against the upgraded Worker and database. Dependabot checks Better Auth updates weekly. To run the browser regression manually, set `PIANORA_LOCAL_MAIL_LOG` to the local Wrangler log and run `scripts/verify-accounts.py` with Python Playwright. Set `PIANORA_TEST_GENERATION=1` with the binary asset packs installed to include saving and replaying a generated take.
+For local development, run `CLERK_PUBLISHABLE_KEY=<dev publishable key> node scripts/account-config.mjs --local`, then `npx wrangler d1 migrations apply DB --local -c wrangler.accounts.generated.json`. Build the frontend and start `npx wrangler dev --local --port 8791 -c wrangler.accounts.generated.json`. Run `bash scripts/ci-accounts.sh` after building with Python Playwright and Chromium installed to verify private access against a local Worker with signed session fixtures. The report is written to `artifacts/accounts.json`. For the hosted login flow, start the local Worker with a Clerk development instance in test mode and run `python3 scripts/verify-clerk-login.py` with its development `CLERK_SECRET_KEY`. It exercises the email-code form, restores a saved score after refresh and writes `artifacts/clerk-login.json`.
 
 ### 界面语言与翻译
 
 在页面顶部选择「中文」或「English」即可切换语言。首次使用默认中文，浏览器通过 `pianora.locale` 保存选择。切换语言时可以继续编辑或试听当前乐谱。
 
-中文原文用作消息键，英文译文集中在 `src/i18n/en.json`。组件用 `t(key, ...values)` 渲染文案，含变量的句子用 `{0}`、`{1}` 占位。需要留在状态中的异步提示用 `message` 创建，在展示时调用 `display`。账户 API 通过 `Accept-Language` 接收界面语言，验证码邮件与页面使用同一翻译目录。
+中文原文用作消息键，英文译文集中在 `src/i18n/en.json`。组件用 `t(key, ...values)` 渲染文案，含变量的句子用 `{0}`、`{1}` 占位。需要留在状态中的异步提示用 `message` 创建，在展示时调用 `display`。账户 API 通过 `Accept-Language` 接收界面语言，登录组件跟随界面语言，验证码邮件由 Clerk 投递。
 
-启动带有本地演奏资源的 `npm run preview` 后，运行 `python scripts/verify-i18n.py`（需要 Python Playwright 和 Chromium）。脚本会生成 `artifacts/i18n.json` 和两张界面截图；设置 `PIANORA_LOCAL_MAIL_LOG` 可同时验证本地 Wrangler 模拟邮件的双语登录流程。
+启动带有本地演奏资源的 `npm run preview` 后，运行 `python scripts/verify-i18n.py`（需要 Python Playwright 和 Chromium）。脚本会生成 `artifacts/i18n.json` 和两张界面截图。
 
 ### 播放时查看和声
 

@@ -38,12 +38,5 @@ await check('Private R2',async()=>{
   if(publicUrl.enabled || domains.domains?.length) throw new Error('Disable public access on the private scores bucket before activation');
   return 'private bucket ready';
 });
-await check('Email Sending opuslin.uk',async()=>{
-  const zones=await cf('/zones?name=opuslin.uk&account.id='+account);
-  if(!zones.length) throw new Error('Missing zone read access');
-  const domains=await cf('/zones/'+zones[0].id+'/email/sending/subdomains');
-  const domain=domains.find(d=>d.name==='opuslin.uk');
-  return domain?.enabled ? 'domain enabled; verify actual delivery before launch' : 'domain requires onboarding in Email Sending';
-});
 for(const line of report) console.log(line);
 if(process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY,report.map(s=>'- '+s).join('\n')+'\n');

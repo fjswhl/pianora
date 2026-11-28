@@ -979,17 +979,17 @@ body {
 }
 
 .account-actions { margin-left: auto; display: flex; gap: 10px; }
-.account-actions button, .account-dialog button, .account-dialog a { color: var(--green); cursor: pointer; padding: 8px 10px; }
+.account-actions button, .account-dialog > header button, .account-dialog .account-identity button, .account-dialog > ul button, .account-dialog > .account-primary { color: var(--green); cursor: pointer; padding: 8px 10px; }
 .account-dialog { width: min(440px, calc(100vw - 28px)); max-height: 85dvh; margin: auto; padding: 24px; background: #fffef9; color: #263c2e; border: 1px solid var(--line); border-radius: 12px; }
 .account-dialog::backdrop { background: rgb(15 30 24 / .4); }
 .account-dialog header, .account-identity { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .account-dialog h2 { font: 600 24px/1.3 'Songti SC',serif; }
-.account-dialog form, .account-dialog label { display: grid; gap: 8px; }
-.account-dialog form { margin: 20px 0 8px; gap: 12px; }
-.account-dialog input { background: white; border: 1px solid #a9b5a8; border-radius: 5px; padding: 10px; font-size: 16px; }
+
+
+.account-dialog .cl-rootBox, .account-dialog .cl-cardBox { width: 100%; max-width: 100%; }
 .account-dialog .account-primary { background: var(--green); color: white; border-radius: 5px; }
-.account-dialog p, .account-dialog li { margin-top: 14px; }
-.account-dialog li { border-top: 1px solid var(--line); padding-top: 12px; overflow-wrap: anywhere; }
+.account-dialog > p, .account-dialog > ul > li { margin-top: 14px; }
+.account-dialog > ul > li { border-top: 1px solid var(--line); padding-top: 12px; overflow-wrap: anywhere; }
 .account-dialog [role=alert] { color: #9a372e; }
 .account-identity { font-size: 13px; margin: 10px 0; overflow-wrap: anywhere; }
 

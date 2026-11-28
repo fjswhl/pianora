@@ -150,8 +150,9 @@ export function injectSchemeHook(lyCode: string): string {
       if (cp === 0x2014 || cp === 0x2013) return '"-"';
       return '" "';
     })
-    // Normalize & sanitize non-Latin characters inside quoted strings
-    .replace(/"([^"\\]|\\.)*"/g, (quoted) =>
+    // Keep replacements within a line. Historical Scheme comments sometimes contain
+    // an unmatched quote; consuming its newline would comment out the following music.
+    .replace(/"(?:[^"\\\r\n]|\\[^\r\n])*"/g, (quoted) =>
       quoted
         .replace(/[\u2018\u2019]/g, "'")
         .replace(/[\u201C\u201D]/g, "'")

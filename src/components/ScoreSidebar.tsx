@@ -123,6 +123,11 @@ export function ScoreSidebar({ onGenerated, publishableKey }: { onGenerated: () 
           ? <a className="underline" href={current.licenseUrl} target="_blank" rel="noreferrer">{current.license}</a>
           : current.license}</>}
       </p>}
+      {current?.id === selectedPresetId && /\.(ly|mxl|musicxml|xml)$/i.test(current.file) && (
+        <a className="mt-2 inline-block text-xs underline" href={current.url} download={current.file.split('/').pop()}>
+          {t('下载原谱')}
+        </a>
+      )}
       {(presets.next !== null || presets.error) && <button disabled={presets.loading} onClick={presets.more}>
         {presets.error ? t("重试") : t("更多曲谱")}
       </button>}

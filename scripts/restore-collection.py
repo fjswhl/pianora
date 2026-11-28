@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import tarfile
 import tempfile
+import sys
 from lilypond_edition import read_edition
 
 parser = argparse.ArgumentParser()
@@ -40,6 +41,23 @@ def download(row):
         save(row, Path(file.name).read_bytes())
 
 
+# Pin the upstream convert-ly tool as well as the original notes for editions
+# whose historical syntax needed conversion to match the browser compiler.
+def prepare_converter(directory):
+    version = '3596756be0fac1f81066a99d2054329212172b2d'
+    files = {
+        'scripts/convert-ly.py': 'ac175804dcc1c8b019d902c460b0a5015bc54577462f62284880c95d045bd1af',
+        'python/convertrules.py': '68d1d18cafda1eee01731f174e70efc8c4477c3d9dd1161553638cdac8342017',
+        'python/lilylib.py': '700edc0b8ac3651b96228d15109a691d12e5b72af97301f4768e91daaa6f1c40',
+    }
+    for name, digest in files.items():
+        target = directory / Path(name).name
+        fetch(f'https://raw.githubusercontent.com/lilypond/lilypond/{version}/{name}', target)
+        if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
+            raise ValueError('Invalid converter checksum: ' + name)
+    return directory / 'convert-ly.py'
+
+
 def source_edition(group):
     url, editions = group
     with tempfile.TemporaryDirectory() as tmp:
@@ -53,7 +71,14 @@ def source_edition(group):
         if len(folders) != 1:
             raise ValueError('Unexpected source archive structure ' + url)
         for row in editions:
-            save(row, read_edition(folders[0], row['sourceEntry']))
+            data = read_edition(folders[0], row['sourceEntry'])
+            if 'sourceSyntaxVersion' in row:
+                if row['sourceSyntaxVersion'] != '2.26.0':
+                    raise ValueError('Unknown target syntax')
+                result = subprocess.run([sys.executable, str(converter), '--to=2.26.0', '-l', 'NONE', '-'],
+                                        input=data, capture_output=True, check=True)
+                data = b'% Updated to LilyPond 2.26.0 syntax with GNU convert-ly.\n' + result.stdout
+            save(row, data)
 
 
 members = {row['archiveMember'].lstrip('./'): row for row in rows if 'archiveMember' in row}
@@ -79,7 +104,8 @@ for row in rows:
         archives[row['sourceArchive']].append(row)
     elif 'archiveMember' not in row:
         singles.append(row)
-with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+with tempfile.TemporaryDirectory() as tmp, concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+    converter = prepare_converter(Path(tmp)) if any('sourceSyntaxVersion' in row for row in rows) else None
     list(pool.map(source_edition, archives.items()))
     list(pool.map(download, singles))
 print('Verified', len(rows), 'score files')

@@ -1116,3 +1116,17 @@ body {
 .profile-signin { grid-template-columns:minmax(0,1fr); }
 .profile-signin .cl-rootBox,.save-login .cl-rootBox { width:min(100%,400px) !important; min-width:0; }
 :is(.profile-signin,.save-login) :is(.cl-cardBox,.cl-card) { width:100% !important; min-width:0; max-width:100% !important; }
+
+.pwa-install { position: relative; }
+.pwa-install button, .pwa-offline {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+  padding: 0 8px; color: var(--green); font-weight: 600;
+}
+.pwa-install p {
+  position: absolute; z-index: 5; inset-block-start: 100%; inset-inline-start: 0;
+  width: min(210px, 50vw); margin: 0; padding: 12px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--paper);
+}
+@media (display-mode: standalone) {
+  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+}

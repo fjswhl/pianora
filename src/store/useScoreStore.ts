@@ -137,7 +137,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
         set({
           selectedPresetId: 'custom',
           loading: false,
-          error: message("曲谱加载失败，请重新选择。"),
+          error: navigator.onLine ? message("曲谱加载失败，请重新选择。") : message("本机尚未缓存这份乐谱，请联网打开一次。"),
         });
     }
   },

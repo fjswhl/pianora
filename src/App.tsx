@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
   Upload, UserRound,
 } from 'lucide-react';
+import { AppAvailability } from './components/AppAvailability';
 import { Library } from './components/Library';
 import { useScoreStore } from './store/useScoreStore';
 
@@ -51,13 +52,24 @@ export function App() {
     document.documentElement.lang = language;
     document.title = t('Pianora 琴境 · 钢琴演奏工作站');
   }, [language]);
+  const [online, setOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const sync = () => setOnline(navigator.onLine);
+    window.addEventListener('online',sync);
+    window.addEventListener('offline',sync);
+    return () => {
+      window.removeEventListener('online',sync);
+      window.removeEventListener('offline',sync);
+    };
+  },[]);
   const [accountChecked, setAccountChecked] = useState(false);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
   useEffect(() => {
+    if (!online) return;
     const abort = new AbortController();
     fetch('/api/account/options', { signal: abort.signal }).then(r => r.json()).then(options => setPublishableKey(options.publishableKey ?? null)).catch(() => {}).finally(() => { if (!abort.signal.aborted) setAccountChecked(true); });
     return () => abort.abort();
-  }, []);
+  }, [online]);
   const [page, setPage] = useState<Page>(currentPage);
   const [shareId, setShareId] = useState(sharedTake);
   useEffect(() => {
@@ -114,6 +126,7 @@ export function App() {
         <header className="crumb">
           <BookOpen size={16} /> {t("工作空间")} <ChevronRight size={13} />{' '}
           <strong>{pages[page].title}</strong>
+          <AppAvailability online={online} />
           <select className="locale-select" aria-label={t('界面语言')} value={language}
             onChange={event => setLocale(event.target.value as Locale)}>
             <option value="zh-CN" lang="zh-CN">中文</option>
@@ -158,13 +171,13 @@ export function App() {
               }}
             />
           )}
-          {page === 'profile' && (publishableKey ? <Suspense fallback={<p role="status">{t("正在打开曲库…")}</p>}>
+          {page === 'profile' && (!online ? <p role="status">{t("联网后即可打开个人曲库。")}</p> : publishableKey ? <Suspense fallback={<p role="status">{t("正在打开曲库…")}</p>}>
             <AccountLibrary publishableKey={publishableKey} />
           </Suspense> : <p role="status">{accountChecked ? t("账户服务尚未启用") : t("正在打开曲库…")}</p>)}
           {(page === 'editor' || page === 'studio') && (
             <Suspense fallback={<p role="status">{t("正在打开工作区…")}</p>}>
               <Workspace
-                page={page} shareId={shareId} publishableKey={publishableKey}
+                page={page} shareId={shareId} publishableKey={online ? publishableKey : null}
                 title={pages[page].title}
                 description={pages[page].desc}
               />

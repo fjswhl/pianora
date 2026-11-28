@@ -59,6 +59,9 @@ async function readPart(url: string, digest: string, background: boolean) {
   const response = await fetch(url, {
     cache: cache && !storageFull ? 'no-store' : 'default',
     priority: background ? 'low' : 'auto',
+  }).catch(error => {
+    if (!navigator.onLine) throw new LocalizedError("离线所需资源尚未下载完整，请联网继续。");
+    throw error;
   });
   const bytes = await verified(response, digest);
   if (cache && !storageFull) {
@@ -158,7 +161,9 @@ export function warmPerformanceAssets() {
   const eligible = () => !disposed && !storageFull && failures < 3 && !!globalThis.crypto?.subtle && typeof DecompressionStream !== 'undefined' && document.visibilityState === 'visible' && navigator.onLine &&
     !connection?.saveData && !['slow-2g', '2g', '3g'].includes(connection?.effectiveType ?? '') &&
     connection?.type !== 'cellular' &&
-    (location.hash === '#editor' || !matchMedia('(pointer: coarse)').matches || connection?.type === 'wifi');
+    // Some mobile browsers report a cellular link as effectiveType "4g" even on Wi-Fi.
+    // Only speculate on touch devices when the browser identifies an unmetered link.
+    (!matchMedia('(pointer: coarse)').matches || ['wifi','ethernet'].includes(connection?.type ?? ''));
   function schedule(delay = 250) {
     clearTimeout(timer);
     if (idle) window.cancelIdleCallback(idle);
@@ -188,8 +193,14 @@ export function warmPerformanceAssets() {
           const date = Date.parse(entry?.headers.get('date') ?? '');
           if (date < Date.now() - 7 * 86400000) await cache.delete(key);
         }
+      }
+      if (index % 8 === 0) {
         const estimate = await navigator.storage?.estimate?.();
-        if (estimate?.quota && estimate.quota - (estimate.usage ?? 0) < 16 * 1024 * 1024) { index = queue.length; return; }
+        // Leave room for a recent generation and the next application update.
+        if (estimate?.quota && estimate.quota - (estimate.usage ?? 0) < 32 * 1024 * 1024) {
+          index = queue.length;
+          return;
+        }
       }
       if (!eligible() || activeReads) return;
       const { path, digest } = queue[index];

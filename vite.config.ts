@@ -2,8 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
+import { pianoraPwa } from './scripts/pwa-build.mjs';
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), pianoraPwa()],
   optimizeDeps: {
     exclude: ['@sightread/lilypond-wasm', 'onnxruntime-web'],
   },

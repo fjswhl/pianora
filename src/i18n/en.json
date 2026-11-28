@@ -1,4 +1,11 @@
 {
+  "联网后即可打开个人曲库。": "Reconnect to open your personal library.",
+  "离线所需资源尚未下载完整，请联网继续。": "Some resources are missing on this device. Reconnect to finish downloading them.",
+  "本机尚未缓存这份乐谱，请联网打开一次。": "Open this score online once to make it available on this device.",
+  "安装 Pianora": "Install Pianora",
+  "离线 · 最近演奏": "Offline · Recent performances",
+  "在浏览器的分享菜单中选择“添加到主屏幕”。": "Choose Add to Home Screen from the browser’s Share menu.",
+  "新版已就绪，关闭所有 Pianora 窗口后生效。": "Update ready. Close all Pianora windows to switch versions.",
   "布格缪勒": "Burgmüller",
   "柴可夫斯基": "Tchaikovsky",
   "勃拉姆斯": "Brahms",

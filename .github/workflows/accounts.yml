@@ -31,10 +31,13 @@ jobs:
       - run: pip install playwright && python -m playwright install --with-deps chromium
       - name: Verify Clerk session validation and private scores using a browser and local Worker
         run: bash scripts/ci-accounts.sh
+      - name: Verify offline shell and safe PWA upgrades
+        run: python scripts/verify-pwa.py --output artifacts/pwa
       - uses: actions/upload-artifact@v4
         with:
           name: account-regression
           path: |
+            artifacts/pwa/pwa.json
             artifacts/accounts.json
             artifacts/catalog.json
             artifacts/catalog-collections.json

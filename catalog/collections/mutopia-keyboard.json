@@ -1,23 +1,6 @@
 {
   "scores": [
     {
-      "id": "mutopia_898",
-      "name": "Rumores de la Caleta",
-      "composer": "Albéniz",
-      "collection": "独立键盘作品",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/898.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "David Surtees",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=898",
-      "sha256": "2c1634e73a11c682662298f0a617c751fe3df5e4a15c6d45657e2853dc7bd91a",
-      "edition": "Union Musical Española",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/AlbenizIMF/O71/Rumores_de_la-caleta/Rumores_de_la-caleta.ly"
-    },
-    {
       "id": "mutopia_1731",
       "name": "Prélude · op. 31,1",
       "composer": "Alkan",
@@ -29,10 +12,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Karsten Hens",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1731",
-      "sha256": "13fa0e8ce0fa2f276838868902b44f760230a75d60e3775e571699bf9866020d",
+      "sha256": "1323ef075ef74c877ced265400ea2430ab74fbe4bb3a13c22554a0690cd630d2",
       "edition": "Schlesinger, Berlin, 1887 [Nachdruck Brandus, 1847]",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/AlkanCV/O31/alkan-op31-1/alkan-op31-1.ly"
+      "sourceEntry": "ftp/AlkanCV/O31/alkan-op31-1/alkan-op31-1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1742",
@@ -46,10 +30,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Karsten Hens",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1742",
-      "sha256": "105cd358fe1e4de8eb94f0eb9a1c4a392d7f53dd9fc82cc72ac1e8a61d01d6b8",
+      "sha256": "e884d674c272af2a84ff90ff0501f6132d99b22bd26dc3f0df0c125475b53a5b",
       "edition": "Schlesinger, Berlin, 1887 [Nachdruck Brandus, 1847]",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/AlkanCV/O31/alkan-op31-2/alkan-op31-2.ly"
+      "sourceEntry": "ftp/AlkanCV/O31/alkan-op31-2/alkan-op31-2.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_2163",
@@ -101,23 +86,6 @@
       "edition": "Bach-Gesellschaft",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/BachJS/BWV773/bach-invention-02/bach-invention-02.ly"
-    },
-    {
-      "id": "mutopia_70",
-      "name": "Invention 3 · BWV 774",
-      "composer": "Bach",
-      "collection": "二部创意曲 · BWV 772–786",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/70.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Allen Garvin",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=70",
-      "sha256": "e248a63ff4b6d4f97f704a389fbb6e4dfd8e1a9d430baf19e1269fa6b535578a",
-      "edition": "Bach-Gesellschaft",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV774/bach-invention-03/bach-invention-03.ly"
     },
     {
       "id": "mutopia_67",
@@ -698,23 +666,6 @@
       "sourceEntry": "ftp/BachJS/BWV846/wtk1-fugue1/wtk1-fugue1.ly"
     },
     {
-      "id": "mutopia_550",
-      "name": "Das Wohltemperierte Clavier I, Praeludium II · BWV 847",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/550.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=550",
-      "sha256": "10b3577ed0146b0a8e291da6699473fa30578e4924694cfc300ed5c046ff298b",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV847/bwv847a/bwv847a.ly"
-    },
-    {
       "id": "mutopia_1941",
       "name": "Das Wohltemperierte Clavier I, Fuga II · BWV 847",
       "composer": "Bach",
@@ -730,74 +681,6 @@
       "edition": "Edition Peters",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/BachJS/BWV847/fuga2/fuga2.ly"
-    },
-    {
-      "id": "mutopia_561",
-      "name": "Das Wohltemperierte Clavier I, Praeludium III · BWV 848",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/561.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=561",
-      "sha256": "174705d2710562e313392a457b49280c75b3302521929fd2aa6ec124e2a2ff99",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV848/bwv848a/bwv848a.ly"
-    },
-    {
-      "id": "mutopia_569",
-      "name": "Das Wohltemperierte Clavier I, Fuga III · BWV 848",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/569.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=569",
-      "sha256": "bf1296e336d7983b90d8a9a4c5796557312e724261af47880aee36aa25aaffd6",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV848/bwv848b/bwv848b.ly"
-    },
-    {
-      "id": "mutopia_562",
-      "name": "Das Wohltemperierte Clavier I, Praeludium IV · BWV 849",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/562.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=562",
-      "sha256": "18fac46603de111d8412624816b4e99ef221f3e1517ee9c7f2e411d6e8f2b718",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV849/bwv849a/bwv849a.ly"
-    },
-    {
-      "id": "mutopia_596",
-      "name": "Das Wohltemperierte Clavier I, Fuga IV · BWV 849",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/596.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=596",
-      "sha256": "43e37966716d03dae26522bc0a6bcdcd9b0e2979e58120dd9208391022b20f2e",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV849/bwv849b/bwv849b.ly"
     },
     {
       "id": "mutopia_1496",
@@ -851,23 +734,6 @@
       "sourceEntry": "ftp/BachJS/BWV851/bwv851_fugue06/bwv851_fugue06.ly"
     },
     {
-      "id": "mutopia_538",
-      "name": "Das Wohltemperierte Clavier I, Praeludium VI · BWV 851",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/538.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=538",
-      "sha256": "c84cfaf6dab1747c089e74a4b5c477fc72f77e1755c831693c21f810d7bd1a8f",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV851/bwv851a/bwv851a.ly"
-    },
-    {
       "id": "mutopia_563",
       "name": "Das Wohltemperierte Clavier I, Praeludium VIII · BWV 853",
       "composer": "Bach",
@@ -883,74 +749,6 @@
       "edition": "Breitkopf & Hartel, 1866",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/BachJS/BWV853/bwv853a/bwv853a.ly"
-    },
-    {
-      "id": "mutopia_597",
-      "name": "Das Wohltemperierte Clavier I, Fuga VIII · BWV 853",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/597.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=597",
-      "sha256": "ea0b1fc1aec898f6f1c9b8db410e6d80d5d751b2efc0c44f10492187887007f0",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV853/bwv853b/bwv853b.ly"
-    },
-    {
-      "id": "mutopia_1791",
-      "name": "Praeludium IX · BWV 854",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/1791.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1791",
-      "sha256": "fa05476380d5ff9f7c5a4d2918eb1c8f7e96f0f47e0f25009423981894356f39",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV854/BWV854_Praeludium_IX_rh/BWV854_Praeludium_IX_rh.ly"
-    },
-    {
-      "id": "mutopia_545",
-      "name": "Das Wohltemperierte Clavier I, Praeludium X · BWV 855",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/545.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=545",
-      "sha256": "36cc0128f9a3804f25a0cd2c3c5b937eaa3e762c12e7860b0a4e6dee7ad80298",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV855/bwv855a/bwv855a.ly"
-    },
-    {
-      "id": "mutopia_546",
-      "name": "Das Wohltemperierte Clavier I, Fuga X · BWV 855",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 I",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/546.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Davide Castellone",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=546",
-      "sha256": "08890e50ae71db250bd7e395b746fd922bfe99d4418cb30e0d881bf95cb2f793",
-      "edition": "Breitkopf & Hartel, 1866",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV855/bwv855b/bwv855b.ly"
     },
     {
       "id": "mutopia_964",
@@ -1259,40 +1057,6 @@
       "sourceEntry": "ftp/BachJS/BWV871/wtk2-prelude2/wtk2-prelude2.ly"
     },
     {
-      "id": "mutopia_974",
-      "name": "Das Wohltemperierte Clavier II, Praeludium VI · BWV 875",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 II",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/974.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Gwenaël Joret",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=974",
-      "sha256": "833b4c0fc7c7c32607faf1915f00509e4282bee30cba5a4ad23ff343de11ebd1",
-      "edition": "Bach Gesellschaft Ausgabe 1851-1899 Band 14 (1866)",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV875/bwv875a/bwv875a.ly"
-    },
-    {
-      "id": "mutopia_1328",
-      "name": "Das Wohltemperierte Clavier II, Fuga IX · BWV 878",
-      "composer": "Bach",
-      "collection": "平均律钢琴曲集 II",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/1328.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Gérard Gréco",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1328",
-      "sha256": "784afe4a88594f4354ddc6ff58c82f9b460e6ab1499f14e3444c4b57a2822c74",
-      "edition": "Le clavecin bien tempéré, volume 2, Révision et annotations par Vincent d'Indy, Édition nationale de musique classique, Éditions Salabert, Paris, 1920.",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV878/f9/f9.ly"
-    },
-    {
       "id": "mutopia_1814",
       "name": "Toccata in f sharp minor · BWV 910",
       "composer": "Bach",
@@ -1576,27 +1340,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Pierre-Luc Gauthier",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=693",
-      "sha256": "28b576b78453133b820a12766e7454260a21d85f7a27231c185a34bd73d8b561",
+      "sha256": "71d9443303f60886d8fcfa73c58b00c21877baa30d97386716d545806405fe45",
       "edition": "Breitkopf & Härtel, 1885",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV1080/contrapunctusI/contrapunctusI-lys/contrapunctusI.ly"
-    },
-    {
-      "id": "mutopia_746",
-      "name": "Die Kunst der Fuge, Contrapunctus XII - Canon alla Ottava · BWV 1080",
-      "composer": "Bach",
-      "collection": "赋格的艺术 · BWV 1080",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/746.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Arnaud Gossart",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=746",
-      "sha256": "c3d0473e864a3e2c59a1d45222691d596c67986b49cfead57f6affc5b4dc5b7a",
-      "edition": "Breitkopf & Härtel, 1885",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV1080/contrapunctusXII/contrapunctusXII.ly"
+      "sourceEntry": "ftp/BachJS/BWV1080/contrapunctusI/contrapunctusI-lys/contrapunctusI.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_748",
@@ -1661,27 +1409,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1211",
-      "sha256": "6797c0188ee0c3e35c212a7753bbde2df5253c84781559e3994e2c181d517348",
+      "sha256": "54c51e37dc5c1ae0dff76bfff55d7ed72cc990e8b17bfea5a5e15bd0ed2f2b4d",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O2/LVB_Sonate_02no1_1/LVB_Sonate_02no1_1.ly"
-    },
-    {
-      "id": "mutopia_2070",
-      "name": "Sonata No. 1 (2nd Movement: Adagio)",
-      "composer": "Beethoven",
-      "collection": "Sonata No. 1 · Op. 2, No. 1",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/2070.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "transcriber": "Javier Ruiz-Alma",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2070",
-      "sha256": "7b30d5e3cff1690710987ea7ca5b91b6644661bdfef7b83844d9ac9bb3db49d7",
-      "edition": "Peters, 1910",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O2/LVB_Sonate_02no1_2/LVB_Sonate_02no1_2-lys/beethoven-op2-no1-adagio.ly"
+      "sourceEntry": "ftp/BeethovenLv/O2/LVB_Sonate_02no1_1/LVB_Sonate_02no1_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1276",
@@ -1729,10 +1461,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=778",
-      "sha256": "becf4c675e728c511764280e4ed91734666ab2bc5c8f4d801c0690fbae0d8b51",
+      "sha256": "532bb559d8549886ae00650530db8a9ac5f43abc28b68df5f52cf0a545355af5",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O10/LVB_Sonate_10no1_1/LVB_Sonate_10no1_1.ly"
+      "sourceEntry": "ftp/BeethovenLv/O10/LVB_Sonate_10no1_1/LVB_Sonate_10no1_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_779",
@@ -1899,10 +1632,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Andreas Scherer",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=288",
-      "sha256": "679dc89f483fccb57aa2669d3d2776a11fcfdf3c4c7fdb4250381137db961b64",
+      "sha256": "80a9aa7dab35c467c42468609f13da5db98e2b725b4cb064443c1b03c2f9153c",
       "edition": "Schott Einzelausgabe",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O57/LVB_Sonate_57_2/LVB_Sonate_57_2.ly"
+      "sourceEntry": "ftp/BeethovenLv/O57/LVB_Sonate_57_2/LVB_Sonate_57_2.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_937",
@@ -1916,10 +1650,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=937",
-      "sha256": "9274b36555a60e6b5b8378996988549531627b74fa8dddbc0d72faf35cc75606",
+      "sha256": "21cfec471fb15abc60d202a5bc9de90c34cb5e6e90a80018ec887e8817002928",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O57/LVB_Sonate_57_3/LVB_Sonate_57_3-lys/LVB_Sonate_57_3.ly"
+      "sourceEntry": "ftp/BeethovenLv/O57/LVB_Sonate_57_3/LVB_Sonate_57_3-lys/LVB_Sonate_57_3.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_497",
@@ -1950,10 +1685,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=934",
-      "sha256": "b91fa2a128f1238506dd5f3475a056f970816fce60cdeb2f89207ac7684f4861",
+      "sha256": "52c63ae19be54282dbcad37a4f60172b7be058ca5694f72ac87648eeb104af5e",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O76/Six_Variations_Opus76/Six_Variations_Opus76.ly"
+      "sourceEntry": "ftp/BeethovenLv/O76/Six_Variations_Opus76/Six_Variations_Opus76.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1137",
@@ -1967,10 +1703,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1137",
-      "sha256": "f39bb6dfdf001bd135166e8c3f466a47b262770c97ac71b492b4ba6b598433df",
+      "sha256": "f93a8a78329865a0ba42568defb5057fb2e26f815a2db99bcdbed96f52dd697d",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O78/LVB_Sonate_78_1/LVB_Sonate_78_1.ly"
+      "sourceEntry": "ftp/BeethovenLv/O78/LVB_Sonate_78_1/LVB_Sonate_78_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1161",
@@ -1984,10 +1721,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1161",
-      "sha256": "6cadf5fdd2e864e816d182554e0144cdf104ed5771d76ed08e73c45ed1ea65de",
+      "sha256": "3dbcfa9a3adc91d24f294eeef82e04c5e97271537553823a7adf49543314f902",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O78/LVB_Sonate_78_2/LVB_Sonate_78_2.ly"
+      "sourceEntry": "ftp/BeethovenLv/O78/LVB_Sonate_78_2/LVB_Sonate_78_2.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_955",
@@ -2001,10 +1739,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=955",
-      "sha256": "90ece6f1e53fbca1a44badbdeca7bfaf26b6753dc4c8bf1c613a9e69fd66044a",
+      "sha256": "5359f4c80d442bc0e5765f172616f8b7da5d048f78fc8c44fe2229103c8c3748",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O79/LVB_Sonate_79_1/LVB_Sonate_79_1.ly"
+      "sourceEntry": "ftp/BeethovenLv/O79/LVB_Sonate_79_1/LVB_Sonate_79_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_956",
@@ -2035,10 +1774,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=957",
-      "sha256": "14362b355c9eda26ad6be7fe4bf2dd872a386e5efa2dc01b4d86fd966bbc5fa2",
+      "sha256": "f8adb189a53fd1cc666cef3d0c303250ab3e84e28ed83f175855690265d2c4ed",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O79/LVB_Sonate_79_3/LVB_Sonate_79_3.ly"
+      "sourceEntry": "ftp/BeethovenLv/O79/LVB_Sonate_79_3/LVB_Sonate_79_3.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_906",
@@ -2052,10 +1792,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=906",
-      "sha256": "74e432989f18622ed99cf8598bc2ac770b9ee1ff7c64ba634b6bfe30b9df96cf",
+      "sha256": "47896de4ca4e3ea698b979974b437ae1fcc5be4c1ce3bd67815e711553d502f3",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O90/LVB_Sonate_90_1/LVB_Sonate_90_1.ly"
+      "sourceEntry": "ftp/BeethovenLv/O90/LVB_Sonate_90_1/LVB_Sonate_90_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_909",
@@ -2069,10 +1810,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=909",
-      "sha256": "49098e0b40b6bc811c6a9016c2c1785c532c539a03ca58c3355a51b9cc43c6ff",
+      "sha256": "003a4b62cd618a54c253e7d7f493e591951ee271d8768e4accbe29ceb32f1ffb",
       "edition": "Breitkopf & Härtel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O90/LVB_Sonate_90_2/LVB_Sonate_90_2.ly"
+      "sourceEntry": "ftp/BeethovenLv/O90/LVB_Sonate_90_2/LVB_Sonate_90_2.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1022",
@@ -2086,27 +1828,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1022",
-      "sha256": "9e57d93398ef40413ac03a74066c5e5349d961fbc744df305b14027dfa085ff3",
+      "sha256": "5322d28d3489f36bd4ef7918c4c9ae20eb236a8fafe9fafa2a725b67617ffb21",
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O111/lvb_sonate_111_1/lvb_sonate_111_1-lys/lvb_sonate_111_1.ly"
-    },
-    {
-      "id": "mutopia_498",
-      "name": "Rondo A Capriccio",
-      "composer": "Beethoven",
-      "collection": "Op. 129",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/498.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Magnus Lewis-Smith",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=498",
-      "sha256": "9cb8e038530f19f2513d5f137f71a150d199d5e8dd1c2d83fd8dfd095617fafb",
-      "edition": "Augener's Edition",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/beethoven_rondo_op129.ly"
+      "sourceEntry": "ftp/BeethovenLv/O111/lvb_sonate_111_1/lvb_sonate_111_1-lys/lvb_sonate_111_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_939",
@@ -2158,23 +1884,6 @@
       "edition": "Breitkopf & Hartel (1862-1865)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/BeethovenLv/WoO82/menuett_WoO82/menuett_WoO82.ly"
-    },
-    {
-      "id": "mutopia_202",
-      "name": "La Candeur",
-      "composer": "Burgmüller",
-      "collection": "25 首简易进阶练习曲 · Op. 100",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/202.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Bas Wassink",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=202",
-      "sha256": "b4167467199cbed038e481eec3a81443585fd332f31f05957df35730619f7f85",
-      "edition": "Collection Litolff, 19th Century",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-01/25EF-01.ly"
     },
     {
       "id": "mutopia_219",
@@ -2239,10 +1948,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=220",
-      "sha256": "0f66168168b9960840433af9ead376d6e7d2749fca1021a61815d6a64b61f61a",
+      "sha256": "afb6006f5de8d7d807fc0219db43c4645110c1e362b3c2a9c0b285313ffc56ed",
       "edition": "Collection Litolff, 19th Century",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-09/25EF-09.ly"
+      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-09/25EF-09.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_222",
@@ -2307,10 +2017,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=225",
-      "sha256": "c4ca2f16597bf216dcceabe86576971ed10410957997ffe9c2d75503d252c453",
+      "sha256": "d2ccfebfa6dc6abb0eeadf6a99842c3053e7d393f79cd012e1df4bf2937a7daf",
       "edition": "Collection Litolff, 19th Century",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-14/25EF-14.ly"
+      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-14/25EF-14.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_227",
@@ -2375,10 +2086,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=230",
-      "sha256": "b5f7c9ed04ac5ed31621ad238a91c9871e1539f21ce6fda2e7ef66c817133d6d",
+      "sha256": "0b3d670998f407f9f6ca0852b3dcca0d78f210d7d43cd30edcb94cfbb678f2c8",
       "edition": "Collection Litolff, 19th Century",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-18/25EF-18.ly"
+      "sourceEntry": "ftp/BurgmullerJFF/O100/25EF-18/25EF-18.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1687",
@@ -2398,23 +2110,6 @@
       "sourceEntry": "ftp/ChopinFF/O6/Mazurka-Op6-No1/Mazurka-Op6-No1.ly"
     },
     {
-      "id": "mutopia_1590",
-      "name": "Nocturne · Op. 9, No. 2",
-      "composer": "Chopin",
-      "collection": "夜曲 · Op. 9",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1590.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Renato Biolcati Rinaldi",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1590",
-      "sha256": "68dfc91f07e0337c5d1a9c2a319cdf6e6984608a41b58380770cbdc333dd6bdb",
-      "edition": "G. Schirmer, New York, 1881",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O9/chopin_nocturne_op9_n2/chopin_nocturne_op9_n2.ly"
-    },
-    {
       "id": "mutopia_1955",
       "name": "Nocturne No. 3 · Opus 9, No. 3",
       "composer": "Chopin",
@@ -2430,91 +2125,6 @@
       "edition": "G. Schirmer,1915",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/ChopinFF/O9/chopin_nocturne_op9_n3/chopin_nocturne_op9_n3.ly"
-    },
-    {
-      "id": "mutopia_582",
-      "name": "Nocturne No. 1 in B-flat minor · Op. 9, No. 1",
-      "composer": "Chopin",
-      "collection": "夜曲 · Op. 9",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/582.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 2.5",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
-      "transcriber": "Benjamin D. Esham",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=582",
-      "sha256": "b33d7b7171f63640fbfc6372aa225d26fe8e34533f1f3506ca67eb7bb61f383a",
-      "edition": "Schirmer, 1915, Ed. R. Joseffy",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O9/nocturne_in_b-flat_minor/nocturne_in_b-flat_minor.ly"
-    },
-    {
-      "id": "mutopia_508",
-      "name": "Etüde a-moll · Op. 10, No. 2",
-      "composer": "Chopin",
-      "collection": "练习曲 · Op. 10",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/508.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Roland Goretzki",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=508",
-      "sha256": "5af6face92b50c560df2abec6e3f9e02355447be183325281140f1063aa0a7e3",
-      "edition": "Peters, Herrmann Scholtz, 1900b",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O10/10-02-i/10-02-i.ly"
-    },
-    {
-      "id": "mutopia_484",
-      "name": "Etüde f-moll · Op. 10, No. 9",
-      "composer": "Chopin",
-      "collection": "练习曲 · Op. 10",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/484.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Roland Goretzki",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=484",
-      "sha256": "a3091267f1d86efd762fd8f54b86f55fa4e10ea92c950cfbd1c47394629294f8",
-      "edition": "Peters, Herrmann Scholtz, 1900b",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O10/chopin-op-10-09-wfi/chopin-op-10-09-wfi.ly"
-    },
-    {
-      "id": "mutopia_914",
-      "name": "Etüde C-Dur · Opus 10, No. 1",
-      "composer": "Chopin",
-      "collection": "练习曲 · Op. 10",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/914.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Roland Goretzki",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=914",
-      "sha256": "f1589f9cdf17ed4b27e51d9d6c9c60b6aa699877193f703df5f24ab1a8beba56",
-      "edition": "Peters, Herrmann Scholtz, 1900b",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O10/chp-10-01/chp-10-01-lys/chp-10-01-a4.ly"
-    },
-    {
-      "id": "mutopia_926",
-      "name": "Etüde Ges-Dur · Opus 10, No. 5",
-      "composer": "Chopin",
-      "collection": "练习曲 · Op. 10",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/926.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Roland Goretzki",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=926",
-      "sha256": "668af3fa3da9da9825226ea91ec1292dc2ea7eb71f18a107a29217d82b403f33",
-      "edition": "Peters, Herrmann Scholtz, 1900b",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O10/chp-10-05/chp-10-05-lys/chp-10-05-a4.ly"
     },
     {
       "id": "mutopia_743",
@@ -2545,10 +2155,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Keith OHara",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=486",
-      "sha256": "a8901eccb900275ce577a2dfde0c279b3c31f0fac36d30f98e78417844e8a56f",
+      "sha256": "d3d0d1042d218bb7357eb8ae8c248a03e7acd907403c241de17ba0c7c25da3e7",
       "edition": "Debussy, 1915",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O27/chopin-nocturne-8/chopin-nocturne-8.ly"
+      "sourceEntry": "ftp/ChopinFF/O27/chopin-nocturne-8/chopin-nocturne-8.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1682",
@@ -2562,27 +2173,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "transcriber": "Ryan Prince",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1682",
-      "sha256": "ce9fb7aa486b1280a2b99039d49f0b41449bb1350ce1c850092aabf184bb42da",
+      "sha256": "8061d4aa68d9cf4a2d9c3fc3731d37c281c6840588040cac80702a2e7b9a4ac9",
       "edition": "G. Schirmer, 1894",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O33/Mazurka-Op33-No1/Mazurka-Op33-No1.ly"
-    },
-    {
-      "id": "mutopia_1727",
-      "name": "Sonate 2 b-moll · Op. 35",
-      "composer": "Chopin",
-      "collection": "第二钢琴奏鸣曲 · Op. 35",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1727.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Roland Goretzki",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1727",
-      "sha256": "23af7c010ca2566b25a6f02a164323efaf25fe42f5b1e2d04c7b9c3ec0ab7c0f",
-      "edition": "Peters, Herrmann Scholtz, 1900c",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O35/chp-op-35-4-scholz-fi/chp-op-35-4-scholz-fi-lys/chp-op-35-4-scholz-fi-a4.ly"
+      "sourceEntry": "ftp/ChopinFF/O33/Mazurka-Op33-No1/Mazurka-Op33-No1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1776",
@@ -2596,27 +2191,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Keith OHara",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1776",
-      "sha256": "dfd6c585a2ebe9d7e093d872588ac92eb871f5d7381aaef9a4aa598e8606161d",
+      "sha256": "9d27df4dc2539ccdcc534ded4234734450dbf4f4d57cc3f506ae55395f3ff55e",
       "edition": "Edition by Herrmann Scholtz (1845-1918)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O45/chopin_prelude_op45/chopin_prelude_op45.ly"
-    },
-    {
-      "id": "mutopia_483",
-      "name": "Valse Op. 64, No. 1 ('Minute Waltz')",
-      "composer": "Chopin",
-      "collection": "圆舞曲 · Op. 64",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/483.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Magnus Lewis-Smith",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=483",
-      "sha256": "88d01f2ab9caee8130f4002ab2aaf5fedc9c4e302a6d26230ed10d84c0858275",
-      "edition": "Edition Peters",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O64/chopin_valse_op64_no1/chopin_valse_op64_no1-lys/chopin_valse_op64_no1.ly"
+      "sourceEntry": "ftp/ChopinFF/O45/chopin_prelude_op45/chopin_prelude_op45.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_509",
@@ -2630,10 +2209,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "transcriber": "Benjamin D. Esham",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=509",
-      "sha256": "6d699a3eaeb957b16096d34a7fc11e36ef74daca6faf1c51e0589d5222dcfe13",
+      "sha256": "f9f579d722d66ab82411e61889ec06e68d467ca2d3159811f35e765d4931306e",
       "edition": "Schirmer, 1915",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/ChopinFF/O72/nocturne_in_e_minor/nocturne_in_e_minor.ly"
+      "sourceEntry": "ftp/ChopinFF/O72/nocturne_in_e_minor/nocturne_in_e_minor.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_2146",
@@ -3112,448 +2692,6 @@
       "sourceEntry": "ftp/CzernyC/Op_821/Czerny_Op_821_No_018/Czerny_Op_821_No_018.ly"
     },
     {
-      "id": "mutopia_2085",
-      "name": "160 Eight-Measure Exercises, No. 19",
-      "composer": "Czerny",
-      "collection": "160 首八小节练习曲 · Op. 821",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/2085.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Manuel Castejon Limas",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2085",
-      "sha256": "2b5a6a59c624280ed7f59b97428bdb3ef1333021eb7b866a695cc71e1c9faadd",
-      "edition": "IMLSP; Leipzig: Edition Peters, n.d.[1888]. Plate 6990-6993.",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/CzernyC/Op_821/Czerny_Op_821_No_019/Czerny_Op_821_No_019.ly"
-    },
-    {
-      "id": "mutopia_389",
-      "name": "28 melodische Übungsstücke (No. 1)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/389.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=389",
-      "sha256": "e7d8b699c7d963b731333ea20f3ea8c8e4fa3422d317b663ba9ef0467c68ad6a",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/diabeli.op149.1/diabeli.op149.1.ly"
-    },
-    {
-      "id": "mutopia_402",
-      "name": "28 melodische Übungsstücke (No. 2)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/402.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=402",
-      "sha256": "3387d37ee4d60470876783e7dee74e1d2b4ece2c095a73476e833ae77412166c",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/diabeli.op149.2/diabeli.op149.2.ly"
-    },
-    {
-      "id": "mutopia_403",
-      "name": "28 melodische Übungsstücke (No. 3)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/403.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=403",
-      "sha256": "2e3d7baeca33bd2e247a7295cd035c11f2f4971089e51be6d65a1a7639a73ec6",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-3/op149-3.ly"
-    },
-    {
-      "id": "mutopia_404",
-      "name": "28 melodische Übungsstücke (No. 4)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/404.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=404",
-      "sha256": "76082b18b461da2c9ba7deb77a20433f6e5aa44d3a83e8dc8cec8347911e1fe3",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-4/op149-4.ly"
-    },
-    {
-      "id": "mutopia_405",
-      "name": "28 melodische Übungsstücke (No. 5)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/405.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=405",
-      "sha256": "19e04549a4ffc7ef3c23a621a277fb3115b9634308d7159e176ecfef7f4616d1",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-5/op149-5.ly"
-    },
-    {
-      "id": "mutopia_410",
-      "name": "28 melodische Übungsstücke (No. 8)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/410.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=410",
-      "sha256": "a1962f06499a6985a5ed9ec9657f8057d11c7b8f47ed98579d4115a605a3e0ec",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-8/op149-8.ly"
-    },
-    {
-      "id": "mutopia_415",
-      "name": "28 melodische Übungsstücke (No. 9)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/415.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=415",
-      "sha256": "8f61fd406a755b567aa576e4e5fe56bf73bfe143b9f4e5e213834d0df5a08bde",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-9/op149-9.ly"
-    },
-    {
-      "id": "mutopia_416",
-      "name": "28 melodische Übungsstücke (No. 10)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/416.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=416",
-      "sha256": "25cc198d4e7d016909731375938444c0e28a8b3dd880b1a9e07afa0b67a7510c",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-10/op149-10.ly"
-    },
-    {
-      "id": "mutopia_417",
-      "name": "28 melodische Übungsstücke (No. 11)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/417.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=417",
-      "sha256": "e5fe8fbee85e437df783461ba60339d34384c60f32f33660b935e24bf348a404",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-11/op149-11.ly"
-    },
-    {
-      "id": "mutopia_418",
-      "name": "28 melodische Übungsstücke (No. 12)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/418.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=418",
-      "sha256": "3b76e80555f70431a36f86a6e5d3ecbdf3bbc7800b747d8bc6f8efbb71d254b3",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-12/op149-12.ly"
-    },
-    {
-      "id": "mutopia_419",
-      "name": "28 melodische Übungsstücke (No. 13)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/419.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=419",
-      "sha256": "702f5aa404599881cfce569465c8122de9748c5c338770f6f5e3bd1a57ac3a38",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-13/op149-13.ly"
-    },
-    {
-      "id": "mutopia_464",
-      "name": "28 melodische Übungsstücke (No. 15)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/464.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=464",
-      "sha256": "d56f27b1dde69f530e9096abc06801aaa1fbeb6cf44b0c4608c2dceb52d971a9",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-15/op149-15.ly"
-    },
-    {
-      "id": "mutopia_530",
-      "name": "28 melodische Übungsstücke (No. 17)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/530.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=530",
-      "sha256": "b51e8af7d5f63ce1abc77c44c3bd835f39e541c83050e96892970b298a863d3b",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-17/op149-17.ly"
-    },
-    {
-      "id": "mutopia_531",
-      "name": "28 melodische Übungsstücke (No. 18)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/531.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=531",
-      "sha256": "313c090f70f281c92d9d29409e128ad5dad530247c27a9822b833642e9e267ec",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-18/op149-18.ly"
-    },
-    {
-      "id": "mutopia_533",
-      "name": "28 melodische Übungsstücke (No. 19)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/533.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=533",
-      "sha256": "6f905a2a6d2d99f2f4c34929877e4963b33406e720465b9c2ff4aff8e4f52683",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-19/op149-19.ly"
-    },
-    {
-      "id": "mutopia_541",
-      "name": "28 melodische Übungsstücke (No. 20)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/541.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=541",
-      "sha256": "3f338bf59bbc75a670ecedbd1f3304262aba6260f341d741d80add30cf841b7b",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-20/op149-20.ly"
-    },
-    {
-      "id": "mutopia_554",
-      "name": "28 melodische Übungsstücke (No. 21)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/554.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=554",
-      "sha256": "5f978069219cd1fb3e627a2dc6916450af4f8eb8495f4412136fa7e7275d7254",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-21/op149-21.ly"
-    },
-    {
-      "id": "mutopia_555",
-      "name": "28 melodische Übungsstücke (No. 22)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/555.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=555",
-      "sha256": "2e01f7525a4bb9356b2e594495b7fbf2266c8835d0547807d28883f6d74d631c",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-22/op149-22.ly"
-    },
-    {
-      "id": "mutopia_556",
-      "name": "28 melodische Übungsstücke (No. 23)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/556.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=556",
-      "sha256": "ce6774dd308c53ed96e29c879a0f6663ffadc59906ee97e8b750525a88836f12",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-23/op149-23.ly"
-    },
-    {
-      "id": "mutopia_557",
-      "name": "28 melodische Übungsstücke (No. 24)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/557.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=557",
-      "sha256": "e69b34c94ef9388543bbc046aaf3e204c969dfe98b2ca0e664f5aee643bf6556",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-24/op149-24.ly"
-    },
-    {
-      "id": "mutopia_558",
-      "name": "28 melodische Übungsstücke (No. 25)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/558.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=558",
-      "sha256": "b44c9c501aa7f288ed506af3fff3b888700cad6dc90446c22decc207a2eb7000",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-25/op149-25.ly"
-    },
-    {
-      "id": "mutopia_559",
-      "name": "28 melodische Übungsstücke (No. 26)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/559.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=559",
-      "sha256": "3fffb8cc466e22947c86992a8ec91d2449aab4033fc72a4d936cf15dcc831dd3",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-26/op149-26.ly"
-    },
-    {
-      "id": "mutopia_560",
-      "name": "28 melodische Übungsstücke (No. 27)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/560.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=560",
-      "sha256": "997757538d00b70c6d657f7c4ac30319eac8c05722ad4a3a6759b0b870663aa1",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-27/op149-27.ly"
-    },
-    {
-      "id": "mutopia_564",
-      "name": "28 melodische Übungsstücke (No. 28)",
-      "composer": "Diabelli",
-      "collection": "28 首旋律练习曲 · Op. 149",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/564.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=564",
-      "sha256": "43d3100ff7daca9caca37d02bf5b9a9bc40949d65290f168e15970c295a87cb9",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O149/op149-28/op149-28.ly"
-    },
-    {
-      "id": "mutopia_1564",
-      "name": "Jugendfreuden - Sechs Sonatinen",
-      "composer": "Diabelli",
-      "collection": "Jugendfreuden · Op. 163",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/1564.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "transcriber": "Alberto Simões",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1564",
-      "sha256": "4c0c5c9a45ebfc1fc791e75e8a4888f4cb671370cd3aec58cd4d4dd4106f63be",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/DiabelliA/O163/diabeli.op163.s1-1/diabeli.op163.s1-1.ly"
-    },
-    {
       "id": "mutopia_1596",
       "name": "Duetto I · BWV802",
       "composer": "Bach",
@@ -3569,23 +2707,6 @@
       "edition": "Bach-Gesellschaft Edition / Ernst Naumann 1890",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/BachJS/BWV802/Bach-Duet1/Bach-Duet1.ly"
-    },
-    {
-      "id": "mutopia_1597",
-      "name": "Duetto III · BWV 804",
-      "composer": "Bach",
-      "collection": "四首二重奏 · BWV 802–805",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/1597.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "H. Gillis",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1597",
-      "sha256": "12b0b53cc9f3af45f604e95d227915ffdc604a5e27476e7cf648389882177321",
-      "edition": "Bach-Gesellschaft Edition / Ernst Naumann 1890",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV804/Bach-Duet3/Bach-Duet3.ly"
     },
     {
       "id": "mutopia_1598",
@@ -3650,10 +2771,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "JD Erickson",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=980",
-      "sha256": "2e7169b39f7c2dcb75798b77582d0a1fe9562f4792e9cccd0c18f4cf23ce28b9",
+      "sha256": "25dbef604527bdaa5e0507bb8bae3f2fb5e407f7e28adb9b26f5bf5976eede7c",
       "edition": "Bach-Gesellschaft",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v01/bwv-988-v01.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v01/bwv-988-v01.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1384",
@@ -3667,10 +2789,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1384",
-      "sha256": "3648849c151f8c25421ebd1d7d357afaae4fea0f2b4ae1ddd4ee5c5ca7f795ef",
+      "sha256": "286dc8c0442af4e92a16d6c4cabfd246d21668756e998e93be0b2eae1862f0e5",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v03/bwv-988-v03.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v03/bwv-988-v03.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1405",
@@ -3684,10 +2807,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1405",
-      "sha256": "473264b67885f6846c3a4987b23cc0e2370aa45a586378f312987521effd4d94",
+      "sha256": "3cd3c7325816345625f51dc45f36a637cd282580482d3ca675de2a579462abce",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v04/bwv-988-v04.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v04/bwv-988-v04.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1406",
@@ -3718,10 +2842,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1385",
-      "sha256": "7b0b7a62ca1ba105c7ecd7a58ea135595e8a78613908222852e0b1a38df21a8a",
+      "sha256": "61e5c76072b4505b9c94c6a628ea2654781e9e1b1d21a9e10ee455bdf93c1c54",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v06/bwv-988-v06.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v06/bwv-988-v06.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1407",
@@ -3735,10 +2860,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1407",
-      "sha256": "b4ba2bc7c1089320a501c54d0329598f31e9f9a2ea5e2b39b474ddf0909da74c",
+      "sha256": "02f5ba6a08ad1730a5186c637a64844aa783edb419d9fbeee5fb7aed5ee99aec",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v07/bwv-988-v07.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v07/bwv-988-v07.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1408",
@@ -3769,10 +2895,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1386",
-      "sha256": "e30aeac8ad870fce8d459eae17ceb244150d9e6cd10e9f5b9c10e27fb6377746",
+      "sha256": "9baa60ce82061ec9bbbd981d466cf2a0609d598f6ae4d57950941de42811380d",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v09/bwv-988-v09.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v09/bwv-988-v09.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1387",
@@ -3786,10 +2913,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1387",
-      "sha256": "e06c20182a2396be8b6222be041fc4b1b5d128098134acc64c292da15348e5e6",
+      "sha256": "0341b236be22d2ed94862f26e1dbc8032386adca3c12faeed93d2a255053d5eb",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v10/bwv-988-v10.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v10/bwv-988-v10.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1409",
@@ -3837,10 +2965,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1411",
-      "sha256": "9d1e004c143a81a253ee16e2750686c99b259647b5b0539a5e4b47ca16155a5d",
+      "sha256": "0150420a2040b24110df40f10d1c90b7caa085f86b84bf0f625646f5d525e3aa",
       "edition": "Bach-Gesellschaft Edition 153 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v13/bwv-988-v13.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v13/bwv-988-v13.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1412",
@@ -3854,10 +2983,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1412",
-      "sha256": "48c5dc177744b06826bd9afa1fbce5c259a428892656d998d4bf2793298c513f",
+      "sha256": "ae9b44d2a1fe966bbb92d7a504c4b4af44f7dad0883cd63d4047ec2ad75d2cd7",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v14/bwv-988-v14.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v14/bwv-988-v14.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1413",
@@ -3871,10 +3001,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1413",
-      "sha256": "a50622be87f5744d747132259d2522c32b34eb58318ce7964811691a7fd0c04c",
+      "sha256": "a55cc8585d541f96f2a5159c6f235bb85f193ec9621a2248de44252e5b640a97",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v16/bwv-988-v16.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v16/bwv-988-v16.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1076",
@@ -3990,10 +3121,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1404",
-      "sha256": "d87aa2cacc47da3d7099d890e5a9d8e9f77d7d8e7f0d54a7142c34f0c1f4adb0",
+      "sha256": "ae62b0332e88d60533af4dc973704e95071295c7a3a75229c5342d711d4c3233",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v24/bwv-988-v24.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v24/bwv-988-v24.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1419",
@@ -4007,10 +3139,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1419",
-      "sha256": "840ea41585d220cba72f85a596bfb58747501278748c6baa6f7284cdc23827a1",
+      "sha256": "fccc4f2057860e57f0fb86dbd965d980b39677ec12cc92b86ee8f6d86fdbd28b",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v25/bwv-988-v25.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v25/bwv-988-v25.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1446",
@@ -4058,10 +3191,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1420",
-      "sha256": "84f35e8fcb0431a55c6e280d73306603592cf1d40e73d99f9cf73f4dbcc44609",
+      "sha256": "4a2d0bd7e2f09b8f9750c64d7deab82d740528232ac55fa44ff71b9e139fbc25",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v28/bwv-988-v28.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v28/bwv-988-v28.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1421",
@@ -4092,27 +3226,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Hajo Dezelski",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1422",
-      "sha256": "1eb5195f2449afaed2196ae2da83daa9aeab7cf74a7d105f0ff4459b03f2190d",
+      "sha256": "1961a33c411e90f026ba5c1c57e9626b30d6f5c447b1799697d77e3958e16f02",
       "edition": "Bach-Gesellschaft Edition 1853 Band 3",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v30/bwv-988-v30.ly"
-    },
-    {
-      "id": "mutopia_129",
-      "name": "Erato Allemande",
-      "composer": "J. C. F. Fischer",
-      "collection": "Musikalischer Parnassus · Erato",
-      "subtitle": "键盘乐谱 · LilyPond",
-      "file": "mutopia/129.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Rune Zedeler",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=129",
-      "sha256": "1e6fd8bfd7907776fb99325b733feb53e4ab58d8f6511e5a1346398e58a16be1",
-      "edition": "Unknown",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/FischerJKF/Fischer_EratoAllemande/Fischer_EratoAllemande.ly"
+      "sourceEntry": "ftp/BachJS/BWV988/bwv-988-v30/bwv-988-v30.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_128",
@@ -4483,10 +3601,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=185",
-      "sha256": "ca934ccbf4283f08610c6b6c8bc812a503a97d061925e5bb9a75f0a5fe83fc71",
+      "sha256": "a7b0b6b3555c96cdbeff9b1e7cf23d7326ce44ad593d9c2cf449330b1a469add",
       "edition": "C. F. Peters, 1880s",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-27/hob-xvi-27-i-allegro-con-brio/hob-xvi-27-i-allegro-con-brio.ly"
+      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-27/hob-xvi-27-i-allegro-con-brio/hob-xvi-27-i-allegro-con-brio.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_186",
@@ -4517,10 +3636,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=187",
-      "sha256": "ae84a6ee92e95aac0a0a1c0a27444badbf2841013f178a40847ffe77ddae3452",
+      "sha256": "d4a82d09680a29d9804bce35e6e96af91290b080fd041367ef8dc229b64e2af7",
       "edition": "C. F. Peters, 1880s",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-27/hob-xvi-27-iii-presto/hob-xvi-27-iii-presto.ly"
+      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-27/hob-xvi-27-iii-presto/hob-xvi-27-iii-presto.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_210",
@@ -4534,10 +3654,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=210",
-      "sha256": "da43f51b6a73c367b348b50da47b64cb36a9153486c4b817d92525305ea1ee66",
+      "sha256": "0762a25514d586d8a5bb4bff8022471fd121d1cada0af7870cd42f0dfdab043a",
       "edition": "C. F. Peters, 1880s",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-28/hob-xvi-28-i-allegro-moderato/hob-xvi-28-i-allegro-moderato.ly"
+      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-28/hob-xvi-28-i-allegro-moderato/hob-xvi-28-i-allegro-moderato.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_211",
@@ -4551,10 +3672,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=211",
-      "sha256": "2e7847d26f85dc374422d046d886fb46cbac4158979eab05d58cbc98e795e558",
+      "sha256": "06dbd07bfe8aa7eaa31b9782c4d3f133156a794cc4c77e4236c294a5f05587ea",
       "edition": "C. F. Peters, 1880s",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-28/hob-xvi-28-ii-menuetto/hob-xvi-28-ii-menuetto.ly"
+      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-28/hob-xvi-28-ii-menuetto/hob-xvi-28-ii-menuetto.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_212",
@@ -4568,10 +3690,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Bas Wassink",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=212",
-      "sha256": "9936e6fc1a64a5df67f240fcf0ae76ce09dad903625bac787f104f8b1b409a0b",
+      "sha256": "b65b13676d686a3ae43c60f7f636197c1111f8a67266834263fa6ef7f21e2937",
       "edition": "C. F. Peters, 1880s",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-28/hob-xvi-28-iii-presto/hob-xvi-28-iii-presto.ly"
+      "sourceEntry": "ftp/HaydnFJ/HOB-XVI-28/hob-xvi-28-iii-presto/hob-xvi-28-iii-presto.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_414",
@@ -4710,40 +3833,6 @@
       "sourceEntry": "ftp/LisztF/ballade/ballade.ly"
     },
     {
-      "id": "mutopia_1653",
-      "name": "Scherzo in E minor · Op. 16, No. 2",
-      "composer": "Mendelssohn",
-      "collection": "三首幻想曲或随想曲 · Op. 16",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1653.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Andrew C. Norman",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1653",
-      "sha256": "0fa2f582d6241dd9dffbf5935eea5cee0ba2bc13bca7a6f107e6234d0fcae83e",
-      "edition": "http://imslp.org/wiki/Image:Mendelssohn_-_Op.16_-_3_Caprices.pdf",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O16/mendelssohn-scherzo-eminor/mendelssohn-scherzo-eminor.ly"
-    },
-    {
-      "id": "mutopia_989",
-      "name": "Inquiétude · Op. 19, No. 5",
-      "composer": "Mendelssohn",
-      "collection": "无词歌 · Op. 19",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/989.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Neil Puttock",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=989",
-      "sha256": "6ed2def862b80501fa16012112bbe153e4e7c5a48b164dccfdeab5a4fe988633",
-      "edition": "Novello, Ewer & Co., ca 1880",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O19/5.Inquietude/5.Inquietude.ly"
-    },
-    {
       "id": "mutopia_1679",
       "name": "Lieder ohne Worte: Venetianisches Gondellied, Op.19 No.6",
       "composer": "Mendelssohn",
@@ -4772,10 +3861,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ryan Prince",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1741",
-      "sha256": "b3689c0fdcf213b8ac0be4842ac5dd7c75fa40499ebda1ae9fadc4bc7f0f87f5",
+      "sha256": "23a420367240ae2f9b4bb4bb01a9228b46cd622d3cfcc70e711b742e069fd896",
       "edition": "Breitkopf & Härtel, 1874-1877",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O30/LiederOhneWorte_-_Op30_No6/LiederOhneWorte_-_Op30_No6.ly"
+      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O30/LiederOhneWorte_-_Op30_No6/LiederOhneWorte_-_Op30_No6.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_592",
@@ -4789,10 +3879,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=592",
-      "sha256": "4c348fad19100663e019809930120d4241f5247076a5b3db436a5ce170112199",
+      "sha256": "d9a3ce611c26ea497282be4312d95ec41ae16594f04d1d083d8509faa7e09c07",
       "edition": "Breitkopf & Hartel, Leipzig",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O53/SongWW_opus53no5/SongWW_opus53no5.ly"
+      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O53/SongWW_opus53no5/SongWW_opus53no5.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1744",
@@ -4806,10 +3897,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ryan Prince",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1744",
-      "sha256": "3c23694244cb6786519ec25c25f6755842dedcf59a03d52fc54dfb3afe5217c1",
+      "sha256": "8157b1655647afb6de22d7e13cae9aaa171e6559fa5e696f1b8d8764bdeda848",
       "edition": "Breitkopf & Härtel, 1874-1877",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O85/LiederOhneWorte_-_Op85_No1/LiederOhneWorte_-_Op85_No1.ly"
+      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O85/LiederOhneWorte_-_Op85_No1/LiederOhneWorte_-_Op85_No1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_589",
@@ -4823,10 +3915,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=589",
-      "sha256": "21b0dd5d606a1d45cc905fab1ff72269fd2408408c093be157b38389d9b7681f",
+      "sha256": "32d3867ca23a7d97c04a0c50638edd9bdefadf82200c847d491e5117793612c7",
       "edition": "Breitkopf & Hartel, Leipzig",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O102/SongWW_opus102no3/SongWW_opus102no3.ly"
+      "sourceEntry": "ftp/Mendelssohn-BartholdyF/O102/SongWW_opus102no3/SongWW_opus102no3.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_424",
@@ -4840,10 +3933,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Maurizio Tomasi",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=424",
-      "sha256": "8bbff4c7a2181bd29ac7f47be52b7fa52541e15dd2ac99fddcbe06fe728950c2",
+      "sha256": "12febe231a780653f22216031cd605f3250b754a2e4fa8b716291338a98c0677",
       "edition": "Breitkopf und Härtel (1878-1887)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV153/k153/k153.ly"
+      "sourceEntry": "ftp/MozartWA/KV153/k153/k153.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_425",
@@ -4857,10 +3951,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Maurizio Tomasi",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=425",
-      "sha256": "cb157485118ae3c331989da8771d69fb478ab0bd780754598049a31b9752c964",
+      "sha256": "6f7c727cdbe2018acc7e2d5a8692aa057e3aa50450e45eb030c06fdea4183132",
       "edition": "Breitkopf und Härtel (1878-1887)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV154/k154/k154.ly"
+      "sourceEntry": "ftp/MozartWA/KV154/k154/k154.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1379",
@@ -4874,10 +3969,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1379",
-      "sha256": "d06c9a91f27d0c4086fe399bf57d88c645d7a877039b3d77924fd317a506f44f",
+      "sha256": "9354a5c826a1f06681cab4d62010c0b80d8c60f3e25d8f5d87ae5c7e79ec6a97",
       "edition": "Breitkopf & Hartel (1877-83)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV309/KV309_1/KV309_1.ly"
+      "sourceEntry": "ftp/MozartWA/KV309/KV309_1/KV309_1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_613",
@@ -4891,10 +3987,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Stelios Samelis",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=613",
-      "sha256": "b3f96987d6d5155ccb4079ca72e67a7b9720a467f340255ea45805af25f580e0",
+      "sha256": "7fe031f8a3cd234e4ec78d7e5fd17aa4f47f66f8a433a2ceb79693e860f871ce",
       "edition": "Breitkopf & Hartel, Leipzig",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV331/KV331_2_1_menuetto/KV331_2_1_menuetto.ly"
+      "sourceEntry": "ftp/MozartWA/KV331/KV331_2_1_menuetto/KV331_2_1_menuetto.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_108",
@@ -4942,10 +4039,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Will Oram",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=356",
-      "sha256": "bfadc413e046777d84a9c124c50eda77f47a3c5dd9f7d8efd39ad72d6caba9a1",
+      "sha256": "c0fe1baf1e42bdc789b656f81e5f6cd8a5b620b170c4866b6c3003058ba2e079",
       "edition": "Schirmer, 1918, and Breitkopf & Härtel, 1878",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV457/sonata1/sonata1.ly"
+      "sourceEntry": "ftp/MozartWA/KV457/sonata1/sonata1.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_357",
@@ -4959,10 +4057,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Will Oram",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=357",
-      "sha256": "41ba0967a14282cbd61ce46dec3c2ba40638ac0f913725a05110a6edb8e29de5",
+      "sha256": "97376706181ec7d4c2d82986aa85d18e5efbd619cd8bf7eea4a9780c036d80fc",
       "edition": "Schirmer, 1918, and Breitkopf & Härtel, 1878",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV457/sonata2/sonata2.ly"
+      "sourceEntry": "ftp/MozartWA/KV457/sonata2/sonata2.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_358",
@@ -4976,10 +4075,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Will Oram",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=358",
-      "sha256": "465fdc82788e6fc3ba18a1dfd5fa58bf0ede858b0d4b2436c76a0017f0939ace",
+      "sha256": "6cde1cccbd274b8b6283b43449101da41447c138e1b5ffb5682ad67399eabb68",
       "edition": "Schirmer, 1918, and Breitkopf & Härtel, 1878",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV457/sonata3/sonata3.ly"
+      "sourceEntry": "ftp/MozartWA/KV457/sonata3/sonata3.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1027",
@@ -5016,23 +4116,6 @@
       "sourceEntry": "ftp/MozartWA/KV574/k574/k574.ly"
     },
     {
-      "id": "mutopia_570",
-      "name": "Fantasia",
-      "composer": "Mozart",
-      "collection": "独立键盘作品",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/570.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Felix Braun",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=570",
-      "sha256": "8edab0401fd3aeb1fc044104358418b04b13138d298b37e1ddc717e60acbf66c",
-      "edition": "Edition Peters 7241",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/MozartWA/KV594/Fantasia/Fantasia-lys/Fantasia.ly"
-    },
-    {
       "id": "mutopia_420",
       "name": "Fugues on the Magnificat III. 7.",
       "composer": "Pachelbel",
@@ -5044,78 +4127,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "transcriber": "Steve Dunlop",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=420",
-      "sha256": "1c5178d3e64e4a56e70566bf8f5f8402554cb45b4a3ad95e22e9069831709eac",
+      "sha256": "337f8078a922d7aeb5e68c729e7112ba222d05788993675dd9927f63b1f97374",
       "edition": "Wien: Artaria, 1901 (Denkmaler der tonkunst in Osterreich; v. 17)",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/PachelbelJ/fugue-3-7/fugue-3-7.ly"
-    },
-    {
-      "id": "mutopia_1958",
-      "name": "Prelude Op. 23, No. 1",
-      "composer": "Rachmaninoff",
-      "collection": "前奏曲 · Op. 23",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1958.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "transcriber": "Abel Cheung",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1958",
-      "sha256": "96cd6e069ae00ee77184b3da6330335fc20e81c760f41ab139aef42879d12b5a",
-      "edition": "IMSLP - Muzyka and Gutheil editions",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/RachmaninoffS/O23/rach-prelude23-01/rach-prelude23-01.ly"
-    },
-    {
-      "id": "mutopia_1960",
-      "name": "Prelude Op. 23, No. 2",
-      "composer": "Rachmaninoff",
-      "collection": "前奏曲 · Op. 23",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1960.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "transcriber": "Abel Cheung",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1960",
-      "sha256": "6b72a2e684cdd2a01bfc79f3d5ce063f22f157a2beade8c7d240d3818915b960",
-      "edition": "IMSLP - Muzyka and Gutheil editions",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/RachmaninoffS/O23/rach-prelude23-02/rach-prelude23-02.ly"
-    },
-    {
-      "id": "mutopia_1990",
-      "name": "Prelude Op. 23, No. 3",
-      "composer": "Rachmaninoff",
-      "collection": "前奏曲 · Op. 23",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1990.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "transcriber": "Abel Cheung",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1990",
-      "sha256": "a8b5de1277a77af28cbacc8a041b6c74223e731d65eff720b5ffab9826efbe1d",
-      "edition": "IMSLP - Muzyka and Gutheil editions",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/RachmaninoffS/O23/rach-prelude23-03/rach-prelude23-03.ly"
-    },
-    {
-      "id": "mutopia_1993",
-      "name": "Prelude Op. 23, No. 4",
-      "composer": "Rachmaninoff",
-      "collection": "前奏曲 · Op. 23",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1993.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "transcriber": "Abel Cheung",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1993",
-      "sha256": "20ed31f0704ce927ab95a19a794e867e9c54fa924fe66ed2c892b7e8421fce46",
-      "edition": "IMSLP - Muzyka and Gutheil editions",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/RachmaninoffS/O23/rach-prelude23-04/rach-prelude23-04.ly"
+      "sourceEntry": "ftp/PachelbelJ/fugue-3-7/fugue-3-7.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_2001",
@@ -5133,23 +4149,6 @@
       "edition": "IMSLP - Muzyka and Gutheil editions",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
       "sourceEntry": "ftp/RachmaninoffS/O23/rach-prelude23-05/rach-prelude23-05.ly"
-    },
-    {
-      "id": "mutopia_1996",
-      "name": "Prelude Op. 23, No. 6",
-      "composer": "Rachmaninoff",
-      "collection": "前奏曲 · Op. 23",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1996.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "transcriber": "Abel Cheung",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1996",
-      "sha256": "095dc4d56c44689cfe8b7020f9b49e1f310f45f3a709a88c99dda896086b78a2",
-      "edition": "IMSLP - Muzyka and Gutheil editions",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/RachmaninoffS/O23/rach-prelude23-06/rach-prelude23-06.ly"
     },
     {
       "id": "mutopia_2057",
@@ -5231,10 +4230,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Thomas Amthor",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1425",
-      "sha256": "9f785c304cf965ba0a8b553150401c030a07d8da06dbf3ff13a814b02857b86e",
+      "sha256": "139dd2d60a51650a04ac2829a0187e1e40a1640b89969137391e7a926231fa7b",
       "edition": "M. P. Belaïeff, Leipzig, 1890",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Rimsky-KorsakovN/O11/rimsky-korsakov-op11-2/rimsky-korsakov-op11-2.ly"
+      "sourceEntry": "ftp/Rimsky-KorsakovN/O11/rimsky-korsakov-op11-2/rimsky-korsakov-op11-2.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1530",
@@ -5248,10 +4248,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Thomas Amthor",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1530",
-      "sha256": "7355f36071de7752940c30879df0f846b2001dd77b76158a1f02929bb0b3b93c",
+      "sha256": "1d572f35295adaf61cbf8b2363d8435876493820258b382f6af02dbda9dfc357",
       "edition": "M. P. Belaïeff, Leipzig, 1890",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Rimsky-KorsakovN/O11/rimsky-korsakov-op11-3/rimsky-korsakov-op11-3.ly"
+      "sourceEntry": "ftp/Rimsky-KorsakovN/O11/rimsky-korsakov-op11-3/rimsky-korsakov-op11-3.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1600",
@@ -5265,10 +4266,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Thomas Amthor",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1600",
-      "sha256": "6b2a9b79ac43fceb1ae2b62e624fb680396358cdb464a1217e31c087772ea78f",
+      "sha256": "c694757349356af189f5d163149377f5c04091fca3ebc5d08a745ddb82136347",
       "edition": "M. P. Belaïeff, Leipzig, 1890",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/Rimsky-KorsakovN/O11/rimsky-korsakov-op11-4/rimsky-korsakov-op11-4.ly"
+      "sourceEntry": "ftp/Rimsky-KorsakovN/O11/rimsky-korsakov-op11-4/rimsky-korsakov-op11-4.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1271",
@@ -5492,57 +4494,6 @@
       "sourceEntry": "ftp/SatieE/enfantillages_pittoresques/enfantillages_pittoresques-lys/enfantillages_pittoresques.ly"
     },
     {
-      "id": "mutopia_1545",
-      "name": "Trois Marches militaires · D.733-1 (Op. 51)",
-      "composer": "Schubert",
-      "collection": "三首军队进行曲 · D. 733",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/1545.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Ph. Raynaud",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1545",
-      "sha256": "e62ab539b85b0130ae360bebac2304e1e17fb377d4be06de2c544b846a1154c2",
-      "edition": "Breitkopf & Härtel",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D733/SchubertF-D733-1-TroisMarches/SchubertF-D733-1-TroisMarches.ly"
-    },
-    {
-      "id": "mutopia_1546",
-      "name": "Trois Marches militaires · D.733-2 (Op. 51)",
-      "composer": "Schubert",
-      "collection": "三首军队进行曲 · D. 733",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/1546.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Ph. Raynaud",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1546",
-      "sha256": "e9ab4035a24bc439cc82da273d76c3fcc143e78a7ee2e92427ced674c2b802c0",
-      "edition": "Breitkopf & Härtel",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D733/SchubertF-D733-2-TroisMarches/SchubertF-D733-2-TroisMarches.ly"
-    },
-    {
-      "id": "mutopia_1547",
-      "name": "Trois Marches militaires · D.733-3 (Op. 51)",
-      "composer": "Schubert",
-      "collection": "三首军队进行曲 · D. 733",
-      "subtitle": "钢琴四手联弹 · LilyPond",
-      "file": "mutopia/1547.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Ph. Raynaud",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1547",
-      "sha256": "3aa5a2d74dd5ab9460361a79afed62b689f671ed73c3718d2c136155cacab5e6",
-      "edition": "Breitkopf & Härtel",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D733/SchubertF-D733-3-TroisMarches/SchubertF-D733-3-TroisMarches.ly"
-    },
-    {
       "id": "mutopia_1023",
       "name": "Moments Musicaux No. 3 in F Minor · D.780 (Op. 94, No. 3)",
       "composer": "Schubert",
@@ -5554,27 +4505,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Claude Chaudron",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1023",
-      "sha256": "125593cf86ffe7ac62715ea7cd5a8245aeaa78eedfe07778443df103bc3423df",
+      "sha256": "e42e1860fcefa72bb143c5a655dbb131f249d2afcf17b1cea739aa09c0a958c4",
       "edition": "Sauer & Leidersdorf, Wien, 1827",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D780/MomentsNo3/MomentsNo3.ly"
-    },
-    {
-      "id": "mutopia_758",
-      "name": "Ungarische Melodie · D.817",
-      "composer": "Schubert",
-      "collection": "匈牙利旋律 · D. 817",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/758.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Felix Braun",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=758",
-      "sha256": "0b29d0bdf2e9e13e2855dbc98b3e86b2913ce3367fca913840bec82ea80ae2bc",
-      "edition": "Neue Schubert Ausgabe BA 5521",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D817/Ungarische/Ungarische.ly"
+      "sourceEntry": "ftp/SchubertF/D780/MomentsNo3/MomentsNo3.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1192",
@@ -5588,27 +4523,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ph. Raynaud",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1192",
-      "sha256": "71bd0e1a2f497c9f090dde37a5b9ae1fabb10545abf04c60778e86cd5108ecde",
+      "sha256": "222a7de5900c735e6dd16221e9bd4f791ced22f028ce1f6a91db7d91210b14c5",
       "edition": "Breitkopf & Härtel, 1888",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D899/SchubertF-D899-1-Impromptu/SchubertF-D899-1-Impromptu.ly"
-    },
-    {
-      "id": "mutopia_1551",
-      "name": "Impromptu in Es-dur · D.899 (Op. 90, No. 2)",
-      "composer": "Schubert",
-      "collection": "即兴曲 · D. 899",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1551.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Ph. Raynaud",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1551",
-      "sha256": "5b501e672643b5d881749583eb2dadad8545bfe1760592bbf1bdcfc282248267",
-      "edition": "Breitkopf & Härtel, 1888",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D899/SchubertF-D899-2-Impromptu/SchubertF-D899-2-Impromptu.ly"
+      "sourceEntry": "ftp/SchubertF/D899/SchubertF-D899-1-Impromptu/SchubertF-D899-1-Impromptu.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1193",
@@ -5622,27 +4541,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ph. Raynaud",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1193",
-      "sha256": "da1cda9d6b967f485cdebb61122ff84f48575962ea3dd2c5b9435b56d45436a3",
+      "sha256": "6fd06ef2a530d7cbd7e54a92629f1d0d2f123a439187792670895d373a3221e0",
       "edition": "Breitkopf & Härtel, 1888",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D899/SchubertF-D899-3-Impromptu/SchubertF-D899-3-Impromptu.ly"
-    },
-    {
-      "id": "mutopia_1552",
-      "name": "Impromptu in As-dur · D.899 (Op. 90, No. 4)",
-      "composer": "Schubert",
-      "collection": "即兴曲 · D. 899",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/1552.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Ph. Raynaud",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1552",
-      "sha256": "93624eb0f96ad930aac2d8e6953b69d8e9b9a45d724ce003547a64d63796b4c4",
-      "edition": "Breitkopf & Härtel, 1888",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D899/SchubertF-D899-4-Impromptu/SchubertF-D899-4-Impromptu.ly"
+      "sourceEntry": "ftp/SchubertF/D899/SchubertF-D899-3-Impromptu/SchubertF-D899-3-Impromptu.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1194",
@@ -5656,10 +4559,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ph. Raynaud",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1194",
-      "sha256": "c32fd2c86f1ff596c8ac7b90dc625f1dcfaa407bd08c322b7f4a046b8daeda0c",
+      "sha256": "8a03e31b2f4c4b4a06ef32612088c5e3610b9202a66ad4c8386447dd9c090d3b",
       "edition": "Breitkopf & Härtel, 1888",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-1-Impromptu/SchubertF-D935-1-Impromptu.ly"
+      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-1-Impromptu/SchubertF-D935-1-Impromptu.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1195",
@@ -5673,10 +4577,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ph. Raynaud",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1195",
-      "sha256": "4680c042740d86a160ac3eac331d9d6bda104f97198a0a3fa8c2a65357399a1c",
+      "sha256": "34919e7ffe2a9a9084765f7341aff37c763845e2666fea4eadd5ed415c38cf46",
       "edition": "Breitkopf & Härtel, 1888",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-2-Impromptu/SchubertF-D935-2-Impromptu.ly"
+      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-2-Impromptu/SchubertF-D935-2-Impromptu.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1721",
@@ -5690,10 +4595,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Simon Otten",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1721",
-      "sha256": "0367e1fa06383da49cdea24d6ea3e3a99f618e10f63971cb98d9a952e1331db8",
+      "sha256": "778a753bb1584c3c9a5c3fec4e5dbcc404aadce35c41b72e6963e591db60e9b9",
       "edition": "Breitkopf & Härtel, 1888",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-3-Impromptu/SchubertF-D935-3-Impromptu.ly"
+      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-3-Impromptu/SchubertF-D935-3-Impromptu.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1689",
@@ -5707,10 +4613,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Simon Otten",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1689",
-      "sha256": "e244f7941ca5d5c6f91f41a8db2c93621264b69b7d1d1b8c1a1dc52392b586c0",
+      "sha256": "6d2418ff448b99572aa92da0848a65f73584861d28d517632efbf17e542e73f2",
       "edition": "Breitkopf & Härtel, 1888",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-4-Impromptu/SchubertF-D935-4-Impromptu.ly"
+      "sourceEntry": "ftp/SchubertF/D935/SchubertF-D935-4-Impromptu/SchubertF-D935-4-Impromptu.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_355",
@@ -5741,10 +4648,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "transcriber": "Ying-Chun Liu",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=365",
-      "sha256": "536f8f4df138ce9129237d8c0d30a13c7ba3d0feb11fdf12f603092e1228d485",
+      "sha256": "e9fb5e378f8dc58cc4d86bf3e8bbdf92294cb52f8a2bb0d51a91ee0c3268cc04",
       "edition": "Leichte Stucke, 1900",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No03/SchumannOp15No03.ly"
+      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No03/SchumannOp15No03.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_366",
@@ -5758,10 +4666,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "transcriber": "Ying-Chun Liu",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=366",
-      "sha256": "e59a0cbe4dcc174d29979741da9c3691840cf0fa605871cd3fe0ddb291aa408a",
+      "sha256": "d3caa0a129ba60de966d6f44660ca3ff4652d4f36ad83dd74d88a55cf5003091",
       "edition": "Leichte Stucke, 1900",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No04/SchumannOp15No04.ly"
+      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No04/SchumannOp15No04.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_372",
@@ -5775,10 +4684,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Ying-Chun Liu",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=372",
-      "sha256": "6b87b9629b21ed23478e7493aca4ffb0e4fa74b483e5fc2d8c6ebd1fa895a167",
+      "sha256": "217a7a7717fcfbed3d51365e040a84a5d32aab4b113c208ce1697a8f219276a7",
       "edition": "Leichte Stucke, 1900",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No05/SchumannOp15No05.ly"
+      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No05/SchumannOp15No05.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_374",
@@ -5792,10 +4702,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "transcriber": "Ying-Chun Liu",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=374",
-      "sha256": "4fe5582dda3d554602cf7f1f830ada83a309c697793c49b0728c6e96c3b55467",
+      "sha256": "ee5758c7029af6ec1f196e163dbaf8037e4776a55bf887186ddf87afe331aa5d",
       "edition": "Leichte Stucke, 1900",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No06/SchumannOp15No06.ly"
+      "sourceEntry": "ftp/SchumannR/O15/SchumannOp15No06/SchumannOp15No06.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_314",
@@ -5809,10 +4720,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "rune@zedeler.dk",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=314",
-      "sha256": "f276eb1642370a66913c3bf6f524be4e50069e18a536f22c704615e08c13da64",
+      "sha256": "4e2fd52aa20b6d7501428983be7a01e7bd5b5f9df66054bb17cd8ff6850bcb64",
       "edition": "Ed. Peters",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O28/romanze-op28-2/romanze-op28-2-lys/schumann-romanze-op28-2-a4.ly"
+      "sourceEntry": "ftp/SchumannR/O28/romanze-op28-2/romanze-op28-2-lys/schumann-romanze-op28-2-a4.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_647",
@@ -5928,10 +4840,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "transcriber": "Philippe Hézaine",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=691",
-      "sha256": "bd0caa8839ff26ac1961b4df975865d343b410f72b1c98d51423ae6fbc31b844",
+      "sha256": "751bdcd0fbd4a9eca77a95bf9176b3b8ce2e1b8372a4a839e3db0a911c4daa0e",
       "edition": "Peters",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-07-chanson-du-chasseur/schumann-op68-07-chanson-du-chasseur.ly"
+      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-07-chanson-du-chasseur/schumann-op68-07-chanson-du-chasseur.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_655",
@@ -6047,10 +4960,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
       "transcriber": "Philippe Hézaine",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=786",
-      "sha256": "b98d541911afcbdac51bb1a1ee2524a58431890aeb3942fbf3520ab94c27f978",
+      "sha256": "38104a3d9ba540d343ec0292ed6f78aec7111253971c451faaf6555f087471df",
       "edition": "Peters",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-14-petite-etude/schumann-op68-14-petite-etude.ly"
+      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-14-petite-etude/schumann-op68-14-petite-etude.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_676",
@@ -6064,10 +4978,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
       "transcriber": "Philippe Hézaine",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=676",
-      "sha256": "26f1b0bb98e300dfe22c7c973d8617083134160ad94b2eb4435e4a27fe9cb5b9",
+      "sha256": "a7e47179c1c6cf308bf46169665cd1821e4b535cfbdaeeb78864a8bdaca51583",
       "edition": "Peters",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-16-premier-chagrin/schumann-op68-16-premier-chagrin.ly"
+      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-16-premier-chagrin/schumann-op68-16-premier-chagrin.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_663",
@@ -6121,23 +5036,6 @@
       "sourceEntry": "ftp/SchumannR/O68/schumann-op68-26-sans-titre/schumann-op68-26-sans-titre.ly"
     },
     {
-      "id": "mutopia_692",
-      "name": "Album pour la jeunesse - 32.Sheherazade",
-      "composer": "Schumann",
-      "collection": "少年曲集 · Op. 68",
-      "subtitle": "钢琴独奏 · LilyPond",
-      "file": "mutopia/692.ly",
-      "scoreType": "LilyPond",
-      "license": "CC BY-SA 2.5",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
-      "transcriber": "Philippe Hézaine",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=692",
-      "sha256": "3e0f0c3322ff20b3a85977a22406f0f48c77d1a5ff835d581bbaa6661282ec80",
-      "edition": "Peters",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-32-sheherazade/schumann-op68-32-sheherazade-lys/schumann-op68-32-sheherazade.ly"
-    },
-    {
       "id": "mutopia_688",
       "name": "Album pour la jeunesse - 36.Chant de marins italiens",
       "composer": "Schumann",
@@ -6149,10 +5047,11 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
       "transcriber": "Philippe Hézaine",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=688",
-      "sha256": "e02609b7c5e83f0954123312c0062754df5f3a248bdb69442510c16ca065437e",
+      "sha256": "d42f12fff07139a750f9efaf239ad4cceab0c74f7a553628a40bc4a31621ccfd",
       "edition": "Peters",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-36-chant-de-marins-italiens/schumann-op68-36-chant-de-marins-italiens.ly"
+      "sourceEntry": "ftp/SchumannR/O68/schumann-op68-36-chant-de-marins-italiens/schumann-op68-36-chant-de-marins-italiens.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_341",
@@ -6166,27 +5065,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Vassily Checkin",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=341",
-      "sha256": "2076e5dd9ec03c272de101b45c5e47b5f27cda0b5f54de94d09fe7850c9450b3",
+      "sha256": "285b20a8e56aa6be921aa95e5360248e0fb091954641a8a33f67faa24cb43047",
       "edition": "Unknown",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/TchaikovskyPI/O59/dumka/dumka.ly"
-    },
-    {
-      "id": "mutopia_1214",
-      "name": "La Traviata - N1 Introduzione",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1214.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1214",
-      "sha256": "403b5c753a0327221d7b7e21858d859c7588c8790bdc2f73666b842d505d7217",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_01/Traviata_01.ly"
+      "sourceEntry": "ftp/TchaikovskyPI/O59/dumka/dumka.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1215",
@@ -6200,10 +5083,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1215",
-      "sha256": "48b6b70dc47f716eb739d87f1b4b62ba5b0d1b7b4591f481d5982784a0c6179f",
+      "sha256": "1d079b7b6a53dd5248174c229124cb2ac0d8a6d68a9d90ed66b8ee7d5593501d",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_02/Traviata_02.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_02/Traviata_02.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1216",
@@ -6217,10 +5101,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1216",
-      "sha256": "1f0cee462c7eb546c38184ca28c67f897462f8af6b4bca533d90595ebb275eca",
+      "sha256": "852e53326a9efda6e7e02a1dcb945f0f29d66acb4dd234f75c1b9502143fa7cc",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_03/Traviata_03.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_03/Traviata_03.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1217",
@@ -6234,10 +5119,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1217",
-      "sha256": "eaaa4537086ac3c014391d2a1d6985078ec40e1e9ed18a665714a6a8abc9be5e",
+      "sha256": "2015c59127c6118e7ab47a3377f6306d9688f6412184839d1bdf1f56c3471cb4",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_04/Traviata_04.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_04/Traviata_04.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1218",
@@ -6251,10 +5137,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1218",
-      "sha256": "f2607b7c920678e52f9ea4d80f604126f087c482d332320d4007115a2106a5b0",
+      "sha256": "6843a696aadf00d839e5a514ebb8fe96541e589a2e2153d6ce04e9ce5bcc6d34",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_05/Traviata_05.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_05/Traviata_05.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1399",
@@ -6268,10 +5155,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1399",
-      "sha256": "5da1042529316e0ad4d982cdbc3a2ab814f931ab796d4b722398312fb0fdf239",
+      "sha256": "fe240dce52f409e5240891e364cdf3c35ff1a69bd810ff659ee1ea7404d887ce",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_06/Traviata_06.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_06/Traviata_06.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1400",
@@ -6285,10 +5173,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1400",
-      "sha256": "aa148f37c37f1ad54fd396e3664731d6077b6e69ab2a6de7c3f6a1126ac910bd",
+      "sha256": "51f9dacbeba646516af20114aba4d1cb18a84afbb4084e8556fc95f7d132e1c8",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_07/Traviata_07.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_07/Traviata_07.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1401",
@@ -6302,10 +5191,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1401",
-      "sha256": "2266e0ffd3279078539e39f0b182159e73a8347a28a02e1137722957f760e669",
+      "sha256": "9e615774dfa4f19f899cfd8705c416b1550a4f01204d281b60a7c4d271523832",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_08/Traviata_08.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_08/Traviata_08.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1402",
@@ -6319,10 +5209,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1402",
-      "sha256": "ed5264fb741111b9949fda4bb85d47a61c5fd5ec5b7e6d3ab3eadf6300b7cb12",
+      "sha256": "3ceb60cc8556340d66c95bd8b9431f5548978cd5fcc9b28b12179798238e8b80",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_09/Traviata_09.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_09/Traviata_09.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1511",
@@ -6336,27 +5227,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1511",
-      "sha256": "a39c8985c40fe73449747c593a8117e512d16d43d41978a598b2dc8615b8eb9f",
+      "sha256": "0f720873ab169eeda4e61b634e938fed574581af5281bbe14970cbcbcbd4f7b9",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_10/Traviata_10.ly"
-    },
-    {
-      "id": "mutopia_1512",
-      "name": "La Traviata - N11 Coro di zingari",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1512.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1512",
-      "sha256": "d8e489fe42eea6441c1555d3dfd0cb3319f5ccd8726f388a75d89fea0a8848c7",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_11/Traviata_11.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_10/Traviata_10.ly",
+      "sourceSyntaxVersion": "2.26.0"
     },
     {
       "id": "mutopia_1513",
@@ -6370,129 +5245,11 @@
       "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
       "transcriber": "Alberto Corella",
       "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1513",
-      "sha256": "d80f90addd5e6d04f1d6ca19bbb6f7ad4aa39c6145fd2eacc6c544d3f759ee95",
+      "sha256": "f0e442c71ea1855fee1dd5e32908fa05d1265de7eccea054da480f27eb3898e4",
       "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
       "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_12/Traviata_12.ly"
-    },
-    {
-      "id": "mutopia_1514",
-      "name": "La Traviata - N13 Seguito del Finale II",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1514.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1514",
-      "sha256": "6d6bf67700faa6fc74dfcbddc11cb90cdd6634bf2cb2e08dcc45ba36de6140b0",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_13/Traviata_13.ly"
-    },
-    {
-      "id": "mutopia_1515",
-      "name": "La Traviata - N14 Largo del Finale II",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1515.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1515",
-      "sha256": "a6a237a27f79bb54a2759cc7adc0e52f32e786eb21f878c4322887b216eede71",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_14/Traviata_14.ly"
-    },
-    {
-      "id": "mutopia_1516",
-      "name": "La Traviata - N15 Scena ed Aria",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1516.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1516",
-      "sha256": "e8ef2cebf5054406d1d97089b9496459869f5b205b21e00184b246a65f2bfde9",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_15/Traviata_15.ly"
-    },
-    {
-      "id": "mutopia_1517",
-      "name": "La Traviata - N16 Coro baccanale",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1517.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1517",
-      "sha256": "d5ab219ac871132899607ee48944fa3275be7fab1ac472bbedbc117ceda8bf1b",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_16/Traviata_16.ly"
-    },
-    {
-      "id": "mutopia_1518",
-      "name": "La Traviata - N17 Scena e duetto",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1518.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1518",
-      "sha256": "4ec6e189d1a245a2fd949540239c84eb4e8fcfc5cd5cafc58d78a7072d6c7bd5",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_17/Traviata_17.ly"
-    },
-    {
-      "id": "mutopia_1519",
-      "name": "La Traviata - N18 Scena finale",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1519.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1519",
-      "sha256": "eec793bc94d7f3d92994c8a4c89c396d379ae136a0e6bb7f8b9bde4eded24dee",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_18/Traviata_18.ly"
-    },
-    {
-      "id": "mutopia_1213",
-      "name": "La Traviata - Preludio",
-      "composer": "Verdi",
-      "collection": "茶花女 · 钢琴改编",
-      "subtitle": "钢琴改编 · LilyPond",
-      "file": "mutopia/1213.ly",
-      "scoreType": "LilyPond",
-      "license": "Public Domain",
-      "licenseUrl": "https://www.mutopiaproject.org/legal.html#publicdomain",
-      "transcriber": "Alberto Corella",
-      "sourceUrl": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1213",
-      "sha256": "a5261424ac06e5c44f29e6423ccb9fd303001c8a27c28c4cdbe60872e9e6079e",
-      "edition": "Calcografía de la 'Nueva Biblioteca Musical Económica', 1857-1869",
-      "sourceArchive": "https://codeload.github.com/MutopiaProject/MutopiaProject/tar.gz/2144afd6f52d56c5b6995b8b589ef1268b3139f0",
-      "sourceEntry": "ftp/VerdiG/Traviata_Preludio/Traviata_Preludio.ly"
+      "sourceEntry": "ftp/VerdiG/Traviata_12/Traviata_12.ly",
+      "sourceSyntaxVersion": "2.26.0"
     }
   ]
 }

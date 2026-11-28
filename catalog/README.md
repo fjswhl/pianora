@@ -48,20 +48,23 @@ npx wrangler d1 execute CATALOG --remote --file /tmp/catalog-verified.sql
 
 | 清单 | 数量 | 版本来源 |
 | --- | ---: | --- |
-| [keyboard-editions](collections/keyboard-editions.json) | 505 | Knute Snortum 的 LilyPond 排版所附 MIDI，按发布版本保存，含斯卡拉蒂、肖邦和斯克里亚宾。[版本示例](https://github.com/ksnortum/scarlatti-sonatas-k1-k10/releases/tag/v0.2) |
-| [mutopia-keyboard](collections/mutopia-keyboard.json) | 382 | Mutopia 发布的键盘 MIDI。作品页与制谱者逐条记录，按各谱采用公有领域、CC BY 或 CC BY-SA。[授权说明](https://www.mutopiaproject.org/legal.html) |
-| [classical-mxl](collections/classical-mxl.json) | 182 | 从 PDMX 的 `no_license_conflict` 与 `all_valid` 交集中挑选的压缩 MusicXML。保留可直接呈现的谱面、归档位置和逐谱授权。[数据版本及论文](https://zenodo.org/records/15571083) |
+| [keyboard-editions](collections/keyboard-editions.json) | 468 | 斯卡拉蒂、肖邦、斯克里亚宾的 LilyPond 原谱。保留 Knute Snortum 的署名、授权和源文件位置。[版本示例](https://github.com/ksnortum/scarlatti-sonatas-k1-k10/releases/tag/v0.2) |
+| [mutopia-keyboard](collections/mutopia-keyboard.json) | 304 | Mutopia 的 LilyPond 原谱，含巴赫、贝多芬、车尔尼和舒曼等。每份谱附作品页和该版本的授权。[授权说明](https://www.mutopiaproject.org/legal.html) |
+| [well-tempered](collections/well-tempered.json) | 66 | 巴赫《平均律钢琴曲集》两卷的前奏曲和赋格，补齐馆藏缺口。Knute Snortum 制谱，CC BY-SA 4.0。[第一卷](https://github.com/ksnortum/bach-well-tempered-1) · [第二卷](https://github.com/ksnortum/bach-well-tempered-2) |
+| [classical-mxl](collections/classical-mxl.json) 与 [classical-mxl-2](collections/classical-mxl-2.json) | 256 | 从 PDMX 的 `no_license_conflict` 与 `all_valid` 交集中选取的压缩 MusicXML。逐谱记录原发布者、作品页、归档位置和授权。[数据版本及论文](https://zenodo.org/records/15571083) |
 
-按可单独打开的曲目计数，包括单独发行的乐章、变奏和舞曲。若几个乐章在同一个文件内，计为一条。大型套曲可以收录其中的一部分；下拉框的数字是实际馆藏数量。斯卡拉蒂键盘奏鸣曲按 K. 编号每十号分组浏览。MIDI 来自制谱项目的乐谱导出，访客设备按需生成五线谱；MXL 保留原来的谱面信息。
+本次新增 1,094 条原谱，仅收 LilyPond 和 MusicXML。按可单独打开的曲目计数，包括独立出版的乐章、变奏与舞曲。若多个乐章在同一文件内，计为一条。下拉框显示每个作品集的实际馆藏数量。斯卡拉蒂奏鸣曲按 K. 编号每十号分组浏览。
+
+LilyPond 版本把同一出版物中引用的文件展开到一个可编辑的 `.ly` 文件，保留原始记谱。清单中标有 `sourceSyntaxVersion` 的早期版本通过 GNU convert-ly 更新语法。逐谱在浏览器编译出五线谱和演奏音符后才收录。MXL 保留上游字节。编辑器的「下载原谱」可取回当前馆藏文件。
 
 在仓库根目录执行以下命令可还原清单内的原始文件并复验。PDMX 的上游压缩包约 1.9 GB，已有副本时可以加 `--pdmx-archive /path/to/mxl.tar.gz` 复用。
 
 ```sh
 python3 scripts/restore-collection.py catalog/collections/keyboard-editions.json /tmp/pianora-scores
-# 启动 Vite 后，使用真实浏览器逐谱解析，输出音符数、时长、音高指纹和源文件 SHA-256
-python3 scripts/audit-catalog-files.py catalog/collections/keyboard-editions.json /tmp/pianora-scores --dev-origin http://localhost:5173 --output artifacts/keyboard-editions-audit.json
+# 启动 Vite 后，浏览器逐谱编译并记录页数、音符数、时长和 SHA-256
+python3 scripts/audit-lilypond.py /tmp/pianora-scores catalog/collections/keyboard-editions.json --dev-origin http://localhost:5173 --output /tmp/keyboard-editions-audit.jsonl
 # 从线上分页、核对每位作曲家的各作品集计数，并在手机宽度的浏览器打开不同来源的谱
-python3 scripts/verify-collections.py https://opuslin.uk --minimum 1011 --output artifacts/collections-production.json
+python3 scripts/verify-collections.py https://opuslin.uk --minimum 1011 --play --output artifacts/collections-production.json
 ```
 
 ## 免费容量规划

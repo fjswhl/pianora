@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('url')
 parser.add_argument('--minimum', type=int, default=1000)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--play', action='store_true', help='Generate, engrave and play the last opened score')
 args = parser.parse_args()
 with sync_playwright() as pw:
     browser = pw.chromium.launch(channel=os.getenv('PIANORA_BROWSER','chrome'))
@@ -78,9 +79,18 @@ with sync_playwright() as pw:
             expect(page.locator('#renderBtn')).to_be_enabled()
             expect(page.get_by_role('link',name='版本来源')).to_have_attribute('href', expected['sourceUrl'])
             opened.append(sample)
+    if args.play:
+        assert opened
+        page.locator('#renderBtn').click()
+        page.wait_for_url('**/#studio', timeout=240000)
+        page.get_by_role('button', name='查看谱面').click()
+        expect(page.locator('.svg-sheet-page svg').first).to_be_visible(timeout=150000)
+        page.get_by_role('button', name='试听与导出').click()
+        page.locator('#playBtn').click()
+        expect(page.locator('#playBtn')).to_have_text('暂停', timeout=90000)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps({'url':base,'scores':len(scores),'collections':len(counts),
         'classicalScores':len(classical),'classicalFormats':dict(formats),
         'classicalComposers':len({s['composer'] for s in classical}),
         'classicalCollections':len({(s['composer'],s['collection']) for s in classical}),
-        'composers':composers,'openedScores':opened,'verifiedNestedNavigation':True},ensure_ascii=False,indent=2)+'\n')
+        'composers':composers,'openedScores':opened,'played':opened[-1] if args.play else None,'verifiedNestedNavigation':True},ensure_ascii=False,indent=2)+'\n')

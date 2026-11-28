@@ -33,11 +33,10 @@ async function currentDraft(intent: Intent): Promise<Draft | null> {
     return { title, source: originalFile ?? new File([lyCode], selectedPresetId + '.ly') };
   }
   const { useStudioStore } = await import('../store/useStudioStore');
-  const { notesToMidiBytes } = await import('../engine/pianoflow');
   const s = useStudioStore.getState();
   if (!s.performanceSource || s.liveActive || s.busy) throw new LocalizedError("请先完成演奏生成。");
   return { title: display(s.performanceTitle), source: s.performanceSource,
-    performance: new Uint8Array(notesToMidiBytes(s.getActiveTrackData().notes, s.activeTrack)) };
+    performance: new Uint8Array(s.activeMidi()) };
 }
 
 async function preview(getToken: GetToken, id: string) {

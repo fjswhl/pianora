@@ -1,0 +1,98 @@
+[
+  {
+    "model": "virtuosonet",
+    "genre": "classical",
+    "source_sha256": "24428488b7c75a75b823955af62807f4baf1f496038d600aaacd0f7888ed4a52",
+    "seconds": 2.52,
+    "notes": 285,
+    "velocity_range": [
+      29,
+      59
+    ],
+    "midi_seconds": 41.63,
+    "cc64": 881,
+    "non_read_requests": 0,
+    "bytes": 7132,
+    "sha256": "591dc94494afabdd5b3409dffcbe00f0b9ea0ad3e6edc66b379ac6e0e89b04f9"
+  },
+  {
+    "model": "virtuosonet",
+    "genre": "pop",
+    "source_sha256": "fcedb5af7ece5865a0d8ea6bf7a8787cb897af94102d9791d50f85e28bf2098e",
+    "seconds": 1.43,
+    "notes": 143,
+    "velocity_range": [
+      37,
+      72
+    ],
+    "midi_seconds": 43.02,
+    "cc64": 449,
+    "non_read_requests": 0,
+    "bytes": 3706,
+    "sha256": "897a30c53558ab634d85d82cdd863425f311cf3de4550063393375e95a2908d4"
+  },
+  {
+    "model": "pianist",
+    "genre": "classical",
+    "source_sha256": "da76266ed73b410a7cb95c9b5e9a1142a2c679349d5c607b0dddce9db83614c9",
+    "seconds": 27.33,
+    "notes": 285,
+    "velocity_range": [
+      17,
+      87
+    ],
+    "midi_seconds": 50.71,
+    "cc64": 5,
+    "non_read_requests": 0,
+    "bytes": 2508,
+    "sha256": "94cc35e2c922f4905e458fa03ea977d6e3f9878505c0ff8677ffd650a383beee"
+  },
+  {
+    "model": "pianist",
+    "genre": "pop",
+    "source_sha256": "dc4e22f2031d60d0b2b4ec631c0602051f9f14126ae09b623348be381daac676",
+    "seconds": 12.15,
+    "notes": 143,
+    "velocity_range": [
+      38,
+      92
+    ],
+    "midi_seconds": 21.0,
+    "cc64": 23,
+    "non_read_requests": 0,
+    "bytes": 1344,
+    "sha256": "afcf383790525e253c9025c53046dc3bc9d8b011142f3beea5dc4b0be6d3aca3"
+  },
+  {
+    "model": "dexter",
+    "genre": "classical",
+    "source_sha256": "24428488b7c75a75b823955af62807f4baf1f496038d600aaacd0f7888ed4a52",
+    "seconds": 80.17,
+    "notes": 285,
+    "velocity_range": [
+      22,
+      109
+    ],
+    "midi_seconds": 60.65,
+    "cc64": 285,
+    "non_read_requests": 0,
+    "bytes": 3601,
+    "sha256": "85eb72b6d37c2cf228b1bd1ae62dcc0300c0969abee08c2ba704ab1929ad523b"
+  },
+  {
+    "model": "dexter",
+    "genre": "pop",
+    "source_sha256": "fcedb5af7ece5865a0d8ea6bf7a8787cb897af94102d9791d50f85e28bf2098e",
+    "seconds": 40.48,
+    "notes": 143,
+    "velocity_range": [
+      28,
+      111
+    ],
+    "midi_seconds": 53.34,
+    "cc64": 143,
+    "non_read_requests": 0,
+    "bytes": 1889,
+    "sha256": "3d6e8d399ab65420ceb942b5707bb86637f8cd9aa7f0e7b4cc0c989f22bc984c"
+  }
+]

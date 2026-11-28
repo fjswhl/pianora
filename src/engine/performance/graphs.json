@@ -1,0 +1,185 @@
+{
+  "pianist-encoder": {
+    "size": 113882637,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "619dd4a713dd38ff10a493d3864868bc5dc21850a17086a6800d0235cc09818c",
+      "5d6807e37c99a7a85be948fe7000140898f46aadb37d52970f9f7dc20fa9772a",
+      "71b13504a0050a90e285a8f7cc94ecf7e00ddf5069baa77120dbb7d4b53edcd8",
+      "1186c69a077538ad6345ce738ccd3b72bfafcd624aca6c3d87fcf70ef5f9a9d9",
+      "0ee68cdc2703a987c342a26d706caf68b9626aa6bfaa88c859e702b7a7d6e8b6",
+      "b663727b3df9fb8c9a5bed8ea4a7eabb6a4bbfc94e1765b473944aa94b6d6a00",
+      "ced149870d1a163db5ea8e38b68bee3ada667e6aa7cf350c3591650f930ae558",
+      "7996bcdbf3bfc045667c1e21f48dd9a99ecb7366d0c86101a1af0b50f8c95fa5",
+      "9234d9dc3f474442c94701013b0d4f11f7a8358a0d9cc2279bf641c414d1d395",
+      "e6a03f1d4cb280fe5f84263c7ed4e541781277cde1327fc3a20daadcb67bd55e",
+      "840881384d68b88302b6f2db19d7d394da3a2865b001f51b1d138b17468d5ee6",
+      "db599ffe8e364ed3a4bc73ff428e5c94bed9bb42af02812408f2f406c6f2846c",
+      "e151c5e4961704dbd56d3359238f794fe42c32acf79f5c666fcb22fd4b6e4b86",
+      "55a1d5412fada1baeb363c5a95839b4211f0739bd4be2f246f843aba43d6bebb"
+    ],
+    "revision": "8c2cc6844ddda110f3fd57f571c64499"
+  },
+  "pianist-step": {
+    "size": 42890322,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "280916d29a88a94d2ada0092ce18b41ee9fc43fb4e94a9be3b0d755edaeb3d8f",
+      "079e625e628d60749191f32caeeb2a44fdbf0e8a15782bdb421e24ce55e1d9e9",
+      "a999044547f0ff681a1c6366e3e2a99c0544e31b5389eb88fc2f3db87ebddb5b",
+      "877bca9fe122afcb3a2a692013f818ad2da2060dfcb07eee8a387f56a91edb43",
+      "efd68a72d5dac0a46579ca8a2db413b8bb882132e8ed45462fe96abcb6f00139",
+      "59b8f58c747b7a0fff60867cbad5da2eca31c597d0f0b7754d902d51d6b8a5fe"
+    ],
+    "revision": "5402361ea7f57ffcd937d030eeba7459"
+  },
+  "virtuosonet-beat_pool": {
+    "size": 4207229,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "594a1dd84ca7f15f218199b544795bab29762d96db681d37a174d13060e1c68b"
+    ],
+    "revision": "a2cf63f8a68dca1c89bcaf772ccc5b75"
+  },
+  "virtuosonet-beat_step": {
+    "size": 4766661,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "9a1f318a596333cc1d15b1f1ce151352f2b4ddf093fff4910f2122432cc795d4"
+    ],
+    "revision": "70fa468c6f7a2b7ae01e62a6448c912b"
+  },
+  "virtuosonet-beats": {
+    "size": 12610654,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "dc5f86d63ee771b844f16dca4abc404f1b83c7db5ce69316fa06eafb54fa9a1a",
+      "dbdac19263c817656934defa0f4f0eb68ffb80bfa39dc9f61525543eab74f932"
+    ],
+    "revision": "c8392ce983b265b4360f1f883a3af57e"
+  },
+  "virtuosonet-embed": {
+    "size": 88123,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "56bcf65f807be6d0519f04e502c0d0ccaad2f6d8c62b01834050ed113a66987b"
+    ],
+    "revision": "57374d664351a43c8edf7f32f688146c"
+  },
+  "virtuosonet-measure_pool": {
+    "size": 1057401,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "458fed2573518f90d787f479c9784252f1865016a1647c69522e386923fcffb5"
+    ],
+    "revision": "d6c176afd8e2e7612c93013da72d6eb7"
+  },
+  "virtuosonet-measure_step": {
+    "size": 3185609,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "3059c103aa82b8c21c640f00270910c4e9f07023911b37f6c9d2406531be5d70"
+    ],
+    "revision": "800aa2cd89c01fa8c8168eae6141488f"
+  },
+  "virtuosonet-measures": {
+    "size": 4732593,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "c18340b5149ee523c2190bfd19d982a0fbc3cec702e1d3a6a2d8aa6ff3083ed8"
+    ],
+    "revision": "f99fbf1213ab1edc9dea36a8a9b5d4d4"
+  },
+  "virtuosonet-note_step": {
+    "size": 7921641,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "eee2993742e3049bb40723e5b5f67e8cb3ca1b38cf1476c30a76ebd65247ee4e"
+    ],
+    "revision": "3d27ee167cb3ee5cf02af45097c1e499"
+  },
+  "virtuosonet-notes": {
+    "size": 7892060,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "a19ffa2fbddc479043c1d16bd0efec35df42e21d4054f6c9f9d62091879dc1e6"
+    ],
+    "revision": "b513377409aaf9dda56f9464a76251c1"
+  },
+  "virtuosonet-result_pool": {
+    "size": 3691,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "a28f11075d54a828fd829bcabe2a5d7e64b9e93b0d75c518739874a157e46cb0"
+    ],
+    "revision": "ec9130a82f38442dd2a6d9355478a853"
+  },
+  "virtuosonet-style": {
+    "size": 17653,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "f33af80644bd8074ca0726c964df51798c133d4f0aed25cbb4097cbe43ebe58a"
+    ],
+    "revision": "cbbcf8f9c84cb269065835fd722f93e2"
+  },
+  "virtuosonet-voices": {
+    "size": 7892060,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "1bcd4146bf249a2fe71486051a0c53ec5ae99180ff61bb64fdd22b75520bf0f9"
+    ],
+    "revision": "abad5c64a5051e57d51e1b13d2bb763e"
+  },
+  "dexter-denoise": {
+    "size": 250230920,
+    "chunkSize": 8388608,
+    "stride": 4,
+    "parts": [
+      "4314e1b730fc5c26e7baa0f1514bd5505c9ff949d1984287a363849d4fc3f7b6",
+      "b5d6d6a12f78dd60edc1070d82e778d2c8645e77dc476fe68c69f7894ffd7e99",
+      "607c316dccf7c13602634070f6ad7a1076eafb8db5d7377ce44028f6065f05f9",
+      "9cc3c137bfa7cfa13f0655ed1f21272237719efc772a12484455fb0c2dfcd733",
+      "3fbedfb161764a4c62e781bb87a20737c1e6544ffcc4c7faa971b5842205628a",
+      "7152bb65ed685aa5b29e1161036ead1df6f51ec512d3a243e4bb802060bca9cd",
+      "8cf66aa38f1c9c2e76d9cc2d6229f62910db72eebaad7e85ca3c67b5ca5cb3cc",
+      "ead57c55e6f45dd8f19d88a6255eb4dcbbb9e22c67237cdf515fe8603c682dc0",
+      "6919e819a1c08edf8e75f9707efeb753276fddaab4700b9d081b6fd662e58fee",
+      "fd9e3f0eb11fc1fd9710c84360e5f9d15235d67b5b538ff3b79eb665dd07b747",
+      "df1f262bb9c693ca4b5f6d08c136ad0b276f43b9b5ceee38fbbb912c4ea84aa5",
+      "838f95efd2630ccb0431543b3dbe62f0bd3e22711f9496050cc0e225af7d3197",
+      "8f9b1c998272663963b7d2920698f8a31e31f9768a2c548683d7060ecc1090be",
+      "06f0c533d1e1c481734fe98a08ee7c106207d21dcda8dcbec332fb59b23d8a02",
+      "0754ba5024d066944ffb1c4c19a396523f9001d6909f15223257aa1839878990",
+      "d26e7cec3cd07855f6c7abf7324691b2bcc3b301b7ca130ee139ec06c9a0cbc2",
+      "4fa96aff3c4b56beb823f03eb41085f7b51ce3b0c3f8994cef1a29c19657245d",
+      "d1dfb0e575a02cc776fc2422bd9e478ac3dbfec99fe322eecc2c18b3d681b42b",
+      "fb9e61922aa746ff3d7356314567fa5ad97f331c7d01a7161ee71996071b565b",
+      "83812b660e81779f55b391956aa58e2ccd44b322bb761ec6bbc78cfc899bfd63",
+      "7ce28f6ab5969b867cb9c96ddb0dac6d648adf1dbbaa31ded6233ab46cf749de",
+      "224698b6cb28497b54e185edcfef17d7736c21bb945b0e814560040faecdb893",
+      "9fd89a888bfdb50a350a71bc031ad284b3f30e4f05d3a52062e24650358bb984",
+      "db82a6c57e4205e5982390aff7c18f6dd4b5f4dbf040765702b9920db48bc76d",
+      "54f1da364ca7d997f6b6672ff09071f82476000c7dce7c3c7d81ca2b4c2b06dc",
+      "8d4b8c584585525fae40acab58a450adf208a12be246b77008c35cb4dd3dbd7b",
+      "24e02b3b25faad85bf42546b4fdcc26812a8450793f027fe33125c0f890b5201",
+      "5b5b9ad7b9344245b857abb7324d533ef9d3362cfe056a91da8a419376ec7445",
+      "cdc6923ca11f97eb48b81d13e6304e541c7c2805a01b57185d3972b53c470fd1",
+      "05b28486c623bc10575695163208ea3347e05440509bf3c9588f768ed69d9000"
+    ],
+    "revision": "6d2b9aff495733af73a1ad1f9fb82124"
+  }
+}

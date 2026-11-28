@@ -54,6 +54,15 @@ jobs:
           PIANORA_PACK_ORIGIN: ${{ vars.VITE_R2_PUBLIC_ORIGIN || 'https://opuslin.uk' }}
         run: npm run setup:packs
 
+      - name: Cache browser performance models
+        uses: actions/cache@v4
+        with:
+          path: public/performance-packs
+          key: performance-models-${{ hashFiles('src/engine/performance/graphs.json') }}
+
+      - name: Restore and verify browser performance models
+        run: npm run setup:performance-models
+
       - name: Build
         env:
           VITE_R2_PUBLIC_ORIGIN: ${{ vars.VITE_R2_PUBLIC_ORIGIN }}

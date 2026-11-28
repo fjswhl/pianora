@@ -37,7 +37,8 @@ function diskCache() {
 }
 
 function partUrl(path: string, digest: string) {
-  return '/packs/' + path.slice(path.lastIndexOf('/') + 1) + '-' + digest + '.pack';
+  const dir = path.startsWith('/performance-packs/') ? '/performance-packs/' : '/packs/';
+  return dir + path.slice(path.lastIndexOf('/') + 1) + '-' + digest + '.pack';
 }
 
 async function verified(response: Response, digest: string) {
@@ -138,6 +139,12 @@ interface Connection extends EventTarget {
   type?: string;
 }
 
+let warmPianoFlow = true;
+export function setPianoFlowPreload(enabled: boolean) {
+  warmPianoFlow = enabled;
+  window.dispatchEvent(new Event('pianora:preload-model'));
+}
+
 export function warmPerformanceAssets() {
   const connection = (navigator as Navigator & { connection?: Connection }).connection;
   let disposed = false;
@@ -156,6 +163,7 @@ export function warmPerformanceAssets() {
     clearTimeout(timer);
     if (idle) window.cancelIdleCallback(idle);
     if (running || !eligible() || index >= queue.length) return;
+    if (!warmPianoFlow && queue[index].path !== sources.abbey.path) return;
     timer = window.setTimeout(() => {
       if ('requestIdleCallback' in window) idle = window.requestIdleCallback(() => { idle = 0; void warm(); });
       else void warm();
@@ -174,7 +182,8 @@ export function warmPerformanceAssets() {
         const keys = await cache.keys();
         const expected = new Set(Object.entries(packs).flatMap(([path, pack]) => pack.parts.map(hash => partUrl(path, hash))));
         for (const key of keys) {
-          if (expected.has(new URL(key.url).pathname)) continue;
+          const pathname = new URL(key.url).pathname;
+          if (!pathname.startsWith('/packs/') || expected.has(pathname)) continue;
           const entry = await cache.match(key);
           const date = Date.parse(entry?.headers.get('date') ?? '');
           if (date < Date.now() - 7 * 86400000) await cache.delete(key);
@@ -196,6 +205,7 @@ export function warmPerformanceAssets() {
   }
   const resume = () => schedule(1000);
   document.addEventListener('visibilitychange', resume);
+  window.addEventListener('pianora:preload-model', resume);
   window.addEventListener('online', resume);
   window.addEventListener('hashchange', resume);
   connection?.addEventListener('change', resume);
@@ -205,6 +215,7 @@ export function warmPerformanceAssets() {
     clearTimeout(timer);
     if (idle) window.cancelIdleCallback(idle);
     document.removeEventListener('visibilitychange', resume);
+    window.removeEventListener('pianora:preload-model', resume);
     window.removeEventListener('online', resume);
     window.removeEventListener('hashchange', resume);
     connection?.removeEventListener('change', resume);

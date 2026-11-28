@@ -492,5 +492,14 @@
   "原谱标记": "From score",
   "自动分析": "Inferred",
   "和声分析": "Harmony analysis",
-  "显示级数": "Show scale degrees"
+  "显示级数": "Show scale degrees",
+  "已取消生成": "Generation canceled",
+  "取消生成": "Cancel generation",
+  "首次下载约 {0} MiB": "First download about {0} MiB",
+  "演奏模型": "Performance model",
+  "扩散采样步数": "Diffusion steps",
+  "正在加载 {0} · {1}%": "Loading {0} · {1}%",
+  "{0} 正在本机演奏 · 第 {1}/{2} 版 · {3}%": "Rendering with {0} on this device · Take {1}/{2} · {3}%",
+  "高清五线谱、实时随奏谱与本机 AI 演奏": "engraved notation, score following and on-device AI performance",
+  "MIDI 自动五线谱、实时随奏谱与本机 AI 演奏": "MIDI notation, score following and on-device AI performance"
 }

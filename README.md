@@ -11,8 +11,8 @@
    When Generate is clicked, the browser Worker compiles the selected or edited LilyPond source. MIDI and MusicXML imports use their own browser parsers. For MIDI, opening the sheet or enabling the follow score loads PlanetScore locally and converts the original file to MusicXML. Both views reuse the same OSMD engraving. Playback uses the original performance timing. MIDI and symbolic ornaments are prepared for playback first. The listening view loads the engraving independently and shares it with the full sheet view. Both paths use the same Mutopia/2.18 sanitization and Scheme hook.
 2. **Stage 2 · Symbolic Ornament Extraction (Scheme Engraver)**
    Injects a custom LilyPond Scheme Engraver (`Demo_arpeggio_collector_engraver`) to extract exact symbolic moments (such as `\arpeggio`) that standard MIDI drops.
-3. **Stage 3 · Expressive Flow Matching AI Pianist (`SyMuPe/PianoFlow-base` ONNX on WebGPU/WASM)**
-   Runs Conditional Flow Matching directly on browser WebGPU (with automatic WASM fallback) using a bit-exact pure-TypeScript `SyMuPe` tokenizer.
+3. **Stage 3 · On-device expressive performance**
+   Choose a model in the score editor. PianoFlow uses WebGPU or WASM. Pianist Transformer, DExter and VirtuosoNet load the selected ONNX graphs on demand and run inside a Web Worker using WASM. Score parsing, sampling and MIDI generation run on the visitor’s device.
 4. **Stage 4 · Symbolic Precision Restoration**
    Restores rolled arpeggios bottom-to-top while preserving 100% of the AI pianist's rubato, dynamics, and voicing — with real-time slider retuning (< 1 ms).
 5. **Stage 5 · Studio Acoustic Grand Piano Engine (Pure Web Audio + AudioWorklet)**
@@ -23,7 +23,18 @@
 
 ---
 
-## 7 Interactive AI Pianist Modes
+## Performance models
+
+| Model | Compressed download | Browser rendering |
+| --- | ---: | --- |
+| PianoFlow (default) | Existing PianoFlow pack | Flow matching with seven interactive editing modes |
+| Pianist Transformer | 97 MiB | Int8 linear projections, cached autoregressive decoding, 512-note windows and nucleus sampling |
+| DExter | 204 MiB | 200-note segments with a 10-note overlap. Choose 32-step DDIM for speed or the original 999-step DDPM sampler in generation settings |
+| VirtuosoNet | 45 MiB | HAN + GRU note, voice, beat and measure encoders with autoregressive tempo, velocity, articulation and pedal prediction |
+
+The three additional models share the editor’s MIDI, MusicXML and LilyPond import paths. MusicXML supplies voice and notation information. MIDI and compiled LilyPond use track and meter information. MIDI exports carry the predicted pedal controls. Playback and WAV rendering extend note lengths using the sustain pedal. Quantization, sampling and score feature extraction can produce a different take from the upstream Python demos. Checkpoint sources and notices are in [model credits](public/notices/performance-models/SOURCES.txt).
+
+## 7 Interactive PianoFlow Modes
 
 - **① Batch Blind-Box Gacha (`批量盲盒抽卡`)**: Generate 2–8 distinct takes with tunable `cfmSteps`, `cfmStepFactor`, and seeds into an A/B Takes Pool.
 - **② Prefix-Lock Continuation (`锁前半段续弹`)**: Freeze bars `1..K` verbatim as conditioning context and regenerate fresh continuations for the rest.
@@ -53,7 +64,10 @@ python scripts/export_pianoflow_onnx.py
 # 4. Optional: compress installed release binaries for the browser download cache
 npm run setup:packs
 
-# 5. Run dev server or production build
+# 5. Install the three additional models from the pinned GitHub release (uses curl and tar)
+npm run setup:performance-models
+
+# 6. Run dev server or production build
 npm run dev
 # or
 npm run build && npm run preview

@@ -1,3 +1,4 @@
+import { modelNames } from '../engine/performance/types';
 import { t, display } from '../i18n';
 import { Disc3 } from 'lucide-react';
 import { useStudioStore, type TrackKey } from '../store/useStudioStore';
@@ -11,6 +12,7 @@ const STAGE_META = [
 ];
 
 export function GenerationRecord() {
+  const model = useStudioStore(s => s.takes.find(take => take.id === s.activeTakeId)?.model ?? 'pianoflow');
   const stages = useStudioStore((s) => s.stages);
   return (
     <details className="generation-record">
@@ -18,7 +20,7 @@ export function GenerationRecord() {
       <ul>
         {STAGE_META.map((stage) => (
           <li key={stage.key}>
-            <strong>{stage.name}</strong>
+            <strong>{stage.key === 'st3' ? modelNames[model] : stage.name}</strong>
             <span>{display(stages[stage.key].stat)}</span>
           </li>
         ))}

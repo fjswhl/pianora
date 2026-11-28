@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5173",
+    "setup:performance-models": "node scripts/performance-models/restore.mjs",
     "setup:packs": "node scripts/prepare-asset-packs.mjs",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",

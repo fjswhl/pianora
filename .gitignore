@@ -29,3 +29,4 @@ wrangler.accounts.generated.json
 # Clerk CLI project links and development configuration
 .clerk/
 wrangler.accounts-test.*.json
+public/performance-packs/

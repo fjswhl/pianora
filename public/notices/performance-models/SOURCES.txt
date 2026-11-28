@@ -1,0 +1,20 @@
+Browser inference graphs exported for Pianora from the following projects and checkpoints.
+
+Pianist Transformer: Towards Expressive Piano Performance Rendering via Scalable Self-Supervised Pre-Training
+Hong-Jie You, Jie-Jing Shao, Xiao-Wen Yang, Lin-Han Jia, Lan-Zhe Guo, Yu-Feng Li
+https://github.com/yhj137/PianistTransformer/tree/747df2d12291e37f6638b39f1b71517e579ad48c
+https://huggingface.co/yhj137/pianist-transformer-rendering
+Pianora exports separate score encoder and cached decoder graphs and quantizes constant linear projections to int8.
+
+DExter: Learning and Controlling Performance Expression with Diffusion Models
+https://github.com/anusfoil/DExter/tree/7918b92d43c1d447e0d4764e0d350415d5d42bc7
+https://arxiv.org/abs/2406.14850
+Official Colab last-v1.ckpt, Drive file 1Rv_ba1wWexaFJ-KFOW8pdnFtssuYc3sy.
+DiffWave components copyright 2020 LMNT, Inc., Apache License 2.0.
+Pianora exports the denoising network and runs classifier-free sampling in a Web Worker.
+
+VirtuosoNet: A Hierarchical RNN-based System for Modeling Expressive Piano Performance
+Dasaem Jeong, Taegyun Kwon, Yoojin Kim, Kyungu Lee, Juhan Nam. ISMIR 2019.
+https://github.com/jdasam/virtuosoNet/tree/f20e5b0c3326b8474dfa5071c78d4ea80714b7e2
+https://huggingface.co/dasaem/virtuosonet/tree/7db7510ff91a30d6efa9ac4bf9d1a6e1d047263c
+RenCon HAN + GRU checkpoint. Pianora exports the recurrent and attention stages and runs the score hierarchy on device.

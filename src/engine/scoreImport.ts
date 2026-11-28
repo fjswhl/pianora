@@ -12,6 +12,8 @@ import { keyNames, readWrittenChord, type WrittenChord } from './harmony';
 import { Midi } from '@tonejs/midi';
 import type { RawArpeggioAnnotation } from './arpeggio';
 
+import type { ScoreMark } from './performance/types';
+
 export type ImportedFormat = 'midi' | 'musicxml';
 
 export interface ImportedScoreData {
@@ -22,6 +24,7 @@ export interface ImportedScoreData {
   midi: Midi;
   rawAnnotations: RawArpeggioAnnotation[];
   musicXmlText?: string;
+  performanceMarks?: Map<string, ScoreMark>;
   midiFile?: File;
   writtenChords?: WrittenChord[];
   noteCount: number;
@@ -121,6 +124,7 @@ export async function parseMidiScoreFile(file: File): Promise<ImportedScoreData>
     const dst = clean.addTrack();
     dst.name = srcTrack.name || 'Piano';
     dst.instrument.number = 0;
+    for (const cc of srcTrack.controlChanges[64] ?? []) dst.addCC({ number: 64, ticks: Math.round(cc.ticks * scale), value: cc.value });
     for (const n of srcTrack.notes) {
       if (n.midi < 21 || n.midi > 108) continue;
       dst.addNote({
@@ -244,6 +248,7 @@ async function readMusicXmlText(file: File): Promise<string> {
  */
 export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> {
   const xmlText = await readMusicXmlText(file);
+  const performanceMarks = new Map<string, ScoreMark>();
   const writtenChords = new Map<number, WrittenChord>();
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
   if (doc.querySelector('parsererror')) {
@@ -285,6 +290,8 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     let divisions = 1;
     let partTick = 0;
     let curVel = 0.65;
+    let dynamic = 0;
+    let dynamicStart = 0;
     let barNum = 0;
 
     // Active ties keyed by `${voice}_${staff}_${midiPitch}` -> { ticks, durationTicks, velocity }
@@ -345,7 +352,13 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
           const dynEl = child.querySelector('direction-type > dynamics');
           if (dynEl && dynEl.firstElementChild) {
             const v = DYNAMICS_VEL[dynEl.firstElementChild.tagName.toLowerCase()];
-            if (v !== undefined) curVel = v;
+            if (v !== undefined) {
+              curVel = v;
+              const word = dynEl.firstElementChild.tagName.toLowerCase();
+              const scale: Record<string, number> = { ppp:-.9, pp:-.7, p:-.4, mp:-.2, mf:.2, f:.4, ff:.7, fff:.9 };
+              dynamic = scale[word] ?? 0;
+              dynamicStart = cursorTick / PPQ;
+            }
           }
         } else if (tag === 'sound') {
           if (pIdx === 0) {
@@ -414,6 +427,16 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
                     durationTicks: durTicks,
                     velocity: curVel,
                   };
+                  performanceMarks.set([midi.tracks.length - 1, onsetTick, midiPitch].join('/'), {
+                    voice: Number(voice) || pIdx + 1, divisions, measure: barNum - 1, measureStart: measureStartTick,
+                    dynamic, dynamicStart,
+                    slurBeam: [
+                      ...['start','continue','stop'].map(type => Number(Boolean(child.querySelector('slur[type="'+type+'"]')))),
+                      ...['begin','continue','end'].map(type => Number(Array.from(child.querySelectorAll('beam')).some(el => el.textContent?.trim()===type))),
+                    ],
+                    notation: ['trill-mark','tenuto','accent','staccato','fermata','arpeggiate','strong-accent','cue','slash']
+                      .map(tag => Number(Boolean(child.querySelector(tag)))),
+                  });
                   pendingNotes.push(noteObj);
                   if (hasTieStart) openTies.set(tieKey, noteObj);
                 }
@@ -464,6 +487,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     midi,
     rawAnnotations,
     musicXmlText: xmlText,
+    performanceMarks,
     writtenChords: [...writtenChords.values()],
     ...stats,
   };

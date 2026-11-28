@@ -6,10 +6,14 @@ import { scorePresets as presets } from '../engine/presets';
 import { FileUp, Play, Sparkles, AlertCircle, Music2, RotateCcw } from 'lucide-react';
 import { fmtTime, useStudioStore } from '../store/useStudioStore';
 
+import { modelNames } from '../engine/performance/types';
+
 export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
   const { loading, error, importedScore } = useScoreStore();
   const selectedPresetId = useScoreStore((s) => s.selectedPresetId);
   const lyCode = useScoreStore((s) => s.lyCode);
+  const model = useStudioStore(s => s.model);
+  const dexSteps = useStudioStore(s => s.dexSteps);
   const cfmSteps = useStudioStore((s) => s.cfmSteps);
   const stepFactor = useStudioStore((s) => s.stepFactor);
   const seed = useStudioStore((s) => s.seed);
@@ -163,8 +167,8 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
             {t("本地浏览器直接解析完成（零上传服务器）。点击下方「生成演奏」将直接进入")}{' '}
             <b className="text-slate-200">
               {importedScore.kind === 'musicxml'
-                ? t("高清五线谱 + 实时三行随奏谱 + PianoFlow WebGPU AI 演奏 + 音乐厅大三角渲染")
-                : t("MIDI 自动五线谱 + 实时三行随奏谱 + PianoFlow AI 演奏")}
+                ? t("高清五线谱、实时随奏谱与本机 AI 演奏")
+                : t("MIDI 自动五线谱、实时随奏谱与本机 AI 演奏")}
             </b>
             {importedScore.rawAnnotations.length > 0
               ? t("，并已提取 {0} 处 MusicXML 琶音记号用于符号级还原。", importedScore.rawAnnotations.length)
@@ -183,10 +187,24 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         />
       )}
 
+      <label className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+        {t("演奏模型")}
+        <select id="performanceModel" disabled={busy} value={model}
+          onChange={e => useStudioStore.getState().setModel(e.target.value as keyof typeof modelNames)}
+          className="min-h-11 rounded-lg border px-3">
+          {Object.entries(modelNames).map(([id,name]) => <option key={id} value={id}>{name}</option>)}
+        </select>
+        {model !== 'pianoflow' && <small>{t("首次下载约 {0} MiB", { pianist: 97, dexter: 204, virtuosonet: 45 }[model])}</small>}
+      </label>
       <details className="advanced">
         <summary>{t("演奏生成参数")}</summary>
         <div className="my-3.5 grid grid-cols-2 gap-3 rounded-xl border border-slate-800/80 bg-[#0c1220] p-3">
-          <div>
+          {model === 'dexter' && <label>{t("扩散采样步数")}
+            <select value={dexSteps} onChange={e => useStudioStore.getState().setDexSteps(Number(e.target.value))}>
+              <option value={32}>32 · DDIM</option><option value={999}>999 · DDPM</option>
+            </select>
+          </label>}
+          {model === 'pianoflow' && <><div>
             <label htmlFor="cfmSteps" className="mb-1 flex justify-between text-[11px] text-slate-400">
               <span>{t("Flow Matching 步数")}</span>
               <span className="font-semibold text-[#e8be6a]">{cfmSteps}</span>
@@ -220,6 +238,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
             />
           </div>
 
+          </>}
           <div>
             <label htmlFor="seed" className="mb-1 block text-[11px] text-slate-400">
               {t("随机种子")}
@@ -283,6 +302,7 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         {busy ? t("正在生成演奏…") : t("生成演奏")}
       </button>
 
+      {busy && model !== 'pianoflow' && <button type="button" className="min-h-11" onClick={() => useStudioStore.getState().cancelGeneration()}>{t("取消生成")}</button>}
       {progressMsg && (
         <div className="mt-3 rounded-xl border border-slate-800 bg-[#0b101c] p-2.5">
           <div id="progressMsg" className="mb-1.5 text-[11.5px] text-sky-300">

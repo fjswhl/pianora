@@ -1194,7 +1194,7 @@ export class LiveConductorSession {
 }
 
 /** Serialize SimpleNote[] back to a standard downloadable .mid Uint8Array */
-export function notesToMidiBytes(notes: SimpleNote[], name = 'PianoFlow'): Uint8Array {
+export function notesToMidiBytes(notes: SimpleNote[], name = 'PianoFlow', pedals: import('./performance/types').Pedal[] = []): Uint8Array {
   const midi = new Midi();
   midi.header.setTempo(120);
   const tr = midi.addTrack();
@@ -1208,5 +1208,6 @@ export function notesToMidiBytes(notes: SimpleNote[], name = 'PianoFlow'): Uint8
       velocity: Math.max(0.01, Math.min(1.0, n.v / 127)),
     });
   }
+  for (const cc of pedals) tr.addCC({number:cc.number,time:cc.time,value:cc.value/127});
   return midi.toArray();
 }

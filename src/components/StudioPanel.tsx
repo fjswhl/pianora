@@ -21,6 +21,7 @@ export function StudioPanel() {
   const [showHarmony, setShowHarmony] = useState(true);
   const [degrees, setDegrees] = useState(false);
   const harmony = useHarmony(showHarmony && view !== 'shape');
+  const hasFlowTake = useStudioStore(s => s.takes.find(take => take.id === s.activeTakeId)?.model === 'pianoflow');
   const playing = useStudioStore(s => s.isPlaying);
   const togglePlay = useStudioStore(s => s.togglePlay);
   const title = useStudioStore((s) => s.performanceTitle);
@@ -48,7 +49,7 @@ export function StudioPanel() {
         </div>
       </header>
       <div className="studio-views" aria-label={t("演奏工具")}>
-        {views.map(({ id, label, icon: Icon }) => (
+        {views.filter(v => v.id !== 'shape' || hasFlowTake).map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             aria-pressed={view === id}

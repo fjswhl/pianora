@@ -1,3 +1,7 @@
+import { modelNames, type Pedal } from '../engine/performance/types';
+import { modelScore, renderLocal } from '../engine/performance/client';
+import { setPianoFlowPreload } from '../engine/assetPacks';
+import { withSustain } from '../engine/performance/playback';
 import type { WrittenChord } from '../engine/harmony';
 import { errorText, LocalizedError, t, message, type DisplayText } from '../i18n';
 import { create } from 'zustand';
@@ -36,7 +40,9 @@ export interface TakeRecord {
   label: DisplayText;
   subtitle: DisplayText;
   seed: number;
-  perfState: PerfState;
+  model: keyof typeof modelNames;
+  perfState?: PerfState;
+  midi?: { raw: SimpleNote[]; restored: SimpleNote[]; pedals: Pedal[] };
   rawNotes: SimpleNote[];
   rawDuration: number;
   restoredNotes: SimpleNote[];
@@ -86,6 +92,7 @@ function defaultCuesForBars(totalBars: number): ConductorCue[] {
 }
 
 // Keep live conductor session & interval outside React render tree
+let generationController: AbortController | null = null;
 let liveSessionRef: LiveConductorSession | null = null;
 let liveLoopTimer: number | null = null;
 
@@ -116,6 +123,12 @@ interface StudioState {
   // Score & Pipeline params
   performanceTitle: DisplayText;
   performanceSource: File | null;
+  model: keyof typeof modelNames;
+  dexSteps: number;
+  setModel: (model: keyof typeof modelNames) => void;
+  setDexSteps: (steps: number) => void;
+  cancelGeneration: () => void;
+  activeMidi: () => Uint8Array;
   cfmSteps: number;
   stepFactor: number;
   seed: number;
@@ -208,6 +221,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       label,
       subtitle: message("{0} · {1}", fmtTime(fixed.duration), summarizeNotes(fixed.notes)),
       seed,
+      model: 'pianoflow',
       perfState,
       rawNotes: decoded.perfSustainNotes,
       rawDuration: decoded.perfDuration,
@@ -252,6 +266,15 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
     performanceSource: null,
     performanceTitle: '',
+    model: 'pianoflow',
+    setModel: model => {
+      if (get().busy) return;
+      setPianoFlowPreload(model === 'pianoflow');
+      set({ model });
+    },
+    dexSteps: 32,
+    setDexSteps: dexSteps => set({ dexSteps }),
+    cancelGeneration: () => generationController?.abort(new LocalizedError("已取消生成")),
     cfmSteps: 10,
     stepFactor: 0.75,
     seed: 42,
@@ -475,11 +498,13 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
       try {
         const controller = new AbortController();
+        generationController = controller;
+        const modelId = st.model;
         let compileProgress = imported ? 100 : 0;
         let modelProgress = 0;
         const report = (msg: DisplayText) => set({
           progressMsg: msg,
-          progressPct: 4 + compileProgress * 0.7 + modelProgress * 0.28,
+          progressPct: modelId === 'pianoflow' ? 4 + compileProgress * 0.7 + modelProgress * 0.28 : 4 + compileProgress * 0.16,
         });
         let compiled: Awaited<ReturnType<typeof lilypondEngine.compile>> | {
           scoreMidi: Midi; writtenChords: WrittenChord[]; rawAnnotations: RawArpeggioAnnotation[]; compileSec: number;
@@ -516,8 +541,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
             st1: { status: 'done', stat: message("{0} · {1} 音", method, imported.noteCount) },
             st2: { status: 'done', stat: message("提取 {0} 条事件", imported.rawAnnotations.length) },
           } }));
-          await pianoFlowEngine.load(report, controller.signal);
-          set({ ortReady: true, ortStatus: message("PianoFlow ({0}) 就绪", pianoFlowEngine.provider) });
+          if (modelId === 'pianoflow') {
+            await pianoFlowEngine.load(report, controller.signal);
+            set({ ortReady: true, ortStatus: message("PianoFlow ({0}) 就绪", pianoFlowEngine.provider) });
+          }
         } else {
           const compileStarted = performance.now();
           const compile = lilypondEngine.compile(lyCode, (msg, pct) => {
@@ -536,7 +563,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
             }));
             return res;
           }).catch(error => { controller.abort(); throw error; });
-          const model = pianoFlowEngine.load((msg, pct) => {
+          const model = modelId !== 'pianoflow' ? Promise.resolve() : pianoFlowEngine.load((msg, pct) => {
             if (pct === modelProgress) return;
             modelProgress = pct ?? modelProgress;
             report(msg);
@@ -555,9 +582,32 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
         const { cfmSteps, stepFactor, seed, batchCount } = get();
         const t3 = performance.now();
+        const input = modelId === 'pianoflow' ? null : modelScore(
+          compiled.scoreMidi,
+          imported?.composer ?? lyCode.match(/composer\s*=\s*"([^"]+)"/)?.[1],
+          imported?.performanceMarks,
+        );
         const generated = [];
         for (let b = 0; b < batchCount; b++) {
           const sd = seed + b;
+          if (input && modelId !== 'pianoflow') {
+            controller.signal.throwIfAborted();
+            const performance = await renderLocal({
+              model: modelId, score: input, seed: sd, dexSteps: st.dexSteps,
+            }, (done, total, loading) => {
+              const pct = Math.round(done / total * 100);
+              const status = loading ? message("正在加载 {0} · {1}%", modelNames[modelId], pct)
+                : message("{0} 正在本机演奏 · 第 {1}/{2} 版 · {3}%", modelNames[modelId], b+1, batchCount, pct);
+              const takeFraction = loading ? 0.25 * done / total : 0.25 + 0.75 * done / total;
+              set(s => ({
+                progressMsg: status,
+                progressPct: 20 + 75 * (b + takeFraction) / batchCount,
+                stages: { ...s.stages, st3: { status: 'active', stat: status } },
+              }));
+            }, controller.signal);
+            generated.push({ seed: sd, performance });
+            continue;
+          }
           const out = await pianoFlowEngine.performScore(compiled.scoreMidi, {
             cfmSteps,
             stepFactor,
@@ -579,7 +629,9 @@ export const useStudioStore = create<StudioState>((set, get) => {
         set({ progressMsg: message("Stage 4/5: 正在执行符号级琶音精准还原..."), progressPct: 97 });
         const t4 = performance.now();
         const firstOut = generated[0].out;
-        const totalBars = firstOut.perfState.scoreData.totalBars;
+        const totalBars = firstOut?.perfState.scoreData.totalBars ?? input!.notes.reduce((max,n) => Math.max(max,n.bar+1),1);
+        const scoreNotes = firstOut?.scoreNotes ?? input!.notes;
+        const duration = (notes: SimpleNote[]) => notes.reduce((end,n) => Math.max(end,n.s+n.d),0);
 
         set({
           performanceSource: score.originalFile ?? new File([lyCode], score.selectedPresetId + ".ly"),
@@ -589,8 +641,10 @@ export const useStudioStore = create<StudioState>((set, get) => {
             message("自定义乐谱"),
           scoreMidi: compiled.scoreMidi,
           writtenChords: compiled.writtenChords,
-          scoreNotes: firstOut.scoreNotes,
-          scoreDuration: firstOut.scoreDuration,
+          scoreNotes,
+          scoreDuration: firstOut?.scoreDuration ?? duration(scoreNotes),
+          ortReady: true,
+          ortStatus: modelId === 'pianoflow' ? get().ortStatus : modelNames[modelId] + ' · WASM',
           rawAnnotations: compiled.rawAnnotations,
           midiNotation: imported?.kind === 'midi',
           loadSheetPages: compiled.loadPages,
@@ -598,9 +652,19 @@ export const useStudioStore = create<StudioState>((set, get) => {
           cues: defaultCuesForBars(totalBars),
         });
 
-        const takes = generated.map((item, idx) =>
-          buildTake(`take_${Date.now()}_${idx}`, message("#{0} 演奏 (Seed {1})", idx + 1, item.seed), item.seed, item.out.perfState),
-        );
+        const takes: TakeRecord[] = generated.map((item, idx) => {
+          const id = `take_${Date.now()}_${idx}`;
+          if (item.out) return buildTake(id, message("#{0} 演奏 (Seed {1})", idx + 1, item.seed), item.seed, item.out.perfState);
+          const { notes, pedals } = item.performance;
+          const fixed = restoreArpeggios(compiled.scoreMidi, notes, compiled.rawAnnotations, st.arpMs);
+          const rawNotes = withSustain(notes, pedals);
+          const restoredNotes = withSustain(fixed.notes, pedals);
+          return { id, model: modelId, label: `${modelNames[modelId]} #${idx+1} (Seed ${item.seed})`,
+            subtitle: summarizeNotes(restoredNotes), seed: item.seed, rawNotes, restoredNotes, arpeggios: fixed.arpeggios,
+            rawDuration: duration(rawNotes), restoredDuration: duration(restoredNotes),
+            midi: { raw: notes, restored: fixed.notes, pedals },
+          };
+        });
         const dt4 = (performance.now() - t4).toFixed(1);
 
         set((s) => ({
@@ -631,6 +695,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           },
         }));
       } finally {
+        generationController = null;
         set({ busy: false });
       }
     },
@@ -670,11 +735,19 @@ export const useStudioStore = create<StudioState>((set, get) => {
       pianoPlayer.seek(sec);
     },
 
+    activeMidi: () => {
+      const st = get();
+      const take = st.takes.find(t => t.id === st.activeTakeId);
+      if (take?.midi && st.activeTrack !== 'score') {
+        const notes = st.activeTrack === 'pianoflow_raw' ? take.midi.raw : take.midi.restored;
+        return notesToMidiBytes(notes, modelNames[take.model], take.midi.pedals);
+      }
+      return notesToMidiBytes(st.getActiveTrackData().notes, st.activeTrack);
+    },
     downloadMidi: () => {
       const st = get();
       if (!st.scoreMidi) return;
-      const tr = st.getActiveTrackData();
-      const bytes = notesToMidiBytes(tr.notes, st.activeTrack);
+      const bytes = st.activeMidi();
       const blob = new Blob([bytes as BlobPart], { type: 'audio/midi' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -739,7 +812,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       await runGuardedMode(message("玩法 ② 锁前 {0} 小节续弹 ({1} 版)", lockBarsRaw, count), async () => {
         const st = get();
         const baseTake = st.takes.find((t) => t.id === st.activeTakeId) ?? st.takes[0];
-        if (!baseTake) return;
+        if (!baseTake?.perfState) return;
         const lockBars = Math.max(1, Math.min(st.totalBars - 1, lockBarsRaw));
         const t0 = performance.now();
         const scoreData = baseTake.perfState.scoreData;
@@ -783,7 +856,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       await runGuardedMode(message("玩法 ③ 双向局部重弹 (第 {0}–{1} 小节)", sBarRaw, eBarRaw), async () => {
         const st = get();
         const baseTake = st.takes.find((t) => t.id === st.activeTakeId) ?? st.takes[0];
-        if (!baseTake) return;
+        if (!baseTake?.perfState) return;
         const sBar = Math.max(1, Math.min(st.totalBars, sBarRaw));
         const eBar = Math.max(sBar, Math.min(st.totalBars, eBarRaw));
         const t0 = performance.now();
@@ -825,7 +898,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
       await runGuardedMode(message("玩法 ④ 拆维度精修 ({0})", dimNames), async () => {
         const st = get();
         const baseTake = st.takes.find((t) => t.id === st.activeTakeId) ?? st.takes[0];
-        if (!baseTake) return;
+        if (!baseTake?.perfState) return;
         const sBar = Math.max(1, Math.min(st.totalBars, sBarRaw));
         const eBar = Math.max(sBar, Math.min(st.totalBars, eBarRaw));
         const t0 = performance.now();

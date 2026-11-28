@@ -1,0 +1,88 @@
+{
+  "tempo": {
+    "notes": 14,
+    "score_seconds": 20.15,
+    "generated_seconds": 20.15,
+    "tempo_map": [
+      [
+        0.0,
+        "set_tempo",
+        750000
+      ],
+      [
+        0.0,
+        "time_signature",
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        3.0,
+        "set_tempo",
+        400000
+      ]
+    ],
+    "first_onset_seconds": 0.75,
+    "median_score_note_ms": 200.0,
+    "median_generated_note_ms": 133.3,
+    "median_abs_offset_ms": 5.4,
+    "max_abs_offset_ms": 49.2,
+    "max_chord_spread_ms": 0,
+    "midi_sha256": "a583b9e92dfdcb35d31b3f55c7e49cf2f09aeac115128d397ac5225e5880de58"
+  },
+  "classical": {
+    "notes": 285,
+    "score_seconds": 48.0,
+    "generated_seconds": 48.003,
+    "tempo_map": [
+      [
+        0.0,
+        "set_tempo",
+        1333333
+      ],
+      [
+        0.0,
+        "time_signature",
+        [
+          9,
+          8
+        ]
+      ]
+    ],
+    "first_onset_seconds": 0,
+    "median_score_note_ms": 666.7,
+    "median_generated_note_ms": 408.3,
+    "median_abs_offset_ms": 30.6,
+    "max_abs_offset_ms": 91.7,
+    "max_chord_spread_ms": 30.6,
+    "midi_sha256": "b646a210ec774e951591527c848fcec699f06fc19c496841499824c9e67f6b67"
+  },
+  "full": {
+    "notes": 1218,
+    "score_seconds": 269.333,
+    "generated_seconds": 269.359,
+    "tempo_map": [
+      [
+        0.0,
+        "set_tempo",
+        666666
+      ],
+      [
+        0.0,
+        "time_signature",
+        [
+          4,
+          4
+        ]
+      ]
+    ],
+    "first_onset_seconds": 2.333,
+    "median_score_note_ms": 333.3,
+    "median_generated_note_ms": 337.5,
+    "median_abs_offset_ms": 31.9,
+    "max_abs_offset_ms": 80.6,
+    "max_chord_spread_ms": 29.2,
+    "midi_sha256": "aca96dfa1fc5c702369651e4056b59b92678f10e0554f2c8eb25fcbf525d3020"
+  }
+}

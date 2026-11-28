@@ -12,8 +12,8 @@ const ranges = [
   [5261, 5389],
 ];
 
-function sample(scores: Float32Array, column: number, random: () => number) {
-  const [lo, hi] = ranges[column];
+function sample(scores: Float32Array, lo: number, hi: number, random: () => number) {
+  if (hi === lo + 1) return lo;
   const sorted = Array.from({ length: hi - lo }, (_, i) => lo + i).sort((a, b) => scores[b] - scores[a]);
   const max = scores[sorted[0]];
   const weights = sorted.map((i) => Math.exp(scores[i] - max));
@@ -27,6 +27,41 @@ function sample(scores: Float32Array, column: number, random: () => number) {
     if (pick <= 0) return sorted[i];
   }
   return sorted[0];
+}
+
+// The timing vocabulary ends at about five seconds. Keep overflow on the score
+// clock while feeding the saturated token back to the autoregressive decoder.
+const timingStart = ranges[1][0];
+
+function sampleMillis(
+  logits: Float32Array, column: 1 | 3, target: number, early: number, late: number, random: () => number,
+) {
+  const limit = ranges[column][1] - timingStart - 1;
+  const overflow = Math.max(0, target - limit);
+  const center = target - overflow;
+  const low = Math.max(column === 3 ? 1 : 0, center - early);
+  const high = Math.min(limit, center + late);
+  return overflow + sample(logits, timingStart + low, timingStart + high + 1, random) - timingStart;
+}
+
+function scoreTiming(notes: ModelScore['notes'], starts: number[]) {
+  const groups = [];
+  for (let first = 0; first < notes.length;) {
+    let end = first + 1;
+    while (end < starts.length && starts[end] === starts[first]) end++;
+    const beat = 60000 / notes[first].bpm;
+    const before = starts[first] - (starts[first - 1] ?? 0);
+    const after = (starts[end] ?? Infinity) - starts[first];
+    // Anchor each bar's first strike. On interior strikes leave room on both
+    // sides for rubato, scaled to the beat and the surrounding note density.
+    const anchor = first === 0 || notes[first].bar !== notes[first - 1].bar;
+    const slack = anchor ? 0 : Math.floor(Math.min(80, beat / 8, before / 4, after / 4));
+    const spread = Math.floor(Math.min(30, beat / 20, after / 4));
+    const group = { first, slack, spread };
+    for (let i = first; i < end; i++) groups.push(group);
+    first = end;
+  }
+  return groups;
 }
 
 export async function pianist(
@@ -55,6 +90,11 @@ export async function pianist(
     }
     tokens.push(...row.map((v, j) => Math.min(ranges[j][1] - 1, Math.max(ranges[j][0], v))));
   }
+  const groups = scoreTiming(notes, starts);
+  // Absolute milliseconds indexed by score note survive overlapping windows.
+  // When the decoder rewrites a suffix, its first interval uses the retained onset.
+  const onsets: number[] = [];
+  const durations: number[] = [];
   const generated: number[] = [];
   // The trained window is 512 notes. Retain a performance prefix across overlapping windows.
   for (let start = 0; start < tokens.length; start += 2048) {
@@ -75,7 +115,29 @@ export async function pianist(
       past = out.present;
       if (pos < prefix) prev = generated[start + pos];
       else {
-        prev = pos % 8 === 0 ? input[pos] : sample(values(out.logits), pos % 8, random);
+        const column = pos % 8;
+        const i = Math.floor((start + pos) / 8);
+        const logits = values(out.logits);
+        if (column === 1) {
+          const group = groups[i];
+          const preceding = onsets[i - 1] ?? 0;
+          const first = group.first === i;
+          const target = first ? starts[i] - preceding : 0;
+          const late = first ? group.slack : onsets[group.first] + group.spread - preceding;
+          const interval = sampleMillis(logits, 1, target, first ? group.slack : 0, late, random);
+          onsets[i] = preceding + interval;
+          prev = Math.min(ranges[1][1] - 1, timingStart + interval);
+        } else if (column === 3) {
+          const written = Math.max(1, Math.round(notes[i].d * 1000));
+          const beat = 60000 / notes[i].bpm;
+          // Let the pianist articulate short notes, but retain held notes and ties.
+          const early = Math.floor(Math.min(written * 0.48, beat * 0.45));
+          const late = Math.floor(Math.min(written * 0.15, beat * 0.12));
+          durations[i] = sampleMillis(logits, 3, written, early, late, random);
+          prev = Math.min(ranges[3][1] - 1, timingStart + durations[i]);
+        } else {
+          prev = column === 0 ? input[pos] : sample(logits, ranges[column][0], ranges[column][1], random);
+        }
         generated.push(prev);
       }
       out.logits.dispose();
@@ -85,28 +147,37 @@ export async function pianist(
     cross.dispose();
     if (start + input.length === tokens.length) break;
   }
-  const intervals = notes.map(
-    (_, i) => Math.max(tokens[i * 8 + 1] > 261 ? 5 : 0, generated[i * 8 + 1] - 261) / 1000,
-  );
   const result: Performance = { notes: [], pedals: [] };
-  let time = 0,
-    last = 0;
+  const previousByPitch = new Map<number, number>();
+  let lastPedal = 0;
   for (let i = 0; i < notes.length; i++) {
-    time += intervals[i];
+    const time = onsets[i] / 1000;
     const row = i * 8;
+    const p = notes[i].p;
+    const previous = previousByPitch.get(p);
+    if (previous !== undefined && onsets[i] > onsets[previous]) {
+      const earlier = result.notes[previous];
+      earlier.d = Math.min(earlier.d, time - earlier.s);
+    }
+    previousByPitch.set(p, i);
     result.notes.push({
       scoreTime: notes[i].s,
-      p: notes[i].p,
+      p,
       s: time,
-      d: Math.max(0.001, (generated[row + 3] - 261) / 1000),
+      d: durations[i] / 1000,
       v: Math.max(1, generated[row + 2] - 133),
     });
+    const span = i + 1 < notes.length ? onsets[i + 1] - onsets[i] : durations[i];
     for (let j = 0; j < 4; j++) {
       const value = generated[row + j + 4] - 5261;
-      if (value !== last)
-        result.pedals.push({ time: time + (j * (intervals[i + 1] ?? 4.99)) / 4, value, number: 64 });
-      last = value;
+      if (value !== lastPedal)
+        result.pedals.push({ time: time + (j * span) / 4000, value, number: 64 });
+      lastPedal = value;
     }
+  }
+  if (lastPedal >= 64) {
+    const end = result.notes.reduce((last, n) => Math.max(last, n.s + n.d), 0);
+    result.pedals.push({ time: end, value: 0, number: 64 });
   }
   return result;
 }

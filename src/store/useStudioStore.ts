@@ -738,11 +738,12 @@ export const useStudioStore = create<StudioState>((set, get) => {
     activeMidi: () => {
       const st = get();
       const take = st.takes.find(t => t.id === st.activeTakeId);
+      const scoreHeader = take?.model === 'pianist' || st.activeTrack === 'score' ? st.scoreMidi?.header : undefined;
       if (take?.midi && st.activeTrack !== 'score') {
         const notes = st.activeTrack === 'pianoflow_raw' ? take.midi.raw : take.midi.restored;
-        return notesToMidiBytes(notes, modelNames[take.model], take.midi.pedals);
+        return notesToMidiBytes(notes, modelNames[take.model], take.midi.pedals, scoreHeader);
       }
-      return notesToMidiBytes(st.getActiveTrackData().notes, st.activeTrack);
+      return notesToMidiBytes(st.getActiveTrackData().notes, st.activeTrack, [], scoreHeader);
     },
     downloadMidi: () => {
       const st = get();

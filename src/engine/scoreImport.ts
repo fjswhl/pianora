@@ -8,6 +8,7 @@ import { LocalizedError, t } from '../i18n';
  * Extracts a clean @tonejs/midi `Midi` object + symbolic arpeggio annotations (`RawArpeggioAnnotation[]`)
  * ready to feed directly into PianoFlow WebGPU inference & Stage 4 arpeggio restoration.
  */
+import { keyNames, readWrittenChord, type WrittenChord } from './harmony';
 import { Midi } from '@tonejs/midi';
 import type { RawArpeggioAnnotation } from './arpeggio';
 
@@ -22,6 +23,7 @@ export interface ImportedScoreData {
   rawAnnotations: RawArpeggioAnnotation[];
   musicXmlText?: string;
   midiFile?: File;
+  writtenChords?: WrittenChord[];
   noteCount: number;
   barCount: number;
   durationSec: number;
@@ -105,6 +107,9 @@ export async function parseMidiScoreFile(file: File): Promise<ImportedScoreData>
   } else {
     clean.header.timeSignatures.push({ ticks: 0, timeSignature: [4, 4] });
   }
+  clean.header.keySignatures = raw.header.keySignatures.map(k => ({
+    ...k, ticks: Math.round(k.ticks * clean.header.ppq / ppq),
+  }));
   clean.header.update();
 
   const scale = clean.header.ppq / ppq;
@@ -239,6 +244,7 @@ async function readMusicXmlText(file: File): Promise<string> {
  */
 export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> {
   const xmlText = await readMusicXmlText(file);
+  const writtenChords = new Map<number, WrittenChord>();
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
   if (doc.querySelector('parsererror')) {
     throw new LocalizedError("MusicXML 文件解析失败，请检查 XML 格式是否完整。");
@@ -303,6 +309,13 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
             if (parsed > 0) divisions = parsed;
           }
           if (pIdx === 0) {
+            const key = child.querySelector('key');
+            if (key?.querySelector('fifths')) {
+              const name = keyNames[7 + Number(key.querySelector('fifths')?.textContent)];
+              const scale = key.querySelector('mode')?.textContent || 'major';
+              if (name && (scale === 'minor' || scale === 'major'))
+                midi.header.keySignatures.push({ ticks: cursorTick, key: name, scale });
+            }
             const beatsEl = child.querySelector('time > beats');
             const beatTypeEl = child.querySelector('time > beat-type');
             if (beatsEl && beatTypeEl) {
@@ -313,6 +326,11 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
               }
             }
           }
+        } else if (tag === 'harmony') {
+          const offset = Number(child.querySelector('offset')?.textContent ?? 0);
+          const tick = Math.max(0, cursorTick + Math.round(offset * PPQ / divisions));
+          if (Number.isFinite(tick) && !writtenChords.has(tick))
+            writtenChords.set(tick, { tick, chord: readWrittenChord(child) });
         } else if (tag === 'direction') {
           if (pIdx === 0) {
             const soundTempo = child.querySelector('sound[tempo]')?.getAttribute('tempo');
@@ -446,6 +464,7 @@ export async function parseMusicXmlFile(file: File): Promise<ImportedScoreData> 
     midi,
     rawAnnotations,
     musicXmlText: xmlText,
+    writtenChords: [...writtenChords.values()],
     ...stats,
   };
 }

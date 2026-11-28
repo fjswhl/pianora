@@ -13,5 +13,5 @@ export function readScoreFiles(files: Record<string, Uint8Array>) {
   const rawAnnotations: RawArpeggioAnnotation[] = files['annotations.json']
     ? JSON.parse(decoder.decode(files['annotations.json']))
     : [];
-  return { midi: files[midiKey], svgPages, rawAnnotations };
+  return { midi: files[midiKey], svgPages, rawAnnotations, chordText: decoder.decode(files['pn-chords.tsv']) };
 }

@@ -1,14 +1,22 @@
+import { HarmonyLabels, useHarmonyLayout, type Harmony } from './HarmonyAnalysis';
+import { readFollowScore } from '../engine/followScore';
 import { t, errorText, display, type DisplayText } from '../i18n';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { FileMusic, Table2, ZoomIn, ZoomOut } from 'lucide-react';
 import { useStudioStore, fmtTime } from '../store/useStudioStore';
 
-export function SheetMusicPanel() {
+const Engraving = memo(function Engraving({ svg }: { svg: string }) {
+  return <div dangerouslySetInnerHTML={{ __html: svg }} />;
+});
+
+export function SheetMusicPanel({ harmony, degrees }: { harmony: Harmony; degrees: boolean }) {
   const [tab, setTab] = useState<'sheet' | 'ann'>('sheet');
   const [zoom, setZoom] = useState(100);
 
   const load = useStudioStore(s => s.loadSheetPages);
   const [svgPages, setPages] = useState<string[]>([]);
+  const score = useMemo(() => svgPages.length ? readFollowScore(svgPages) : undefined, [svgPages]);
+  const labels = useHarmonyLayout(score, harmony);
   const [loading, setLoading] = useState(true);
   const [sheetError, setSheetError] = useState<DisplayText>('');
   const [attempt, setAttempt] = useState(0);
@@ -89,8 +97,15 @@ export function SheetMusicPanel() {
                 key={i}
                 className="svg-sheet-page mx-auto shrink-0 overflow-x-auto rounded-xl bg-white p-3 text-[#111111] shadow-inner"
                 style={{ width: `${zoom}%` }}
-                dangerouslySetInnerHTML={{ __html: svgHtml }}
-              />
+              >
+                <div className="harmony-page">
+                  <Engraving svg={svgHtml} />
+                  {labels.length > 0 && score && <svg className="harmony-overlay" aria-hidden="true" viewBox={score.pages[i].box.join(' ')}>
+                    {score.rows.map((row,j) => row.page === i && <HarmonyLabels key={j} labels={labels[j]}
+                      y={Math.max(2,row.top-0.4)} right={row.right} current={harmony.current} degrees={degrees} />)}
+                  </svg>}
+                </div>
+              </div>
             ))
           )}
         </div>

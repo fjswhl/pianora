@@ -1,3 +1,4 @@
+import type { WrittenChord } from '../engine/harmony';
 import { errorText, LocalizedError, t, message, type DisplayText } from '../i18n';
 import { create } from 'zustand';
 import { Midi } from '@tonejs/midi';
@@ -130,6 +131,7 @@ interface StudioState {
 
   // Compiled score & Takes pool
   scoreMidi: Midi | null;
+  writtenChords: WrittenChord[];
   scoreNotes: SimpleNote[];
   scoreDuration: number;
   rawAnnotations: RawArpeggioAnnotation[];
@@ -269,6 +271,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     },
 
     scoreMidi: null,
+    writtenChords: [],
     scoreNotes: [],
     scoreDuration: 0,
     rawAnnotations: [],
@@ -479,7 +482,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           progressPct: 4 + compileProgress * 0.7 + modelProgress * 0.28,
         });
         let compiled: Awaited<ReturnType<typeof lilypondEngine.compile>> | {
-          scoreMidi: Midi; rawAnnotations: RawArpeggioAnnotation[]; compileSec: number;
+          scoreMidi: Midi; writtenChords: WrittenChord[]; rawAnnotations: RawArpeggioAnnotation[]; compileSec: number;
           loadPages: (() => Promise<string[]>) | null; method: DisplayText;
         };
         if (imported) {
@@ -508,7 +511,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
             });
             return pending;
           };
-          compiled = { method, scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages };
+          compiled = { method, writtenChords: imported.writtenChords ?? [], scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages };
           set(s => ({ stages: { ...s.stages,
             st1: { status: 'done', stat: message("{0} · {1} 音", method, imported.noteCount) },
             st2: { status: 'done', stat: message("提取 {0} 条事件", imported.rawAnnotations.length) },
@@ -585,6 +588,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
             lyCode.match(/^\s*title\s*=\s*"([^"\n]+)"/m)?.[1] ||
             message("自定义乐谱"),
           scoreMidi: compiled.scoreMidi,
+          writtenChords: compiled.writtenChords,
           scoreNotes: firstOut.scoreNotes,
           scoreDuration: firstOut.scoreDuration,
           rawAnnotations: compiled.rawAnnotations,

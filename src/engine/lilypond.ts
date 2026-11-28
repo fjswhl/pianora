@@ -1,3 +1,5 @@
+import { readFollowScore, performanceOrder } from './followScore';
+import { readLilyChords, type WrittenChord } from './harmony';
 import { display, message, type DisplayText } from '../i18n';
 import type { createReusableCompiler } from '@sightread/lilypond-wasm';
 import { Midi } from '@tonejs/midi';
@@ -8,6 +10,7 @@ import { readScoreFiles } from './scoreFiles';
 
 interface ScoreData {
   scoreMidi: Midi;
+  writtenChords: WrittenChord[];
   loadPages: () => Promise<string[]>;
   rawAnnotations: RawArpeggioAnnotation[];
 }
@@ -104,12 +107,32 @@ export class BrowserLilyPondEngine {
     try {
       await this.prepare();
       onProgress?.(message("正在提取演奏 MIDI 和琶音标记…"), 22);
-      const { midi, rawAnnotations } = await this.run(source, 'midi');
-      const data = {
-        scoreMidi: new Midi(midi),
-        loadPages: this.sheetLoader(source),
-        rawAnnotations,
-      };
+      const { midi, rawAnnotations, chordText } = await this.run(source, 'midi');
+      const scoreMidi = new Midi(midi);
+      const loadPages = this.sheetLoader(source);
+      let writtenChords = readLilyChords(chordText, scoreMidi.header.ppq);
+      // ChordNames follows printed order; playback MIDI may unfold voltas.
+      if (writtenChords.length && source.includes('\\repeat')) {
+        const score = readFollowScore(await loadPages());
+        const order = performanceOrder(score, scoreMidi);
+        if (order !== score.measures) {
+          const marks = writtenChords;
+          writtenChords = [];
+          const whole = 4 * scoreMidi.header.ppq;
+          let tick = 0;
+          for (const bar of order) {
+            const start = Math.round(bar.moment * whole);
+            const end = Math.round(bar.end * whole);
+            for (const mark of marks) {
+              const stop = Math.min(mark.endTick ?? end, end);
+              if (stop <= start || mark.tick >= end) continue;
+              writtenChords.push({ ...mark, tick: tick + Math.max(0, mark.tick-start), endTick: tick+stop-start });
+            }
+            tick += end-start;
+          }
+        }
+      }
+      const data = { scoreMidi, writtenChords, loadPages, rawAnnotations };
       this.last = { source, data };
       return result(data, message("浏览器编译"));
     } finally {

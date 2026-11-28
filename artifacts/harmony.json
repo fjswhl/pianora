@@ -1,0 +1,26 @@
+{
+  "inferred": [
+    "Dm7",
+    "G7",
+    "C"
+  ],
+  "degrees": [
+    "ii7",
+    "V7",
+    "I"
+  ],
+  "tested": [
+    "score playback",
+    "AI playback",
+    "restored playback",
+    "pause",
+    "seek",
+    "sheet playback",
+    "layer toggle",
+    "English controls",
+    "LilyPond chord names and repeats",
+    "MusicXML authored chords",
+    "MIDI engraving"
+  ],
+  "pageErrors": []
+}

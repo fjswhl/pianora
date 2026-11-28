@@ -1007,3 +1007,16 @@ body {
   .rail { flex-wrap: wrap; }
   .crumb { display: flex; height: auto; min-height: 44px; padding: 4px 16px; flex-wrap: wrap; gap: 6px; }
 }
+
+.harmony-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: 0 0 14px; font-size: 13px; }
+.harmony-tools label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; min-height: 32px; }
+.harmony-tools input { accent-color: var(--green); }
+.harmony-tools button { color: var(--green); text-decoration: underline; padding: 5px 8px; }
+.harmony-readout { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; flex-basis: 100%; }
+.harmony-readout strong { font-size: 22px; color: var(--green); }
+.harmony-readout small, .harmony-next { color: var(--muted); }
+.harmony-page { position: relative; }
+.svg-sheet-page .harmony-overlay { position: absolute; inset: 0; height: 100%; pointer-events: none; }
+.harmony-labels text { font: 600 1.85px system-ui, sans-serif; fill: #345943; stroke: white; stroke-width: .48px; paint-order: stroke; }
+.harmony-labels .harmony-degree { font-size: 1.45px; }
+.harmony-labels .current text { fill: #183d26; text-decoration: underline; font-weight: 800; }

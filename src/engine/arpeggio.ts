@@ -75,6 +75,10 @@ export const SCHEME_ARP_HOOK = String.raw`
      ((volta-repeat-end-event engraver event) (record "end" '()))
      ((alternative-event engraver event) (record "ending" (ly:event-property event 'volta-numbers '()))))
     (acknowledgers
+     ((note-head-interface engraver grob source)
+      (ly:grob-set-property! grob 'output-attributes
+        (list (cons 'data-onset (number->string (exact->inexact
+          (ly:moment-main (ly:context-current-moment ctx))))))))
      ((staff-symbol-interface engraver grob source)
       (ly:grob-set-property! grob 'output-attributes
        (lambda (piece)
@@ -87,8 +91,43 @@ export const SCHEME_ARP_HOOK = String.raw`
             (list (cons 'data-line (pn-moment (ly:spanner-bound (ly:grob-system piece) LEFT)))
                   (cons 'data-moment moment) (cons 'data-number number))))))))))
 
+% Read the same root-ordered pitches that LilyPond passes to its chord
+% formatter, including the separate inversion or slash bass.
+#(define pn-chords '())
+#(define (pn-chord-collector ctx)
+   (let ((original #f) (duration 0))
+     (make-engraver
+      (listeners
+       ((note-event engraver event)
+        (let ((d (ly:event-property event 'duration)))
+          (when (ly:duration? d)
+            (set! duration (exact->inexact (ly:duration->number d)))))))
+      ((initialize engraver)
+       (set! original (ly:context-property ctx 'chordNameFunction))
+       (ly:context-set-property! ctx 'chordNameFunction
+        (lambda (pitches bass inversion context)
+          (let ((text (original pitches bass inversion context)))
+            (when (pair? pitches)
+              (let* ((root (car pitches))
+                     (low (if (ly:pitch? bass) bass inversion)))
+                (set! pn-chords
+                  (cons (format #f "~a|~a|~a|~a|~a|~a|~a|~a"
+                         (exact->inexact (ly:moment-main (ly:context-current-moment context)))
+                         (ly:pitch-notename root)
+                         (inexact->exact (round (* 2 (ly:pitch-alteration root))))
+                         (string-join (map (lambda (p) (number->string (ly:pitch-semitones p))) pitches) ",")
+                         (if (ly:pitch? low) (ly:pitch-notename low) -1)
+                         (if (ly:pitch? low) (inexact->exact (round (* 2 (ly:pitch-alteration low)))) 0)
+                         duration (markup->string text)) pn-chords))))
+            text))))
+      ((finalize engraver)
+       (call-with-output-file "pn-chords.tsv"
+         (lambda (port)
+           (for-each (lambda (line) (display line port) (newline port)) (reverse pn-chords))))))))
+
 \layout {
   \context { \Staff \consists #pn-bar-engraver }
+  \context { \ChordNames \consists #pn-chord-collector }
   \context {
     \Voice
     \consists #Demo_arpeggio_collector_engraver

@@ -9,6 +9,7 @@ interface Measure {
   left: number;
   right: number;
   row: number;
+  anchors?: { moment: number; x: number }[];
 }
 
 interface System {
@@ -80,6 +81,15 @@ export function readFollowScore(sources: string[]): FollowScore {
         x: position[0], number: Number(bar.getAttribute('data-number')),
       });
     }
+    const onsets = new Map<number, number>();
+    for (const head of svg.querySelectorAll('[data-onset]')) {
+      const onset = Number(head.getAttribute('data-onset'));
+      if (onsets.has(onset)) continue;
+      const mark = head.querySelector('[transform]');
+      const pos = mark && translation(mark);
+      if (pos) onsets.set(onset, pos[0]);
+    }
+    const pageStart = measures.length;
     for (const system of [...systems.values()].sort((a, b) => a.moment - b.moment)) {
       const row = rows.length;
       rows.push(system);
@@ -97,6 +107,15 @@ export function readFollowScore(sources: string[]): FollowScore {
       if (system.end > moment && system.right > left)
         measures.push({ row, left, right: system.right, moment, end: system.end, number });
     }
+    const points = [...onsets].sort(([a],[b]) => a-b);
+    let i = 0;
+    for (const bar of measures.slice(pageStart)) {
+      bar.anchors = [];
+      while (i < points.length && points[i][0] < bar.end) {
+        const [moment, x] = points[i++];
+        if (moment >= bar.moment) bar.anchors.push({ moment, x });
+      }
+    }
     return { box };
   });
   const score = { rows, measures, pages, repeats };
@@ -106,7 +125,7 @@ export function readFollowScore(sources: string[]): FollowScore {
 
 // LilyPond emits repeat and alternative events even when the MIDI score has
 // been unfolded separately from the printed score (e.g. Mozart K.331).
-function performanceOrder({ measures, repeats }: FollowScore, midi: Midi) {
+export function performanceOrder({ measures, repeats }: FollowScore, midi: Midi) {
   const writtenEnd = measures.at(-1)?.end ?? 0;
   if (!repeats) return measures;
   const endTick = midi.tracks.reduce((end, track) => Math.max(end, track.endOfTrackTicks ?? 0), midi.durationTicks);

@@ -27,7 +27,7 @@ with sync_playwright() as playwright:
             page.get_by_role("button", name="显示 MIDI 随奏谱").click()
             expect(page.locator(".follow-system").first).to_be_visible(timeout=90000)
         page.get_by_role("button", name="查看谱面").click()
-        pages = page.locator(".svg-sheet-page svg")
+        pages = page.locator(".svg-sheet-page svg:not(.harmony-overlay)")
         expect(pages.first).to_be_visible(timeout=90000)
         assert pages.first.locator("path").count() > 10
         report[song] = {"pages": pages.count(), "entry": "preset" if preset else "upload"}

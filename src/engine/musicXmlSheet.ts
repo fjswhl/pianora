@@ -116,6 +116,7 @@ export async function renderMusicXmlToSvgPages(xmlText: string): Promise<string[
       for (const system of musicPage.MusicSystems ?? []) {
         // Group GraphicalMeasures across all staves by measureListIndex so ordering is guaranteed
         // regardless of [staff][col] vs [col][staff] layout.
+        const anchors = new Map<number, Map<number,number>>();
         const byMeasure = new Map<
           number,
           {
@@ -134,6 +135,13 @@ export async function renderMusicXmlToSvgPages(xmlText: string): Promise<string[
             if (!gm || !gm.parentSourceMeasure || !gm.PositionAndShape) continue;
             const sm = gm.parentSourceMeasure;
             const idx = sm.measureListIndex;
+            const points = anchors.get(idx) ?? new Map<number,number>();
+            for (const entry of gm.staffEntries) {
+              const time = entry.getAbsoluteTimestamp().RealValue;
+              const x = entry.PositionAndShape.AbsolutePosition.x;
+              if (Number.isFinite(x)) points.set(time, x);
+            }
+            anchors.set(idx, points);
             const ps = gm.PositionAndShape;
             const abs = ps.AbsolutePosition;
             if (!abs) continue;
@@ -161,7 +169,8 @@ export async function renderMusicXmlToSvgPages(xmlText: string): Promise<string[
 
         const ordered = [...byMeasure.entries()]
           .sort(([a], [b]) => a - b)
-          .map(([, v]) => v);
+          .map(([idx, v]) => ({ ...v, anchors: [...(anchors.get(idx) ?? [])]
+            .sort(([a],[b]) => a-b).map(([moment,x]) => ({ moment,x })) }));
         if (!ordered.length) continue;
 
         let sysTop = Infinity;
@@ -201,7 +210,7 @@ export async function renderMusicXmlToSvgPages(xmlText: string): Promise<string[
         for (const m of ordered) {
           if (m.right > m.left && m.end > m.moment) {
             measures.push({
-              row: rowIndex,
+              row: rowIndex, anchors: m.anchors,
               moment: m.moment,
               end: m.end,
               number: m.number,

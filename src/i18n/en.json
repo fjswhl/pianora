@@ -476,5 +476,21 @@
   "重演选定的小节。双向 Flow Matching 会与前后保留的段落自然衔接。": "Regenerate the selected bars. Bidirectional flow matching blends the new passage into the sections on either side.",
   "导入演奏 MIDI 或选用内置引子。浏览器会逐音对齐开头的小节，保留触键与呼吸，让 PianoFlow 按相同风格续弹。": "Import a performance MIDI or choose a built-in introduction. PianoFlow aligns the opening bars note by note and continues with the same touch and phrasing.",
   "{0} · 文件：{1}": "{0} · File: {1}",
-  "。": "."
+  "。": ".",
+  "大三和弦": "Major triad",
+  "小三和弦": "Minor triad",
+  "属七和弦": "Dominant seventh",
+  "大七和弦": "Major seventh",
+  "小七和弦": "Minor seventh",
+  "减三和弦": "Diminished triad",
+  "半减七和弦": "Half-diminished seventh",
+  "减七和弦": "Diminished seventh",
+  "增三和弦": "Augmented triad",
+  "挂四和弦": "Suspended fourth",
+  "挂二和弦": "Suspended second",
+  "当前和弦": "Current chord",
+  "原谱标记": "From score",
+  "自动分析": "Inferred",
+  "和声分析": "Harmony analysis",
+  "显示级数": "Show scale degrees"
 }

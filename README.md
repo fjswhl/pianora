@@ -170,3 +170,9 @@ The account regression workflow exercises simulated email, sign-in, session pers
 中文原文用作消息键，英文译文集中在 `src/i18n/en.json`。组件用 `t(key, ...values)` 渲染文案，含变量的句子用 `{0}`、`{1}` 占位。需要留在状态中的异步提示用 `message` 创建，在展示时调用 `display`。账户 API 通过 `Accept-Language` 接收界面语言，验证码邮件与页面使用同一翻译目录。
 
 启动带有本地演奏资源的 `npm run preview` 后，运行 `python scripts/verify-i18n.py`（需要 Python Playwright 和 Chromium）。脚本会生成 `artifacts/i18n.json` 和两张界面截图；设置 `PIANORA_LOCAL_MAIL_LOG` 可同时验证本地 Wrangler 模拟邮件的双语登录流程。
+
+### 播放时查看和声
+
+演奏室默认打开「和声分析」。在「试听与导出」或「查看谱面」中播放，当前和弦会随音乐高亮，旁边显示和弦类型和下一个和弦。「显示级数」可在和弦下方加上当前调内的罗马数字。MIDI 可以先看当前和弦，再点击「显示 MIDI 随奏谱」打开五线谱。
+
+Pianora 优先读取 MusicXML 的和弦标记或 LilyPond 的 ChordNames。其余段落按原谱音高、低音和时值估算，因此分解和弦、经过音密集的段落和临时转调可能有多种解释。无法确定调内级数时，仅显示和弦。使用本地资源启动预览后，可运行 `python scripts/verify-harmony.py` 重放浏览器验证，生成和声截图与 JSON 报告。

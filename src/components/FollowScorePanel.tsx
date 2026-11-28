@@ -1,10 +1,13 @@
+import { HarmonyLabels, useHarmonyLayout, type Harmony } from './HarmonyAnalysis';
 import { t } from '../i18n';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { followTimeline, readFollowScore, type FollowScore } from '../engine/followScore';
 import { pianoPlayer } from '../engine/instances';
 import { getLiveSession, useStudioStore } from '../store/useStudioStore';
 
-function ScoreWindow({ score, images }: { score: FollowScore; images: string[] }) {
+type HarmonyProps = { harmony: Harmony; degrees: boolean };
+function ScoreWindow({ score, images, harmony, degrees }: { score: FollowScore; images: string[] } & HarmonyProps) {
+  const labels = useHarmonyLayout(score, harmony);
   const midi = useStudioStore(s => s.scoreMidi);
   const track = useStudioStore(s => s.activeTrack);
   const take = useStudioStore(s => s.takes.find(item => item.id === s.activeTakeId));
@@ -62,11 +65,19 @@ function ScoreWindow({ score, images }: { score: FollowScore; images: string[] }
         const here = start + i === active.row;
         const height = row.bottom - row.top;
         const width = row.right - row.left + 4;
+        const band = labels[start+i]?.length ? (degrees ? 4.8 : 3) : 0;
         return <svg className="follow-system" key={start + i} role="img"
           aria-label={t("第 {0} 行钢琴谱", start + i + 1)} data-row={start + i + 1}
-          viewBox={`${row.left - 3} ${row.top - 0.7} ${width} ${height + 1.4}`}>
-          <image href={images[row.page]} x={page.box[0]} y={page.box[1]}
+          viewBox={`${row.left - 3} ${row.top - 0.7 - band} ${width} ${height + 1.4 + band}`}>
+          <svg x={row.left-3} y={row.top-0.7} width={width} height={height+1.4}
+            viewBox={`${row.left-3} ${row.top-0.7} ${width} ${height+1.4}`} overflow="hidden">
+            <image href={images[row.page]} x={page.box[0]} y={page.box[1]}
             width={page.box[2]} height={page.box[3]} />
+          </svg>
+          {band > 0 && <>
+            <rect x={row.left-3} y={row.top-band-0.7} width={width} height={band} fill="white" />
+            <HarmonyLabels labels={labels[start+i]} y={row.top-1.1} right={row.right} current={here ? harmony.current : undefined} degrees={degrees} />
+          </>}
           {here && <g key={index} className="follow-highlight" data-bar={active.number}>
             <rect x={active.left} y={row.top} width={active.right - active.left}
               height={height} rx=".4" fill="#547f54" fillOpacity=".13" />
@@ -79,7 +90,7 @@ function ScoreWindow({ score, images }: { score: FollowScore; images: string[] }
   </>;
 }
 
-export function FollowScorePanel() {
+export function FollowScorePanel(props: HarmonyProps) {
   const load = useStudioStore(s => s.loadSheetPages);
   const [loaded, setLoaded] = useState<{ score: FollowScore; images: string[]; load: typeof load }>();
   const [attempt, retry] = useState(0);
@@ -103,7 +114,7 @@ export function FollowScorePanel() {
   }, [load, attempt]);
   if (!load) return null;
   return <div className="follow-score" role="group" aria-label={t("随奏谱")}>
-    {loaded?.load === load ? <ScoreWindow {...loaded} /> : failed
+    {loaded?.load === load ? <ScoreWindow {...loaded} {...props} /> : failed
       ? <p role="alert">{t("随奏谱加载失败。")} <button onClick={() => retry(n => n + 1)}>{t("重试")}</button></p>
       : <p role="status">{t("正在准备随奏谱…")}</p>}
   </div>;

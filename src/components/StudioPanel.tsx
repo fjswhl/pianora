@@ -2,6 +2,7 @@ import { t, display } from '../i18n';
 import { useState } from 'react';
 import { AudioLines, BookOpen, SlidersHorizontal } from 'lucide-react';
 import { PipelineHeader, GenerationRecord } from './PipelineHeader';
+import { useHarmony, HarmonyReadout } from './HarmonyAnalysis';
 import { TransportBar } from './TransportBar';
 import { PianoRollCanvas } from './PianoRollCanvas';
 import { WorkbenchPanel } from './WorkbenchPanel';
@@ -17,6 +18,11 @@ const views = [
 
 export function StudioPanel() {
   const [view, setView] = useState<(typeof views)[number]['id']>('listen');
+  const [showHarmony, setShowHarmony] = useState(true);
+  const [degrees, setDegrees] = useState(false);
+  const harmony = useHarmony(showHarmony && view !== 'shape');
+  const playing = useStudioStore(s => s.isPlaying);
+  const togglePlay = useStudioStore(s => s.togglePlay);
   const title = useStudioStore((s) => s.performanceTitle);
   const midiNotation = useStudioStore(s => s.midiNotation);
   const score = useStudioStore(s => s.scoreMidi);
@@ -56,6 +62,12 @@ export function StudioPanel() {
           </button>
         ))}
       </div>
+      {view !== 'shape' && <div className="harmony-tools">
+        <label><input type="checkbox" checked={showHarmony} onChange={e => setShowHarmony(e.target.checked)} /> {t('和声分析')}</label>
+        {showHarmony && <label><input type="checkbox" checked={degrees} onChange={e => setDegrees(e.target.checked)} /> {t('显示级数')}</label>}
+        {view === 'sheet' && <button onClick={togglePlay}>{playing ? t('暂停') : t('播放')}</button>}
+        {showHarmony && <HarmonyReadout harmony={harmony} degrees={degrees} />}
+      </div>}
       {busy && <p role="status">{display(progress)}</p>}
       {error && <p role="alert">{display(error)}</p>}
       <div className="console">
@@ -65,7 +77,7 @@ export function StudioPanel() {
               <PipelineHeader />
               {midiNotation && requestedScore !== score
                 ? <button onClick={() => setRequestedScore(score)}>{t("显示 MIDI 随奏谱")}</button>
-                : <FollowScorePanel />}
+                : <FollowScorePanel harmony={harmony} degrees={degrees} />}
               <PianoRollCanvas />
             </div>
             <TransportBar pianoStatus={display(pianoStatus)} />
@@ -75,7 +87,7 @@ export function StudioPanel() {
         <div hidden={view !== 'shape'}>
           <WorkbenchPanel />
         </div>
-        {view === 'sheet' && <SheetMusicPanel />}
+        {view === 'sheet' && <SheetMusicPanel harmony={harmony} degrees={degrees} />}
       </div>
     </section>
   );

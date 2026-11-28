@@ -15,6 +15,7 @@ import { useStudioStore, fmtTime } from '../store/useStudioStore';
 
 export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
   const hasScore = useStudioStore((s) => Boolean(s.scoreMidi));
+  const pianoReady = useStudioStore(s => s.pianoReady);
   const isPlaying = useStudioStore((s) => s.isPlaying);
   const liveActive = useStudioStore((s) => s.liveActive);
   const activeTimbreId = useStudioStore((s) => s.activeTimbreId);
@@ -68,7 +69,7 @@ export function TransportBar({ pianoStatus }: { pianoStatus: string }) {
   return (
     <>
       <div className="transport-strip">
-        <button id="playBtn" disabled={!hasScore} onClick={togglePlay}>
+        <button id="playBtn" disabled={!hasScore || !pianoReady} onClick={togglePlay}>
           {isPlaying ? <Pause /> : <Play />}
           {isPlaying ? t("暂停") : t("播放")}
         </button>

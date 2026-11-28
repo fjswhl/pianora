@@ -79,7 +79,7 @@ export class BrowserLilyPondEngine {
     }
   }
 
-  private sheetLoader(source: string) {
+  sheetLoader(source: string) {
     let pending: Promise<string[]> | undefined;
     return () =>
       (pending ??= this.run(source, 'svg').then(result => result.svgPages).catch(error => {

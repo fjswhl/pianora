@@ -1,4 +1,13 @@
 {
+  "最近生成": "Recent generations",
+  "无法读取此浏览器的生成记录。": "This browser could not read your recent generations.",
+  "此浏览器会保留最近 10 次生成。": "This browser keeps your last 10 generations.",
+  "这台设备还没有生成记录。": "No generations on this device yet.",
+  "正在读取生成记录…": "Loading recent generations…",
+  "正在打开演奏…": "Opening performance…",
+  "这条生成记录已不可用。": "This generation is no longer available.",
+  "正在加载 PianoFlow…": "Loading PianoFlow…",
+  "演奏已生成，但浏览器未能保存本次记录。": "Your performance is ready, but this browser could not save it to recent generations.",
   "保存最终演奏": "Save final performance",
   "正在渲染最终演奏…": "Rendering the final performance…",
   "正在保存演奏…": "Saving the performance…",

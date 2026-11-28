@@ -30,7 +30,9 @@ import {
 } from '../engine/pianoAudio';
 import { useScoreStore } from './useScoreStore';
 import { lilypondEngine, pianoFlowEngine, pianoPlayer } from '../engine/instances';
-import { renderMusicXmlToSvgPages } from '../engine/musicXmlSheet';
+import { importedSheetLoader } from '../engine/importedSheet';
+import { parseDirectScoreFile, isDirectScoreFile } from '../engine/scoreImport';
+import { rememberGeneration, getGeneration, getGenerationPages, storeGenerationPages } from './generationHistory';
 
 export type TrackKey = 'score' | 'pianoflow_raw' | 'final_restored';
 export type StageStatus = 'idle' | 'active' | 'done';
@@ -51,6 +53,7 @@ export interface TakeRecord {
 }
 
 export interface CustomTimbreItem {
+  file: File;
   id: string;
   name: string;
 }
@@ -100,7 +103,9 @@ export function getLiveSession(): LiveConductorSession | null {
   return liveSessionRef;
 }
 
-interface StudioState {
+export interface StudioState {
+  historyWarning: DisplayText;
+  openGeneration: (id: number) => Promise<boolean>;
   // Engine status pills
   wasmReady: boolean;
   wasmStatus: DisplayText;
@@ -231,6 +236,16 @@ export const useStudioStore = create<StudioState>((set, get) => {
     };
   };
 
+  const remember = async (takes: TakeRecord[]) => {
+    try {
+      await rememberGeneration(get(), takes);
+      set({ historyWarning: '' });
+      window.dispatchEvent(new Event('pianora:history'));
+    } catch {
+      set({ historyWarning: message("演奏已生成，但浏览器未能保存本次记录。") });
+    }
+  };
+
   const runGuardedMode = async (title: DisplayText, fn: () => Promise<void>) => {
     const st = get();
     if (!st.scoreMidi || st.busy) return;
@@ -238,6 +253,8 @@ export const useStudioStore = create<StudioState>((set, get) => {
     set({ busy: true, errorMsg: '', progressMsg: message("{0}…", title), progressPct: 12 });
     try {
       await fn();
+      const added = get().takes.slice(st.takes.length);
+      if (added.length) await remember(added);
     } catch (err) {
       console.error(err);
       set({ errorMsg: errorText(err) });
@@ -247,6 +264,51 @@ export const useStudioStore = create<StudioState>((set, get) => {
   };
 
   return {
+    historyWarning: '',
+    openGeneration: async id => {
+      const previous = get();
+      if (previous.busy || previous.liveActive || previous.exportingWav) return false;
+      set({ busy: true, errorMsg: '', progressMsg: message("正在打开演奏…") });
+      try {
+        const saved = await getGeneration(id);
+        if (!saved) throw new LocalizedError("这条生成记录已不可用。");
+        const { score, mixer, ...session } = saved;
+        const scoreMidi = new Midi();
+        scoreMidi.fromJSON(score);
+        const source = session.performanceSource;
+        let pending: Promise<string[]> | undefined;
+        const loadPages = async () => {
+          const cached = await getGenerationPages(id).catch(() => undefined);
+          if (cached) return cached;
+          const loader = isDirectScoreFile(source.name)
+            ? importedSheetLoader(await parseDirectScoreFile(source))
+            : lilypondEngine.sheetLoader(await source.text());
+          const pages = await loader();
+          void storeGenerationPages(id, pages).catch(() => {});
+          return pages;
+        };
+        const take = session.takes.find(item => item.id === session.activeTakeId)!;
+        pianoPlayer.stop(true);
+        pianoPlayer.setTrack(take.restoredNotes, take.restoredDuration);
+        pianoPlayer.seek(0);
+        set({
+          ...session, scoreMidi, isPlaying: false, activeTrack: 'final_restored',
+          loadSheetPages: () => pending ??= loadPages().catch(e => { pending = undefined; throw e; }),
+          stages: { ...session.stages, st5: get().stages.st5 }, progressMsg: '', progressPct: 100,
+        });
+        get().setReverbWet(mixer.reverbWet);
+        get().setResonanceAmount(mixer.resonanceAmount);
+        if (mixer.activeHallId !== previous.activeHallId) await get().switchHallIr(mixer.activeHallId);
+        if (mixer.customFile) await get().importCustomSf2(mixer.customFile);
+        else if (!pianoPlayer.ready || pianoPlayer.activePresetId !== mixer.activeTimbreId)
+          await get().switchTimbre(mixer.activeTimbreId);
+        return true;
+      } catch (error) {
+        set({ errorMsg: errorText(error) });
+        return false;
+      } finally { set({ busy: false }); }
+    },
+
     wasmReady: false,
     wasmStatus: message("LilyPond WASM 待命"),
     ortReady: false,
@@ -402,9 +464,8 @@ export const useStudioStore = create<StudioState>((set, get) => {
         set((s) => ({
           activeTimbreId: id,
           timbreDesc: message("本地导入 SoundFont2 ({0}, {1} MB) · 琴弦共鸣 + 音乐厅卷积", file.name, (file.size / 1e6).toFixed(1)),
-          customTimbres: s.customTimbres.some((c) => c.id === id)
-            ? s.customTimbres
-            : [...s.customTimbres, { id, get name() { return t("{0} (本地 SF2)", name); } }],
+          customTimbres: [...s.customTimbres.filter(c => c.id !== id),
+            { id, file, get name() { return t("{0} (本地 SF2)", name); } }],
         }));
         if (wasPlaying) {
           set({ isPlaying: true });
@@ -515,30 +576,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         };
         if (imported) {
           const method = imported.kind === 'musicxml' ? 'MusicXML' : 'MIDI';
-          const render = async () => {
-            let xml = imported.musicXmlText;
-            if (imported.midiFile) {
-              const { default: MidiToMusicXML } = await import('../vendor/planetscore/MidiToMusicXML.js');
-              xml = new MidiToMusicXML().convert(await imported.midiFile.arrayBuffer(), {
-                title: imported.title,
-                creator: imported.composer === t("MIDI 导入") ? '' : imported.composer,
-                normalize: false, // Preserve leading rests for the playback cursor.
-                muteChannels: [9], // The piano playback path also excludes percussion.
-                autoSplit: true,
-                divisions: 12, // Represent both sixteenths and triplet eighths.
-              });
-            }
-            if (!xml) throw new LocalizedError("缺少可排版的乐谱数据");
-            return renderMusicXmlToSvgPages(xml);
-          };
-          let pending: Promise<string[]> | null = null;
-          const loadPages = () => {
-            pending ??= render().catch(err => {
-              pending = null;
-              throw err;
-            });
-            return pending;
-          };
+          const loadPages = importedSheetLoader(imported);
           compiled = { method, writtenChords: imported.writtenChords ?? [], scoreMidi: imported.midi, rawAnnotations: imported.rawAnnotations, compileSec: 0, loadPages };
           set(s => ({ stages: { ...s.stages,
             st1: { status: 'done', stat: message("{0} · {1} 音", method, imported.noteCount) },
@@ -685,6 +723,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
         pianoPlayer.setTrack(takes[0].restoredNotes, takes[0].restoredDuration);
         pianoPlayer.seek(0);
+        await remember(takes);
       } catch (err) {
         console.error(err);
         set((s) => ({
@@ -709,6 +748,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
         st.stopLiveConductor(false);
         return;
       }
+      if (!pianoPlayer.ready) return;
       if (pianoPlayer.isPlaying) {
         pianoPlayer.pause();
         set({ isPlaying: false });
@@ -719,6 +759,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
     },
 
     playFrom: (sec) => {
+      if (!pianoPlayer.ready) return;
       if (get().liveActive) return;
       set({ isPlaying: true });
       void pianoPlayer.play(sec, () => set({ isPlaying: false }));
@@ -962,12 +1003,18 @@ export const useStudioStore = create<StudioState>((set, get) => {
 
     startLiveConductor: async () => {
       const st = get();
-      if (!st.scoreMidi || st.liveActive) return;
+      if (!st.scoreMidi || st.liveActive || st.busy) return;
       if (!pianoPlayer.ready) {
         set({ errorMsg: message("钢琴音色正在加载中，请稍等 1 秒再启动实时指挥。") });
         return;
       }
       pianoPlayer.stop(true);
+      if (!pianoFlowEngine.meta) {
+        set({ busy: true, progressMsg: message("正在加载 PianoFlow…") });
+        try { await pianoFlowEngine.load(); }
+        catch (error) { set({ errorMsg: errorText(error) }); return; }
+        finally { set({ busy: false }); }
+      }
       liveSessionRef = pianoFlowEngine.createLiveSession(st.scoreMidi, {
         seed: Math.floor(Math.random() * 9000) + 100,
         cfmSteps: 5,
@@ -1049,6 +1096,7 @@ export const useStudioStore = create<StudioState>((set, get) => {
           liveStatus: message("实时指挥实录已保存到版本池！(共 {0} 音)", sess.generatedNoteCount),
         }));
         get().selectTake(tk.id);
+        void remember([tk]);
       } else if (sess) {
         set({ liveStatus: message("已停止实时指挥（已实时演奏 {0}/{1} 音）", sess.generatedNoteCount, sess.scoreData.noteCount) });
       }

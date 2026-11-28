@@ -1,8 +1,9 @@
-import { t } from '../i18n';
+import { t, display } from '../i18n';
 import { lazy, Suspense, useEffect } from 'react';
-import { ArrowRight, AudioLines } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useScoreStore } from '../store/useScoreStore';
 import { useStudioStore } from '../store/useStudioStore';
+import { RecentGenerations } from './RecentGenerations';
 import { ScoreSidebar } from './ScoreSidebar';
 const StudioPanel = lazy(() =>
   import('./StudioPanel').then((m) => ({ default: m.StudioPanel })),
@@ -18,6 +19,8 @@ export default function Workspace({
   description: string;
 }) {
   const takes = useStudioStore((s) => s.takes);
+  const error = useStudioStore(s => s.errorMsg);
+  const progress = useStudioStore(s => s.progressMsg);
   const busy = useStudioStore((s) => s.busy);
   useEffect(() => {
     const source = useScoreStore.getState();
@@ -60,6 +63,7 @@ export default function Workspace({
             <h1>{title}</h1>
             <p>{description}</p>
           </div>
+          {page === 'studio' && <a href="#editor" className="import">{t("前往乐谱编辑")} <ArrowRight size={16} /></a>}
         </div>
       )}
       {page === 'editor' && (
@@ -71,23 +75,10 @@ export default function Workspace({
           />
         </div>
       )}
-      {page === 'studio' &&
-        (takes.length ? (
-          <StudioPanel />
-        ) : (
-          <section className="empty">
-            <AudioLines size={38} />
-            <h2>{busy ? t("正在生成演奏") : t("演奏室等待第一份乐谱")}</h2>
-            <p>
-              {busy
-                ? t("可以在编辑页查看生成进度。")
-                : t("在编辑页生成演奏后，就能试听、调整音色和导出音频。")}
-            </p>
-            <a href="#editor">
-              {t("前往乐谱编辑")} <ArrowRight size={16} />
-            </a>
-          </section>
-        ))}
+      {page === 'studio' && <RecentGenerations hasSession={Boolean(takes.length)} />}
+      {page === 'studio' && !takes.length && error && <p role="alert">{display(error)}</p>}
+      {page === 'studio' && !takes.length && busy && <p role="status">{display(progress)}</p>}
+      {page === 'studio' && takes.length > 0 && <StudioPanel key={takes[0].id} />}
     </Suspense>
   );
 }

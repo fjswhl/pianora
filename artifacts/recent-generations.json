@@ -1,0 +1,25 @@
+{
+  "generations": 11,
+  "retainedSeeds": [
+    111,
+    110,
+    109,
+    108,
+    107,
+    106,
+    105,
+    104,
+    103,
+    102
+  ],
+  "restoredBatchSize": 2,
+  "restoredFinalMidiSha256": "b912edcf5127e715422f95b1266a60009eceda8e75b8ca18cdaf5582ed9c3c19",
+  "playbackAdvanced": true,
+  "restoredNotation": true,
+  "restoredLilyPondWithoutCompiler": true,
+  "reopenedWithoutModel": true,
+  "cancellationPreservedHistory": true,
+  "storageFailureKeptPerformance": true,
+  "restoredReverb": "0.65",
+  "mobileViewport": 390
+}

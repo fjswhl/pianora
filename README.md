@@ -193,3 +193,9 @@ For local development, run `CLERK_PUBLISHABLE_KEY=<dev publishable key> node scr
 演奏室默认打开「和声分析」。在「试听与导出」或「查看谱面」中播放，当前和弦会随音乐高亮，旁边显示和弦类型和下一个和弦。「显示级数」可在和弦下方加上当前调内的罗马数字。MIDI 可以先看当前和弦，再点击「显示 MIDI 随奏谱」打开五线谱。
 
 Pianora 优先读取 MusicXML 的和弦标记或 LilyPond 的 ChordNames。其余段落按原谱音高、低音和时值估算，因此分解和弦、经过音密集的段落和临时转调可能有多种解释。无法确定调内级数时，仅显示和弦。使用本地资源启动预览后，可运行 `python scripts/verify-harmony.py` 重放浏览器验证，生成和声截图与 JSON 报告。
+
+### 本机最近生成
+
+演奏室的「最近生成」按生成时间展示此浏览器最近 10 次成功的演奏，无需登录。一次批量生成占一条记录，打开后可以切换这批的各个版本、试听、查看谱面和导出 MIDI。历史保存在当前站点的 IndexedDB，清除站点数据会移除记录。
+
+在具备 Pianist 模型和钢琴音色的本地生产预览上运行 `python scripts/verify-recent-generations.py --url http://127.0.0.1:4173`，可重放 11 次生成、淘汰旧记录、刷新恢复、播放和 MIDI 一致性验证。结果写入 `artifacts/recent-generations.json`。

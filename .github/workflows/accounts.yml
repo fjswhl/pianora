@@ -5,6 +5,8 @@ on:
     paths:
       - 'worker/**'
       - 'migrations/**'
+      - 'catalog/**'
+      - 'scripts/*catalog*'
       - 'src/**'
       - 'package*.json'
       - 'scripts/*account*'
@@ -32,4 +34,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: account-regression
-          path: artifacts/accounts.json
+          path: |
+            artifacts/accounts.json
+            artifacts/catalog.json

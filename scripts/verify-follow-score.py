@@ -90,7 +90,7 @@ with sync_playwright() as p:
 
     # A short custom score exercises browser engraving and avoids padding blank rows.
     page.get_by_role("link", name="乐谱编辑").click()
-    page.locator("#lyEditor").fill((root / "public/presets/short_etude.ly").read_text() + "\n% follow score E2E")
+    page.locator("#lyEditor").fill((root / "catalog/seed/files/short_etude.ly").read_text() + "\n% follow score E2E")
     page.locator("#renderBtn").click()
     page.wait_for_function("location.hash === '#studio' || document.querySelector('#errBox')", timeout=180000)
     assert page.url.endswith("#studio"), page.locator("#errBox").inner_text()

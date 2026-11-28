@@ -56,7 +56,7 @@ def run(browser, piece, reference):
         page.add_init_script(observer.replace("REFERENCE", json.dumps(reference)))
         page.goto(url + "/#editor")
         page.locator("#presetSelect").select_option(piece)
-        expect(page.locator("#lyEditor")).to_have_value((root / "public/presets" / scores[piece]).read_text())
+        expect(page.locator("#lyEditor")).to_have_value((root / "catalog/seed/files" / scores[piece]).read_text())
         page.locator("summary").first.click()
         page.locator("#cfmSteps").fill("4")
         page.locator("#renderBtn").click()

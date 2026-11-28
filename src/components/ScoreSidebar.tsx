@@ -2,7 +2,7 @@ import { t, display } from '../i18n';
 import { useEffect, useState } from 'react';
 import { lilypondEngine } from '../engine/instances';
 import { useScoreStore } from '../store/useScoreStore';
-import { scorePresets as presets } from '../engine/presets';
+import { useScores, label } from '../engine/presets';
 import { FileUp, Play, Sparkles, AlertCircle, Music2, RotateCcw } from 'lucide-react';
 import { fmtTime, useStudioStore } from '../store/useStudioStore';
 
@@ -11,6 +11,8 @@ import { modelNames } from '../engine/performance/types';
 export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
   const { loading, error, importedScore } = useScoreStore();
   const selectedPresetId = useScoreStore((s) => s.selectedPresetId);
+  const presets = useScores();
+  const current = useScoreStore(s => s.selectedPreset);
   const lyCode = useScoreStore((s) => s.lyCode);
   const model = useStudioStore(s => s.model);
   const dexSteps = useStudioStore(s => s.dexSteps);
@@ -104,12 +106,17 @@ export function ScoreSidebar({ onGenerated }: { onGenerated: () => void }) {
         <option value="imported" hidden>
           {importedScore ? t("已导入：{0} ({1})", importedScore.title, importedScore.kind.toUpperCase()) : t("已导入本地乐谱")}
         </option>
-        {presets.map((p) => (
+        {current?.id === selectedPresetId && !presets.items.some(p => p.id === selectedPresetId) &&
+          <option value={current.id}>{label(current, 'name')}</option>}
+        {presets.items.map((p) => (
           <option key={p.id} value={p.id}>
-            {p.name} — {p.subtitle}
+            {label(p, 'name')} — {label(p, 'subtitle')}
           </option>
         ))}
       </select>
+      {(presets.next !== null || presets.error) && <button disabled={presets.loading} onClick={presets.more}>
+        {presets.error ? t("重试") : t("更多曲谱")}
+      </button>}
 
       {loading && <p role="status">{t("正在读取并解析曲谱…")}</p>}
       {error && <p role="alert">{display(error)}</p>}

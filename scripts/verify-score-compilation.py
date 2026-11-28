@@ -59,7 +59,7 @@ with sync_playwright() as p:
         page.on("request", lambda r: assets.append(r.url))
         page.goto(url + "/#editor")
         page.locator("#presetSelect").select_option(piece)
-        source = (root / "public/presets" / (piece + ".ly")).read_text()
+        source = (root / "catalog/seed/files" / (piece + ".ly")).read_text()
         expect(page.locator("#lyEditor")).to_have_value(source)
         assert page.evaluate("scoreJobs.length") == 0
         results = {"first": generate(page)}

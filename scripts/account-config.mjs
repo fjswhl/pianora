@@ -11,7 +11,7 @@ const key = process.env.CLERK_PUBLISHABLE_KEY;
 if (key && !databaseId) throw new Error('Clerk requires the private library D1 binding');
 if (databaseId) {
   if (!/^[0-9a-f-]{36}$/i.test(databaseId)) throw new Error('Invalid PIANORA_D1_ID');
-  config.d1_databases = [{binding:'DB', database_name:'pianora-accounts', database_id:databaseId}];
+  config.d1_databases.push({binding:'DB', database_name:'pianora-accounts', database_id:databaseId});
   config.r2_buckets.push({binding:'PRIVATE_SCORES',bucket_name:'pianora-private-scores'});
   config.vars = { APP_ORIGIN: local ? 'http://127.0.0.1:8791' : 'https://opuslin.uk' };
   if (key) {

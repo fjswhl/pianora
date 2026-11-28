@@ -1,9 +1,13 @@
 # Pianora 琴境
 
 > **Turn sheet music into living grand piano performances — 100% locally in your browser.**
-> 让静态乐谱拥有钢琴家的呼吸与音乐厅灵魂：100% 纯前端零后端，端到端浏览器内完成制谱、AI 演奏演绎、交互指挥与真实三角钢琴声学渲染。
+> 让静态乐谱拥有钢琴家的呼吸与音乐厅灵魂：在访客浏览器内完成制谱、AI 演奏演绎、交互指挥与真实三角钢琴声学渲染。
 
 ---
+
+## 公开曲谱馆
+
+作品目录保存在 Cloudflare D1，乐谱和附件保存在 R2。浏览器按作曲家分页浏览，打开作品时再获取谱面。后续曲集可以独立导入。[曲库架构、免费容量与导入步骤](catalog/README.md)
 
 ## Core Architecture (5-Stage Pure-Browser Pipeline)
 

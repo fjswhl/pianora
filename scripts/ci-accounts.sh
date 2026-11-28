@@ -28,6 +28,9 @@ writeFileSync(process.env.PIANORA_TEST_DIR+'/sessions.json',JSON.stringify(token
 JS
 tool=node_modules/.bin/wrangler
 "$tool" d1 migrations apply DB --local --persist-to "$test_dir/state" -c "$config"
+"$tool" d1 migrations apply CATALOG --local --persist-to "$test_dir/state" -c "$config"
+node scripts/import-catalog.mjs --local --persist-to "$test_dir/state" --sql-out "$test_dir/catalog.sql"
+"$tool" d1 execute CATALOG --local --persist-to "$test_dir/state" --file "$test_dir/catalog.sql" -c "$config" > "$test_dir/catalog-import.log"
 "$tool" dev --local -c "$config" --port 8791 --persist-to "$test_dir/state" >"$test_dir/worker.log" 2>&1 &
 server=$!
 for attempt in {1..60}; do
@@ -35,3 +38,5 @@ for attempt in {1..60}; do
   sleep 1
 done
 python3 scripts/verify-accounts.py
+
+PIANORA_BROWSER="${PIANORA_BROWSER:-chromium}" python3 scripts/verify-catalog.py http://127.0.0.1:8791 --output artifacts/catalog.json

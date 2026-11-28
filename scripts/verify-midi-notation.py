@@ -17,7 +17,7 @@ with sync_playwright() as playwright:
         if preset:
             page.locator("#presetSelect").select_option(preset)
         else:
-            page.locator("#fileInput").set_input_files(root / "public/presets/mandopop" / (song + ".mid"))
+            page.locator("#fileInput").set_input_files(root / "catalog/seed/files/mandopop" / (song + ".mid"))
         expect(page.locator("#importedScoreCard")).to_contain_text(song)
         page.locator("#renderBtn").click()
         page.wait_for_url("**/#studio", timeout=240000)

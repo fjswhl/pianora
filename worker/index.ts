@@ -1,3 +1,4 @@
+import { catalogApi } from './catalog';
 import { sharedPerformance } from './sharedPerformance';
 import { accountApi } from './accounts';
 import type { AccountEnv } from './auth';
@@ -5,6 +6,7 @@ import type { AccountEnv } from './auth';
 interface Env extends AccountEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
   BIG_FILES: R2Bucket;
+  CATALOG: D1Database;
 }
 
 const TYPES: Record<string, string> = {
@@ -90,7 +92,9 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ): Promise<Response> {
-    if (new URL(request.url).pathname.startsWith('/p/')) return sharedPerformance(request, env);
+    const path = new URL(request.url).pathname;
+    if (path.startsWith('/api/catalog/') || path.startsWith('/presets/')) return catalogApi(request, env, ctx);
+    if (path.startsWith('/p/')) return sharedPerformance(request, env);
     if (new URL(request.url).pathname.startsWith('/api/')) return accountApi(request, env);
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method Not Allowed', { status: 405 });

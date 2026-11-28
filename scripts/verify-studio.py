@@ -1,6 +1,7 @@
 """Run against npm run preview with the model, soundfont and runtimes installed.
 Requires Python Playwright and Chromium. Writes PNG evidence under artifacts/.
 """
+import hashlib
 import json
 import os
 import re
@@ -11,16 +12,20 @@ from playwright.sync_api import sync_playwright, expect
 root = Path(__file__).resolve().parents[1]
 output = Path(os.getenv("PIANORA_ARTIFACTS", root / "artifacts"))
 output.mkdir(parents=True, exist_ok=True)
+def score_url(file):
+    data = (root / "catalog/seed/files" / file).read_bytes()
+    return "/api/catalog/files/" + hashlib.sha256(data).hexdigest() + Path(file).suffix
+
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(channel=os.getenv("PIANORA_BROWSER", "chromium"))
     page = browser.new_page(viewport={"width": 1440, "height": 900}, accept_downloads=True)
     page.goto(os.getenv("PIANORA_URL", "http://127.0.0.1:4173"))
-    expect(page.locator(".score-card")).to_have_count(35)
+    expect(page.locator(".score-card").first).to_be_visible()
     page.wait_for_load_state("networkidle")
     resources = page.evaluate("performance.getEntriesByType('resource').map(r => ({path: new URL(r.name).pathname, bytes: r.decodedBodySize}))")
     scripts = [r for r in resources if r["path"].endswith(".js") and r["path"].startswith("/assets/")]
     assert scripts and 0 < sum(r["bytes"] for r in scripts) < 1_227_482, scripts
-    assert not any(r["path"].startswith(("/presets/", "/models/", "/ort/", "/soundfonts/")) for r in resources), resources
+    assert not any(r["path"].startswith(("/api/catalog/files/", "/presets/", "/models/", "/ort/", "/soundfonts/")) for r in resources), resources
     page.screenshot(path=output / "library.png")
     library_url = page.url
     warm = None
@@ -34,7 +39,7 @@ with sync_playwright() as playwright:
     requests = []
     page.on("request", lambda r: requests.append((r.method, urlsplit(r.url).path)))
     page.goto(library_url)
-    expect(page.locator(".score-card")).to_have_count(35)
+    expect(page.locator(".score-card").first).to_be_visible()
     expect(page.get_by_role("heading", name="精选曲谱")).to_be_visible()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     page.screenshot(path=output / "mobile.png")
@@ -45,7 +50,7 @@ with sync_playwright() as playwright:
     page.get_by_role("link", name="曲谱馆").click()
     with page.expect_file_chooser() as chooser:
         page.get_by_role("button", name="导入乐谱").click()
-    chooser.value.set_files(root / "public/presets/rosee_dargent.ly")
+    chooser.value.set_files(root / "catalog/seed/files/rosee_dargent.ly")
     expect(page.locator("#presetSelect")).to_have_value("custom")
     page.get_by_role("link", name="曲谱馆").click()
     page.get_by_role("button", name="打开乐谱").click()
@@ -72,7 +77,7 @@ with sync_playwright() as playwright:
     sf_parts = [path for _, path in requests if path.startswith("/packs/abbey_steinway_d.sf2-")]
     assert (soundfont_requests == ["GET"] or (sf_parts and not soundfont_requests)), requests
     assert len(sf_parts) == len(set(sf_parts)), sf_parts
-    assert [path for m, path in requests if path.endswith(".ly")] == ["/presets/clair_de_lune.ly", "/presets/short_etude.ly"]
+    assert [path for m, path in requests if path.endswith(".ly")] == [score_url("clair_de_lune.ly"), score_url("short_etude.ly")]
     page.locator("#stopBtn").click()
     with page.expect_download() as midi:
         page.locator("#dlMidiBtn").click()
@@ -104,7 +109,7 @@ with sync_playwright() as playwright:
     editor.goto(library_url + "#editor")
     expect(editor.locator("#lyEditor")).to_have_value(re.compile("Lune Miniature"))
     preset = editor.locator("#presetSelect")
-    source_url = "**/presets/rosee_dargent.ly"
+    source_url = "**" + score_url("rosee_dargent.ly")
     editor.route(source_url, lambda route: route.fulfill(status=503, body="Unavailable"), times=1)
     preset.select_option("rosee_dargent")
     expect(editor.get_by_role("alert")).to_contain_text("曲谱加载失败")
@@ -126,7 +131,7 @@ with sync_playwright() as playwright:
         ("mozart_sonata_k545_2", "mozart_sonata_k545_2.ly"),
     ]:
         preset.select_option(score_id)
-        expect(editor.locator("#lyEditor")).to_have_value((root / "public/presets/mozart" / filename).read_text())
+        expect(editor.locator("#lyEditor")).to_have_value((root / "catalog/seed/files/mozart" / filename).read_text())
     editor.close()
     report = {"homepageAssets": resources, "generationToPlayMs": round(elapsed),
               "pipelineMs": timing, "soundfontRequests": soundfont_requests,

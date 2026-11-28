@@ -1,6 +1,6 @@
 import { message, errorText, type DisplayText } from '../i18n';
 import { create } from 'zustand';
-import { scorePresets, composerName } from '../engine/presets';
+import { getPreset, label, composerName, type ScorePreset } from '../engine/presets';
 import {
   isDirectScoreFile,
   parseDirectScoreFile,
@@ -14,6 +14,7 @@ interface ScoreState {
   lyCode: string;
   originalFile: File | null;
   selectedPresetId: string;
+  selectedPreset: ScorePreset | null;
   importedScore: ImportedScoreData | null;
   loading: boolean;
   error: DisplayText;
@@ -28,6 +29,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
   lyCode: '',
   originalFile: null,
   selectedPresetId: 'short_etude',
+  selectedPreset: null,
   importedScore: null,
   loading: false,
   error: '',
@@ -93,12 +95,13 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
   },
 
   async selectPreset(id) {
-    const preset = scorePresets.find((p) => p.id === id);
-    if (!preset) return;
     const request = ++revision;
     set({ selectedPresetId: id, originalFile: null, importedScore: null, loading: true, error: '' });
     try {
-      let source = sources.get(id);
+      const preset = await getPreset(id);
+      if (request !== revision) return;
+      set({selectedPreset:preset});
+      let source = sources.get(preset.url);
       if (source === undefined) {
         const response = await fetch(preset.url);
         if (
@@ -107,7 +110,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
         )
           throw new Error();
         if (isDirectScoreFile(preset.url)) {
-          const fileName = preset.url.split('/').pop()!;
+          const fileName = preset.file.split('/').pop()!;
           const file = new File([await response.blob()], fileName);
           const parsed = await parseDirectScoreFile(file);
           if (request === revision) {
@@ -115,7 +118,7 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
               originalFile: file,
               importedScore: {
                 ...parsed,
-                get title() { return preset.name; },
+                get title() { return label(preset, 'name'); },
                 get composer() { return composerName(preset.composer); },
               },
               lyCode: '',
@@ -125,7 +128,8 @@ export const useScoreStore = create<ScoreState>((set, get) => ({
           return;
         }
         source = await response.text();
-        sources.set(id, source);
+        sources.set(preset.url, source);
+        if (sources.size > 8) sources.delete(sources.keys().next().value!);
       }
       if (request === revision) set({ lyCode: source, importedScore: null, loading: false });
     } catch {

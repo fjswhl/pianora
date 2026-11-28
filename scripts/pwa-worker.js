@@ -17,7 +17,7 @@ function storable(response) {
     !/text\/html/i.test(response.headers.get('content-type') || '');
 }
 
-// Never skipWaiting or reload a tab: rendering, playback and unsaved edits can last hours.
+// Promote only complete releases. The last working offline shell survives a failed install.
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC);
@@ -29,16 +29,29 @@ self.addEventListener('install', event => {
       if (!storable(response)) throw new Error('Incomplete app shell: '+path);
       await cache.put(key, response);
     }));
+    await self.skipWaiting();
   })());
 });
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC);
+    // Older workers served embedded HTML even on reload. Upgrade their already
+    // controlled windows once; subsequent releases load directly on navigation.
+    const legacyWindows = await cache.match('/') ? [] : await self.clients.matchAll({type:'window'});
+    await cache.put('/', new Response(BUILD.html, {headers:{'Content-Type':'text/html; charset=utf-8'}}));
     for (const request of await cache.keys()) {
       const url = new URL(request.url);
+      if (url.pathname === '/') continue;
       if (staticKey(url.pathname) !== url.pathname + url.search) await cache.delete(request);
     }
     await self.clients.claim();
+    for (const client of legacyWindows) {
+      const url = new URL(client.url);
+      if (isAppEntry(url)) {
+        // A navigation intercepted by this worker can only finish after activation.
+        void client.navigate(client.url).catch(() => {});
+      }
+    }
   })());
 });
 
@@ -85,14 +98,28 @@ async function catalog(event, request) {
   return hit;
 }
 
+function isAppEntry(url) {
+  return !url.search && (url.pathname === '/' || url.pathname === '/index.html');
+}
+
+async function appDocument(request) {
+  // Revalidate the small HTML entry point. Hashed JS, CSS and model packs
+  // keep their normal caches, including when the worker update is still installing.
+  try {
+    const response = await fetch(request, {cache:'no-cache'});
+    if (response.status < 500) return response;
+  } catch { /* Offline: use the last fully installed release. */ }
+  return await (await caches.open(STATIC)).match('/') ??
+    new Response(BUILD.html, {headers:{'Content-Type':'text/html; charset=utf-8'}});
+}
+
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin ||
       request.headers.has('authorization') || request.headers.has('range')) return;
   if (request.mode === 'navigate') {
-    if (!url.search && (url.pathname === '/' || url.pathname === '/index.html'))
-      event.respondWith(new Response(BUILD.html, { headers:{'Content-Type':'text/html; charset=utf-8'} }));
+    if (isAppEntry(url)) event.respondWith(appDocument(request));
     return;
   }
   const key = !url.search && staticKey(url.pathname);

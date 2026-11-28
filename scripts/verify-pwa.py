@@ -8,6 +8,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import threading
+import time
 from urllib.parse import urlsplit
 
 from playwright.sync_api import expect, sync_playwright
@@ -21,7 +22,7 @@ score = json.loads(Path("catalog/seed/manifest.json").read_text())["scores"][0]
 source = (Path("catalog/seed/files") / score["file"]).read_bytes()
 score["url"] = "/api/catalog/files/" + hashlib.sha256(source).hexdigest() + ".ly"
 score["number"] = 1
-revision = 1
+revision = 0
 down = False
 worker = Path("dist/sw.js").read_text()
 first_line, code = worker.split("\n", 1)
@@ -45,14 +46,21 @@ class Site(SimpleHTTPRequestHandler):
         path = urlsplit(self.path).path
         if down:
             return self.body(b"network unavailable", "text/plain", 503)
+        html = build["html"].replace("</head>", f'<meta name="qa-release" content="{revision}"></head>')
+        if path in ("/", "/index.html"):
+            return self.body(html.encode(), "text/html; charset=utf-8")
         if path == "/sw.js":
-            cfg = dict(build)
+            cfg = dict(build, html=html)
             if revision > 1:
-                cfg.update(html=build["html"].replace("</head>", '<meta name="qa-release" content="2"></head>'),
-                           assets=build["assets"] + ["/assets/test-release.css"],
+                cfg.update(assets=build["assets"] + ["/assets/test-release.css"],
                            core=build["core"] + ["/assets/test-release.css"])
-            return self.body(("const BUILD = " + json.dumps(cfg) + ";\n" + code +
-                              f"\n// test build {revision}").encode(), "text/javascript")
+            script = code
+            if revision == 0:
+                # Previously deployed worker always served the embedded document.
+                script = """self.addEventListener('activate', e=>e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', e=>{if(e.request.mode==='navigate')
+                    e.respondWith(new Response(BUILD.html,{headers:{'Content-Type':'text/html; charset=utf-8'}}))})"""
+            return self.body(("const BUILD = " + json.dumps(cfg) + ";\n" + script).encode(), "text/javascript")
         if path == "/assets/test-release.css":
             return self.body(b"body{}", "text/css", 503 if revision == 2 else 200)
         if path.startswith("/assets/") and self.headers.get("Range"):
@@ -88,8 +96,18 @@ report = {}
 with TemporaryDirectory() as profile, sync_playwright() as pw:
     ctx = pw.chromium.launch_persistent_context(profile,channel=os.environ.get("PIANORA_BROWSER","chromium"),locale="zh-CN",accept_downloads=True)
     page = ctx.new_page()
-    page.goto(origin)
+    page.goto(origin + "/#library")
     page.wait_for_function("!!navigator.serviceWorker.controller")
+    release = 'meta[name="qa-release"]'
+    other = ctx.new_page()
+    other.goto(origin + "/#editor")
+    expect(other.locator(release)).to_have_attribute("content", "0")
+    revision = 1
+    page.reload(wait_until="commit")
+    expect(page.locator(release)).to_have_attribute("content", "1", timeout=45000)
+    assert page.url.endswith("/#library") and not other.is_closed()
+    other.close()
+    report["legacyUpgradeOnSingleRefresh"] = True
     manifest = page.evaluate("fetch('/manifest.webmanifest').then(r=>r.json())")
     assert manifest["display"] == "standalone" and manifest["start_url"] == "/"
     errors = ctx.new_cdp_session(page).send("Page.getInstallabilityErrors")["installabilityErrors"]
@@ -157,33 +175,42 @@ with TemporaryDirectory() as profile, sync_playwright() as pw:
     report["offlinePlaybackAndGeneration"] = args.playback
     ctx.set_offline(False)
     down = False
-    # Failed staging must leave the running app intact. A successful update
-    # must wait for both open windows and reuse the existing model cache.
+    # A failed install leaves the complete offline shell available.
     other = ctx.new_page()
-    other.goto(origin)
+    other.goto(origin + "/#library")
     revision = 2
     update = """async()=>{const reg=await navigator.serviceWorker.ready;
       const result=new Promise(resolve=>reg.addEventListener('updatefound',()=>{const w=reg.installing;
         w.addEventListener('statechange',()=>{if(['installed','redundant'].includes(w.state))resolve(w.state)})},{once:true}));
       await reg.update();return result}"""
     assert page.evaluate(update) == "redundant"
-    revision = 3
-    assert page.evaluate(update) == "installed"
-    page.close()
+    down = True
     other.reload()
-    assert other.locator('meta[name="qa-release"]').count() == 0
-    other.close()
-    # Wait in the worker, with no old tab remaining.
-    ctx.service_workers[-1].evaluate("""async()=>{for(let n=0;n<150;n++){
-      if(self.registration.active?.state==='activated'&&!self.registration.waiting)return;
-      await new Promise(r=>setTimeout(r,100));}throw Error('Update failed to activate')}""")
-    page = ctx.new_page()
-    page.goto(origin)
-    assert page.locator('meta[name="qa-release"]').count() == 1
+    expect(other.locator(release)).to_have_attribute("content", "1")
+    down = False
+    # No explicit update() or tab closing before the user's single refresh.
+    revision = 3
+    other.reload()
+    expect(other.locator(release)).to_have_attribute("content", "3")
+    assert not page.is_closed()
+    # Wait for the offline document to be committed before disconnecting.
+    offline_revision = """async()=>{const cache=await caches.open('pianora-pwa-static-v1');
+      const html=await (await cache.match('/')).text();
+      return new DOMParser().parseFromString(html,'text/html').querySelector('meta[name=qa-release]').content}"""
+    deadline = time.monotonic() + 30
+    while other.evaluate(offline_revision) != "3":
+        assert time.monotonic() < deadline, "new offline document never activated"
+        other.wait_for_timeout(100)
+    down = True
+    ctx.set_offline(True)
+    other.reload()
+    expect(other.locator(release)).to_have_attribute("content", "3")
+    expect(other.locator(".score-card").first).to_be_visible()
     after = page.evaluate("name=>caches.open(name).then(async c=>(await c.keys()).map(k=>k.url))",pack_cache)
     assert set(parts).issubset(after)
     report["retainedPackChunks"] = len(parts)
-    report["updateAfterLastWindowClosed"] = True
+    report["singleRefreshWithOtherWindowOpen"] = True
+    report["offlineAfterUpgrade"] = True
     ctx.close()
 server.shutdown()
 (args.output/"pwa.json").write_text(json.dumps(report,indent=2))

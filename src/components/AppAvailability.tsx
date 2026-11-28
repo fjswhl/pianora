@@ -7,7 +7,6 @@ interface InstallEvent extends Event {
   userChoice: Promise<{outcome:'accepted' | 'dismissed'}>;
 }
 let pending: InstallEvent | undefined;
-let waiting = false;
 const changed = () => window.dispatchEvent(new Event('pianora:availability'));
 
 function requestDurableStorage() {
@@ -47,11 +46,9 @@ export function startPwa() {
     }, {once:true});
   }
   void navigator.serviceWorker.register('/sw.js', {updateViaCache:'none'}).then(reg => {
-    const check = () => { waiting = !!reg.waiting && !!navigator.serviceWorker.controller; changed(); };
-    check();
-    const observe = () => reg.installing?.addEventListener('statechange', check);
-    observe();
-    reg.addEventListener('updatefound', observe);
+    // Navigation already has fresh HTML. Stage its offline assets even in a
+    // long-lived browser that throttles automatic worker update checks.
+    if (navigator.serviceWorker.controller && navigator.onLine) void reg.update().catch(() => {});
     let lastCheck = Date.now();
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && navigator.onLine && Date.now()-lastCheck > 3600_000) {
@@ -83,7 +80,6 @@ export function AppAvailability({online}: {online:boolean}) {
   }
   return <>
     {!online && <a className="pwa-offline" href="#studio"><WifiOff size={15}/>{t('离线 · 最近演奏')}</a>}
-    {waiting && <span role="status">{t('新版已就绪，关闭所有 Pianora 窗口后生效。')}</span>}
     {import.meta.env.PROD && !standalone && (pending || ios) && <div className="pwa-install">
       <button onClick={install} aria-expanded={ios && !pending ? help : undefined}>
         <Download size={15}/>{t('安装 Pianora')}

@@ -2,7 +2,7 @@ import type { Midi } from '@tonejs/midi';
 import type { Note } from '@tonejs/midi/dist/Note';
 import type { ScoreMark } from './performance/types';
 
-const kinds = ['trill', 'prall', 'mordent', 'turn', 'reverseturn'] as const;
+const kinds = ['trill', 'prall', 'mordent', 'prallmordent', 'turn', 'reverseturn'] as const;
 type Kind = typeof kinds[number];
 export interface Ornament {
   kind: Kind;
@@ -29,6 +29,8 @@ function strokes(note: Note, mark: Ornament) {
     }
     case 'prall': pitches = [p, upper, p]; break;
     case 'mordent': pitches = [p, lower, p]; break;
+    // Bach's trillo und mordant starts above and resolves through the lower neighbor.
+    case 'prallmordent': pitches = [upper, p, upper, p, lower, p]; break;
     case 'turn': pitches = [upper, p, lower, p]; break;
     case 'reverseturn': pitches = [lower, p, upper, p]; break;
   }

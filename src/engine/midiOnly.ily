@@ -39,7 +39,7 @@
    (let ((highest #f) (marked '()) (mark #f) (span #f) (trill-pitch #f))
      (define (mark-type event)
        (let ((kind (ly:event-property event 'articulation-type)))
-         (and (memq kind '(trill prall mordent turn reverseturn)) kind)))
+         (and (memq kind '(trill prall mordent prallmordent turn reverseturn)) kind)))
      (define (record pitch kind)
        (let* ((staff (ly:context-find ctx 'Staff))
               (key (hashq-ref pn-ornament-keys staff '()))

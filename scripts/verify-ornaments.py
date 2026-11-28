@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--url", default="http://127.0.0.1:4173")
 parser.add_argument("--output", type=Path, required=True)
 parser.add_argument("--quick", action="store_true", help="only run the two short fixtures")
+parser.add_argument("--goldberg-only", action="store_true", help="verify the catalog Aria's opening compound ornament")
 args = parser.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 scores = {"trill.ly": r'''\version "2.24.3"
@@ -36,8 +37,12 @@ scores["trill.musicxml"] = (
 
 
 mozart = Path("catalog/seed/files/mozart/mozart_sonata_k545_1.ly")
-if not args.quick:
+goldberg = Path("catalog/seed/files/bach/bach_goldberg_aria_BWV988.ly")
+if args.goldberg_only:
+    scores = {goldberg.name: goldberg.read_text()}
+elif not args.quick:
     scores[mozart.name] = mozart.read_text()
+    scores[goldberg.name] = goldberg.read_text()
 
 
 def timed_pitches(path):
@@ -82,7 +87,7 @@ with sync_playwright() as p:
             page.wait_for_function("code => document.querySelector('#lyEditor')?.value === code", arg=data)
         else:
             page.locator("#importedScoreCard").wait_for()
-        page.locator("#performanceModel").select_option("virtuosonet" if filename == mozart.name else "pianist")
+        page.locator("#performanceModel").select_option("virtuosonet" if filename in (mozart.name, goldberg.name) else "pianist")
         page.locator("#renderBtn").click()
         page.wait_for_function("location.hash === '#studio' || document.querySelector('#errBox')", timeout=900000)
         assert page.url.endswith("#studio"), page.locator("#errBox").inner_text()
@@ -94,12 +99,21 @@ with sync_playwright() as p:
             dl.value.save_as(midi_path)
             if filename == mozart.name:
                 report[midi_path.name] = mozart_trills(midi_path, args.output / f"{filename}-原谱演奏.mid")
+            elif filename == goldberg.name:
+                # G5, G5, dotted A5 with prallmordent, written B5. Other voices are lower.
+                report[midi_path.name] = [n for n in pitches(midi_path) if n >= 79][:9]
+                if variant == "原谱演奏":
+                    melody = [(t, n) for t, n in timed_pitches(midi_path) if n >= 79 and t < 0.75]
+                    assert melody[-1] == (0.6875, 83), melody
             else:
                 report[midi_path.name] = pitches(midi_path)
         page.close()
     browser.close()
 (args.output / "note-ons.json").write_text(json.dumps(report, indent=2))
 for name, sequence in report.items():
+    if name.startswith(goldberg.name):
+        assert sequence == [79, 79, 83, 81, 83, 81, 79, 81, 83], (name, sequence)
+        continue
     if name.startswith(mozart.name):
         for hits in sequence.values():
             assert len(hits) >= 5 and all(a != b for a, b in zip(hits, hits[1:])), (name, hits)

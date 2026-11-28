@@ -1,10 +1,8 @@
 """Verify server pagination, nested browser filters and opening a score across categories."""
 import argparse, hashlib, json, os, re
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
-from urllib.request import urlopen
 from pathlib import Path
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode
 from playwright.sync_api import sync_playwright, expect
 
 parser = argparse.ArgumentParser()
@@ -70,14 +68,20 @@ with sync_playwright() as pw:
         if args.manifest:
             editions = json.loads(args.manifest.read_text())['scores']
             published = {score['id']:score for score in scores}
-            def verify_edition(edition):
+            for edition in editions:
                 score = published[edition['id']]
                 for field in ('name','composer','collection','file','sha256','license','sourceUrl'):
                     assert score[field] == edition[field], (edition['id'],field)
-                with urlopen(urljoin(base, score['url']), timeout=60) as response:
-                    assert hashlib.sha256(response.read()).hexdigest() == edition['sha256'], edition['id']
-            with ThreadPoolExecutor(max_workers=6) as pool:
-                list(pool.map(verify_edition, editions))
+            for start in range(0, len(editions), 6):
+                batch = [published[e['id']] for e in editions[start:start+6]]
+                digests = page.evaluate("""async urls => Promise.all(urls.map(async url => {
+                    const response = await fetch(url);
+                    if (!response.ok) throw Error(response.status + ' ' + url);
+                    const hash = await crypto.subtle.digest('SHA-256', await response.arrayBuffer());
+                    return Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, '0')).join('');
+                }))""", [score['url'] for score in batch])
+                for score, digest in zip(batch, digests, strict=True):
+                    assert digest == score['sha256'], score['id']
             samples = [(s['composer'],s['composer'],s['collection'],s['id'])
                        for s in (editions[0], editions[len(editions)//2], editions[-1])]
         for composer, translated, collection, sample in samples:
@@ -85,7 +89,7 @@ with sync_playwright() as pw:
             select_composer(composer, translated)
             menu.select_option(collection)
             expected = next(s for s in scores if s['id'] == sample)
-            card = page.locator('.score-card').filter(has=page.locator('.catalogue-no', has_text=f"PN / {expected['number']:03}"))
+            card = page.locator('.score-card').filter(has=page.locator('.catalogue-no', has_text=re.compile(rf"^PN / {expected['number']:03}$")))
             card.first.click()
             expect(page.locator('#presetSelect')).to_have_value(sample)
             if expected['file'].endswith('.ly'):

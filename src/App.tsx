@@ -1,15 +1,8 @@
 import { display, t, useLocale, setLocale, type Locale } from './i18n';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import {
-  AudioLines,
-  BookOpen,
-  ChevronRight,
-  FileMusic,
-  LibraryBig,
-  Piano,
-  SlidersHorizontal,
-  Upload, UserRound,
-} from 'lucide-react';
+import { Upload } from 'lucide-react';
+import { Button } from './components/ui/button';
+import { NativeSelect, NativeSelectOption } from './components/ui/native-select';
 import { AppAvailability } from './components/AppAvailability';
 import { Library } from './components/Library';
 import { useScoreStore } from './store/useScoreStore';
@@ -19,20 +12,17 @@ const AccountLibrary = lazy(() => import('./components/AccountLibrary'));
 const Workspace = lazy(() => import('./components/Workspace'));
 
 const pages = {
-  profile: { get title() { return t('个人中心'); }, icon:UserRound, get desc() { return ''; } },
+  profile: { get title() { return t('个人中心'); }, get desc() { return ''; } },
   library: {
     get title() { return t("曲谱馆"); },
-    icon: LibraryBig,
     get desc() { return t("挑选一份钢琴谱，开始你的演奏。"); },
   },
   editor: {
     get title() { return t("乐谱编辑"); },
-    icon: FileMusic,
     get desc() { return t("编写乐谱，设定演奏细节，生成可供试听的版本。"); },
   },
   studio: {
     get title() { return t("演奏室"); },
-    icon: SlidersHorizontal,
     get desc() { return t("试听、比较与调整你的钢琴演奏。"); },
   },
 };
@@ -97,42 +87,25 @@ export function App() {
     return () => window.removeEventListener('hashchange', navigate);
   }, []);
   return (
-    <div className="shell">
-      <aside className="rail">
-        <a className="brand" href="#library">
-          <Piano aria-hidden="true" /> Pianora
-        </a>
-        <nav aria-label={t("工作空间")}>
-          {(['library','editor','studio',...(publishableKey ? ['profile'] : [])] as Page[]).map((key) => {
-            const Icon = pages[key].icon;
-            return (
-              <a
-                href={'#' + key}
-                key={key}
-                aria-current={page === key ? 'page' : undefined}
-              >
-                <Icon size={19} />
-                {pages[key].title}
-              </a>
-            );
-          })}
+    <div className={page === 'studio' ? 'shell has-player' : 'shell'}>
+      <header className="topbar">
+        <a className="wordmark" href="#library" aria-label="Pianora">pianora<span>.</span></a>
+        <nav className="seg" aria-label={t("工作空间")}>
+          {(['library','editor','studio',...(publishableKey ? ['profile'] : [])] as Page[]).map((key) => (
+            <a href={'#' + key} key={key} aria-current={page === key ? 'page' : undefined}>
+              {pages[key].title}
+            </a>
+          ))}
         </nav>
-        <div className="rail-foot">
-          <AudioLines size={19} />
-          <span>{t("本地演奏工作站")}</span>
-        </div>
-      </aside>
-      <div className="workspace">
-        <header className="crumb">
-          <BookOpen size={16} /> {t("工作空间")} <ChevronRight size={13} />{' '}
-          <strong>{pages[page].title}</strong>
+        <div className="topbar-tools">
           <AppAvailability online={online} />
-          <select className="locale-select" aria-label={t('界面语言')} value={language}
+          <NativeSelect size="sm" className="locale-select rounded-full" aria-label={t('界面语言')} value={language}
             onChange={event => setLocale(event.target.value as Locale)}>
-            <option value="zh-CN" lang="zh-CN">中文</option>
-            <option value="en" lang="en">English</option>
-          </select>
-        </header>
+            <NativeSelectOption value="zh-CN" lang="zh-CN">中文</NativeSelectOption>
+            <NativeSelectOption value="en" lang="en">English</NativeSelectOption>
+          </NativeSelect>
+        </div>
+      </header>
         <main className="content">
           {page === 'library' && (
             <div className="page-title">
@@ -140,13 +113,13 @@ export function App() {
                 <h1>{pages[page].title}</h1>
                 <p>{pages[page].desc}</p>
               </div>
-              <button
+              <Button
                 className="import"
                 disabled={pipelineBusy}
                 onClick={() => upload.current?.click()}
               >
-                <Upload size={16} /> {t("导入乐谱 (.ly / .mid / MusicXML)")}
-              </button>
+                <Upload /> {t("导入乐谱 (.ly / .mid / MusicXML)")}
+              </Button>
             </div>
           )}
           <input
@@ -184,7 +157,6 @@ export function App() {
             </Suspense>
           )}
         </main>
-      </div>
     </div>
   );
 }

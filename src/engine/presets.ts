@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getLocale, t } from '../i18n';
-import type { CoverEdition } from '../components/CoverArt';
 
 export interface ScorePreset {
   number: number;
@@ -16,7 +15,7 @@ export interface ScorePreset {
   creditEn?: string;
   title?: string;
   bars?: number;
-  art?: CoverEdition;
+  art?: string;
   composer: string;
   url: string;
   scoreType?: string;

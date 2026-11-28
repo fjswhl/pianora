@@ -1,6 +1,6 @@
 import { t } from '../i18n';
 import { useEffect, useRef } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Button } from './ui/button';
 import { pianoPlayer } from '../engine/instances';
 import { useStudioStore, fmtTime, getLiveSession } from '../store/useStudioStore';
 import type { SimpleNote } from '../engine/arpeggio';
@@ -65,36 +65,34 @@ export function PianoRollCanvas() {
   }, []);
 
   return (
-    <div className="space-y-2.5">
-      <div className="roll-surface">
-        <canvas
-          ref={canvasRef}
-          id="pianoCanvas"
-          width={1060}
-          height={220}
-          role="img"
-          aria-label={t("实时钢琴卷帘与琴键：音符越宽、色调越暖，力度越强；下落速度随演奏节拍变化。")}
-          className="roll-canvas"
-        />
+    <div className="roll-surface">
+      <canvas
+        ref={canvasRef}
+        id="pianoCanvas"
+        width={1060}
+        height={220}
+        role="img"
+        aria-label={t("实时钢琴卷帘与琴键：音符越宽、色调越暖，力度越强；下落速度随演奏节拍变化。")}
+        className="roll-canvas"
+      />
+      <div className="roll-label">
+        <span>{t("演奏卷帘 · 颜色越深力度越强")}</span>
       </div>
-
       {arpeggios.length > 0 && (
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs text-stone-600">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-800" />
-            <span>{t("试听琶音片段")}</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {arpeggios.map((a, idx) => (
-              <button
-                key={`${a.bar}-${idx}`}
-                onClick={() => playFrom(Math.max(0, a.time_sec - 1.5))}
-                className="cue-chip"
-                title={t("琶音跨度 {0} → {1} ms", a.before_ms, a.after_ms)}
-              > {t("第 {0} 小节", a.bar)} · {fmtTime(a.time_sec)}
-              </button>
-            ))}
-          </div>
+        <div className="cues">
+          <span>{t("试听琶音片段")}</span>
+          {arpeggios.map((a, idx) => (
+            <Button
+              key={`${a.bar}-${idx}`}
+              variant="toggle"
+              size="xs"
+              onClick={() => playFrom(Math.max(0, a.time_sec - 1.5))}
+              className="cue-chip"
+              title={t("琶音跨度 {0} → {1} ms", a.before_ms, a.after_ms)}
+            >
+              {t("第 {0} 小节", a.bar)} · {fmtTime(a.time_sec)}
+            </Button>
+          ))}
         </div>
       )}
     </div>

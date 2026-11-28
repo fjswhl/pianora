@@ -67,7 +67,7 @@ with sync_playwright() as p:
     expect(mark).to_have_attribute("data-bar", "1")
     for track in ["AI 演绎", "琶音还原版"]:
         page.get_by_role("button", name=track, exact=True).click()
-        page.locator("#takesBar").select_option(index=1)
+        page.locator("#takesBar .take-card").nth(1).click()
         seek.press("End")
         expect(mark).to_have_attribute("data-bar", "18")
         expect(systems).to_have_count(3)

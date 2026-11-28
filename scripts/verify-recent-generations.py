@@ -77,7 +77,7 @@ with sync_playwright() as pw:
             page.locator('#reverbSlider').press('End')
             expected_wet = page.locator('#reverbSlider').input_value()
         if seed == 102:
-            page.locator('#takesBar').select_option(index=1)
+            page.locator('#takesBar .take-card').nth(1).click()
             original = final_digest(page)
     page.locator('nav a[href="#editor"]').click()
     page.locator('#renderBtn').click()
@@ -105,8 +105,8 @@ with sync_playwright() as pw:
     assert seeds == list(range(111, 101, -1)), seeds
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     rows.last.click()
-    expect(page.locator('#takesBar option')).to_have_count(2)
-    page.locator('#takesBar').select_option(index=1)
+    expect(page.locator('#takesBar .take-card')).to_have_count(2)
+    page.locator('#takesBar .take-card').nth(1).click()
     assert final_digest(page) == original
     expect(page.locator('#reverbSlider')).to_have_value(expected_wet)
     page.locator('#playBtn').click()

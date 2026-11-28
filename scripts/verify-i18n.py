@@ -45,7 +45,7 @@ with sync_playwright() as pw:
     page.wait_for_url("**/#studio", timeout=240000)
     language.select_option("en")
     expect(page.get_by_role("button", name="Shape performance")).to_be_visible()
-    expect(page.locator("#takesBar option:checked")).to_contain_text("Take #1")
+    expect(page.locator("#takesBar [aria-pressed=true]")).to_contain_text("Take A")
     expect(page.locator(".mixer-field small")).to_contain_text("ready", timeout=120000)
     page.get_by_role("button", name="View score").click()
     expect(page.locator(".svg-sheet-page svg").first).to_be_visible(timeout=120000)

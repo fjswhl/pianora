@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, BookOpen, Disc3, Download, FileMusic, LibraryBig, Link2, LockKeyhole, LogOut, MoreHorizontal, Unlink, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { captureNotation, packNotation, unpackNotation, notationFromSource } from '../engine/savedNotation';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
 import { useScoreStore } from '../store/useScoreStore';
 
 import { ClerkFailed, ClerkProvider, SignIn, useAuth, useClerk, useUser } from '@clerk/react';
@@ -139,9 +141,6 @@ function SaveDraft({intent,finish}:SaveProps) {
   return isLoaded && !userId && draft ? <LoginDialog title={t("登录后将保存《{0}》。",draft.title)} close={()=>finish(false)}/> : null;
 }
 
-function RecordArt() {
-  return <div className="profile-art" aria-hidden="true"><div className="vinyl"/><div className="record-sleeve"><i/><i/><i/></div></div>;
-}
 
 export default function AccountLibrary({publishableKey}:{publishableKey:string}) {
   return <AccountProvider publishableKey={publishableKey}><Profile/></AccountProvider>;
@@ -152,9 +151,9 @@ function Profile() {
   if (!isLoaded) return <p role="status">{t("正在打开曲库…")}</p>;
   if (userId) return <PrivateLibrary key={userId}/>;
   return <section className="profile-page profile-guest">
-    <div className="guest-cover"><LibraryBig size={28}/><h1>{t("个人中心")}</h1>
-      <p>{t("登录后，在这里打开保存的乐谱和演奏，管理分享链接。")}</p><RecordArt/></div>
-    <div className="profile-signin"><Login/></div>
+    <Card className="guest-cover"><LibraryBig size={28}/><h1>{t("个人中心")}</h1>
+      <p>{t("登录后，在这里打开保存的乐谱和演奏，管理分享链接。")}</p></Card>
+    <Card className="profile-signin"><Login/></Card>
   </section>;
 }
 
@@ -231,14 +230,14 @@ function PrivateLibrary() {
   const name = user?.fullName || user?.username || t("个人中心");
   const initial = Array.from(user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || 'P')[0];
   return <section className="profile-page">
-    <header className="profile-cover"><div className="profile-identity">
-      <div className="profile-monogram" aria-hidden="true">{initial.toUpperCase()}</div>
+    <Card asChild className="profile-cover"><header><div className="profile-monogram" aria-hidden="true">{initial.toUpperCase()}</div><div className="profile-identity">
       <h1>{name}</h1><p title={user?.primaryEmailAddress?.emailAddress}>{user?.primaryEmailAddress?.emailAddress}</p>
-      <button className="profile-signout" disabled={busy} onClick={()=>void run(()=>signOut({redirectUrl:'/#profile'}))}><LogOut size={15}/>{t("退出登录")}</button>
-    </div><RecordArt/></header>
-    <section className="profile-collection" aria-labelledby="collection-title">
+    </div>
+      <Button variant="outline" className="profile-signout" disabled={busy} onClick={()=>void run(()=>signOut({redirectUrl:'/#profile'}))}><LogOut />{t("退出登录")}</Button>
+    </header></Card>
+    <Card asChild className="profile-collection"><section aria-labelledby="collection-title">
       <header><h2 id="collection-title">{t("我的曲库")}</h2></header>
-      <div className="collection-filters">{filters.map(f=><button key={f.key} aria-pressed={filter===f.key}
+      <div className="seg collection-filters">{filters.map(f=><button key={f.key} aria-pressed={filter===f.key}
         aria-label={f.key==='takes'?t("仅看演奏"):f.label} onClick={()=>setFilter(f.key)}>{f.label}<span>{f.rows.length}</span></button>)}</div>
       {status && <p className="profile-message" role="status">{display(status)}</p>}
       {error && <p className="profile-message" role="alert">{display(error)} <button onClick={()=>void run(refresh)}>{t("重试")}</button></p>}
@@ -254,20 +253,20 @@ function PrivateLibrary() {
             <h3>{item.title}</h3><small>{item.take_label || item.filename}</small></div>
           <span className="work-visibility">{item.share_id?<Link2 size={14}/>:<LockKeyhole size={14}/>}
             {item.share_id?t("已分享"):t("仅自己可见")}</span>
-          <button className="work-open" disabled={busy} onClick={()=>void run(()=>performance?openPerformance(item):openScore(item))}>
-            {performance?t("打开演奏"):t("打开乐谱")}<ArrowUpRight size={15}/></button>
+          <Button variant="outline" size="sm" className="work-open" disabled={busy} onClick={()=>void run(()=>performance?openPerformance(item):openScore(item))}>
+            {performance?t("打开演奏"):t("打开乐谱")}<ArrowUpRight /></Button>
         </div>
         {performance && <details className="work-options"><summary><MoreHorizontal size={17}/>{t("作品操作")}</summary><div>
-          {item.filename && <button disabled={busy} onClick={()=>void run(()=>openScore(item))}><BookOpen size={15}/>{t("打开乐谱")}</button>}
-          <button disabled={busy} onClick={()=>void run(()=>download(item))}><Download size={15}/>{t("下载 MIDI")}</button>
+          {item.filename && <Button variant="secondary" size="sm" disabled={busy} onClick={()=>void run(()=>openScore(item))}><BookOpen size={15}/>{t("打开乐谱")}</Button>}
+          <Button variant="secondary" size="sm" disabled={busy} onClick={()=>void run(()=>download(item))}><Download size={15}/>{t("下载 MIDI")}</Button>
           {item.share_id ? <>
-            <a href={'/p/'+item.share_id} target="_blank" rel="noreferrer">{t("打开分享页")}<ArrowUpRight size={15}/></a>
-            <button disabled={busy} onClick={()=>void run(async()=>{await navigator.clipboard.writeText(location.origin+'/p/'+item.share_id); setStatus(() => message("已复制分享链接。"));})}><Link2 size={15}/>{t("复制链接")}</button>
-            <button disabled={busy} onClick={()=>void run(()=>share(item,'DELETE'))}><Unlink size={15}/>{t("取消公开分享")}</button>
-          </> : <button disabled={busy} onClick={()=>void run(()=>share(item,'POST'))}><Link2 size={15}/>{t("公开分享演奏")}</button>}
+            <Button asChild variant="secondary" size="sm"><a href={'/p/'+item.share_id} target="_blank" rel="noreferrer">{t("打开分享页")}<ArrowUpRight size={15}/></a></Button>
+            <Button variant="secondary" size="sm" disabled={busy} onClick={()=>void run(async()=>{await navigator.clipboard.writeText(location.origin+'/p/'+item.share_id); setStatus(() => message("已复制分享链接。"));})}><Link2 size={15}/>{t("复制链接")}</Button>
+            <Button variant="secondary" size="sm" disabled={busy} onClick={()=>void run(()=>share(item,'DELETE'))}><Unlink size={15}/>{t("取消公开分享")}</Button>
+          </> : <Button variant="secondary" size="sm" disabled={busy} onClick={()=>void run(()=>share(item,'POST'))}><Link2 size={15}/>{t("公开分享演奏")}</Button>}
           {!item.has_audio && <small>{t("公开后，持链接者可试听、下载 MIDI，并查看已保存的谱面。")}</small>}
         </div></details>}</li>;
       })}</ul>
-    </section>
+    </section></Card>
   </section>;
 }

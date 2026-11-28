@@ -1,12 +1,10 @@
 import { t } from '../i18n';
-import { useState } from 'react';
-import {
-  ArrowRight,
-  ArrowUpRight,
-  BookOpen,
-  Feather,
-  Music2,
-} from 'lucide-react';
+import { Fragment, useState } from 'react';
+import { ChevronRight, Play } from 'lucide-react';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { NativeSelect, NativeSelectOption } from './ui/native-select';
 import {
   useScores,
   useComposers,
@@ -14,7 +12,6 @@ import {
   composerName,
   label,
 } from '../engine/presets';
-import { CoverArt } from './CoverArt';
 
 const primaryComposers = [
   '周杰伦', '林俊杰', 'Bach', 'Mozart', 'Beethoven', 'Schumann', 'Liszt',
@@ -46,147 +43,130 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
   const count = collection
     ? collections.items.find((c) => c.collection === collection)?.pieces
     : countFor(composer);
+  const heading = collection || (composer ? composerName(composer) : t('精选曲谱'));
 
   return (
-    <>
-      <section className="feature">
-        <div className="feature-art">
-          <CoverArt edition="keyboard" />
-        </div>
-        <div className="feature-copy">
-          <span className="feature-kicker">
-            <Feather size={15} /> {t('入门选曲')}
-          </span>
-          <h2>Lune Miniature</h2>
-          <p>{t('从四小节的《月光小品》开始，聆听同一份乐谱的不同演绎。')}</p>
-          <button onClick={() => openScore('short_etude')}>
-            {t('打开乐谱')} <ArrowRight size={16} />
-          </button>
-        </div>
-      </section>
-      <section className="shelf">
-        <header>
-          <h2>{t('精选曲谱')}</h2>
-          <span>
-            <BookOpen size={15} />{' '}
-            {count === undefined
-              ? '…'
-              : count === 1
-                ? t('1 部作品')
-                : t('{0} 部作品', count)}
-          </span>
-        </header>
+    <div className="library">
+      <aside className="composer-index">
         {filters.length > 24 ? (
           <label className="catalog-select">
             {t('作曲家')}
-            <select
+            <NativeSelect
+              wrapperClassName="w-full"
               aria-label={t('作曲家')}
               id="catalogComposer"
               value={composer}
               onChange={(e) => chooseComposer(e.target.value)}
             >
               {filters.map((f) => (
-                <option key={f.id} value={f.id}>
+                <NativeSelectOption key={f.id} value={f.id}>
                   {f.label} ({countFor(f.id)})
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
         ) : (
-          <div
-            className="composer-tabs"
-            role="tablist"
-            aria-label={t('按作曲家筛选')}
-          >
-            {filters.map((f) => {
-              const count = countFor(f.id);
-              return (
+          <div role="tablist" aria-label={t('按作曲家筛选')} aria-orientation="vertical" style={{ display: 'contents' }}>
+            {filters.map((f, i) => (
+              <Fragment key={f.id}>
+                {i === 1 && <h2 aria-hidden="true">{t('作曲家')}</h2>}
                 <button
-                  key={f.id}
                   role="tab"
                   aria-selected={composer === f.id}
-                  className={
-                    composer === f.id ? 'composer-tab active' : 'composer-tab'
-                  }
+                  className={composer === f.id ? 'composer-tab active' : 'composer-tab'}
                   onClick={() => chooseComposer(f.id)}
                 >
-                  {f.label} <span>{count}</span>
+                  {f.label} <span>{countFor(f.id)}</span>
+                </button>
+              </Fragment>
+            ))}
+          </div>
+        )}
+        {(composers.next || composers.error) && (
+          <Button size="sm" variant="secondary" className="mt-2 justify-self-start" disabled={composers.loading} onClick={composers.more}>
+            {composers.error ? t('重试') : t('更多作曲家')}
+          </Button>
+        )}
+      </aside>
+
+      <div className="library-main">
+        {composer === '' && (
+          <button className="starter rounded-xl bg-card" onClick={() => openScore('short_etude')}>
+            <span className="play-dot" aria-hidden="true"><Play /></span>
+            <span>
+              <b>{t('第一次来？从 4 小节的《月光小品》开始')}</b>
+              <small>{t('比较同一份乐谱的几种 AI 演绎。')}</small>
+            </span>
+            <Badge variant="secondary" className="ml-auto">{t('打开乐谱')}</Badge>
+          </button>
+        )}
+
+        <Card asChild className="shelf">
+        <section>
+          <header>
+            <h2>{heading}</h2>
+            <span>
+              {count === undefined
+                ? '…'
+                : count === 1
+                  ? t('1 部作品')
+                  : t('{0} 部作品', count)}
+            </span>
+          </header>
+          {composer && (collections.items.length > 0 || collections.loading) && (
+            <label className="catalog-select" style={{ marginTop: 12 }}>
+              {t('作品集')}
+              <NativeSelect
+                wrapperClassName="w-full max-w-sm"
+                aria-label={t('作品集')}
+                value={collection}
+                onChange={(e) => setCollection(e.target.value)}
+              >
+                <NativeSelectOption value="">{t('全部作品集')}</NativeSelectOption>
+                {collections.items.map((c) => (
+                  <NativeSelectOption key={c.collection} value={c.collection}>
+                    {c.collection} ({c.pieces})
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </label>
+          )}
+          <div className="score-grid" aria-busy={scores.loading}>
+            {scores.items.map((p) => {
+              const name = label(p, 'displayName') || label(p, 'name');
+              const credit = label(p, 'credit') || composerName(p.composer);
+              return (
+                <button className="score-card" key={p.id} onClick={() => openScore(p.id)}>
+                  <span className="catalogue-no">{String(p.number).padStart(3, '0')}</span>
+                  <span>
+                    <h3>{p.title || label(p, 'name')}</h3>
+                    <p>{p.scoreType ? credit : name + ' · ' + credit}</p>
+                  </span>
+                  <span className="type">{p.scoreType ? label(p, 'subtitle') : t('钢琴独奏')}</span>
+                  <span className="bars">{(p.bars ?? 0) > 0 ? `${p.bars} ${t('小节')}` : ''}</span>
+                  <span className="go" aria-hidden="true"><ChevronRight /></span>
                 </button>
               );
             })}
           </div>
-        )}
-        {composer && (
-          <label className="catalog-select">
-            {t('作品集')}
-            <select
-              aria-label={t('作品集')}
-              value={collection}
-              onChange={(e) => setCollection(e.target.value)}
-            >
-              <option value="">{t('全部作品集')}</option>
-              {collections.items.map((c) => (
-                <option key={c.collection} value={c.collection}>
-                  {c.collection} ({c.pieces})
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {(collections.next || collections.error) && (
-          <button disabled={collections.loading} onClick={collections.more}>
-            {collections.error ? t('重试') : t('更多作品集')}
-          </button>
-        )}
-        {(composers.next || composers.error) && (
-          <button disabled={composers.loading} onClick={composers.more}>
-            {composers.error ? t('重试') : t('更多作曲家')}
-          </button>
-        )}
-        <div className="score-grid" aria-busy={scores.loading}>
-          {scores.items.map((p) => {
-            const name = label(p, 'displayName') || label(p, 'name');
-            const credit = label(p, 'credit') || composerName(p.composer);
-            return (
-              <button
-                className="score-card"
-                key={p.id}
-                onClick={() => openScore(p.id)}
-              >
-                <div className="jacket">
-                  <CoverArt edition={p.art ?? 'etude'} />
-                  <span className="catalogue-no">
-                    PN / {String(p.number).padStart(3, '0')}
-                  </span>
-                </div>
-                <div className="card-copy">
-                  <div>
-                    <h3>{p.title || label(p, 'name')}</h3>
-                    <ArrowUpRight size={17} />
-                  </div>
-                  <p>{p.scoreType ? credit : name + ' · ' + credit}</p>
-                  <footer>
-                    <Music2 size={13} />{' '}
-                    {p.scoreType ? label(p, 'subtitle') : t('钢琴独奏')}
-                    {(p.bars ?? 0) > 0 && (
-                      <span>
-                        {p.bars} {t('小节')}
-                      </span>
-                    )}
-                  </footer>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        {scores.loading && <p role="status">{t('正在读取曲谱目录…')}</p>}
-        {(scores.next !== null || scores.error) && (
-          <button disabled={scores.loading} onClick={scores.more}>
-            {scores.error ? t('重试') : t('更多曲谱')}
-          </button>
-        )}
+          {scores.loading && <p role="status" className="muted" style={{ padding: '12px 0' }}>{t('正在读取曲谱目录…')}</p>}
+          <div className="shelf-more">
+            {(collections.next || collections.error) && (
+              <Button size="sm" variant="secondary" disabled={collections.loading} onClick={collections.more}>
+                {collections.error ? t('重试') : t('更多作品集')}
+              </Button>
+            )}
+            {(scores.next !== null || scores.error) && (
+              <Button size="sm" variant="outline" disabled={scores.loading} onClick={scores.more}>
+                {scores.error ? t('重试') : t('更多曲谱')}
+              </Button>
+            )}
+          </div>
+        </section>
+        </Card>
+
         {(composer === '' || composer === '林俊杰') && (
-          <p>
+          <p className="library-note">
             <a
               href="/presets/mandopop/林俊杰 - 江南（前奏）.pdf"
               target="_blank"
@@ -196,7 +176,7 @@ export function Library({ openScore }: { openScore: (id: string) => void }) {
             </a>
           </p>
         )}
-      </section>
-    </>
+      </div>
+    </div>
   );
 }
